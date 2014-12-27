@@ -1,0 +1,14 @@
+extends ../../../components/layout/templates/index
+
+block head
+  include ../../../components/layout/templates/common_head
+
+append locals
+  - assetPackage = 'brooklyn'
+
+block body
+  #brooklyn
+    header
+      .heading.faux-underline-large Visualizations of apartment sales
+      .sub-heading The goal of this project is to display sales in a readable and interesting way
+    svg#brooklyn-svg( height='600px', width='1000px' )

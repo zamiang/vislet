@@ -1,0 +1,40 @@
+{
+    "name": "Vislet",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "start": "make s"
+    },
+    "dependencies": {
+        "express": "*",
+        "jade": "*",
+        "sharify": "*",
+        "backbone": "*",
+        "underscore": "*",
+        "underscore.string": "*",
+        "backbone-super-sync": "*",
+        "coffee-script": "*",
+        "node-env-file": "*"
+    },
+    "devDependencies": {
+        "jquery": "*",
+        "d3": "*",
+        "topojson": "*",
+        "point-in-polygon": "*",
+        "browserify": "*",
+        "stylus": "*",
+        "nib": "*",
+        "jadeify": "*",
+        "browserify-dev-middleware": "*",
+        "bucket-assets": "*",
+        "should": "*",
+        "mocha": "*",
+        "sinon": "*",
+        "benv": "*",
+        "zombie": "*",
+        "html5": "*",
+        "sqwish": "*",
+        "uglify-js": "*",
+        "caching-coffeeify": "*"
+    }
+}

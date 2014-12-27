@@ -1,0 +1,20 @@
+//- Override any locals with `append locals`
+block locals
+  - assetPackage = 'home'
+
+doctype html
+html
+  head
+    include head
+    block head
+    link( type='text/css', rel='stylesheet', href=(sd.ASSET_PATH + assetPackage + sd.CSS_EXT) )
+  body
+    include ../header/template
+    #main-layout-container.responsive-layout-container
+      block body
+      .main-layout-footer-push
+    #scripts
+      include scripts
+      script( src=(sd.ASSET_PATH + assetPackage + sd.JS_EXT) )
+      block scripts
+    include ../footer/template

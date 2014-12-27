@@ -1,0 +1,11 @@
+- title= "Title of app"
+- description= "description"
+title= title
+meta( property="og:title", content=title )
+meta( name="description", content=description )
+meta( property="og:description", content=description )
+meta( property="twitter:description", content=description )
+meta( property="og:type", content="website" )
+meta( property="og:url", content=(sd.APP_URL + (req ? req.path : "")) )
+meta( property="og:image", content=(sd.ASSET_PATH + "og_image.jpg") )
+meta( property="twitter:card", content="summary" )

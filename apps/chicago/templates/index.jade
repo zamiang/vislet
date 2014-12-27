@@ -1,0 +1,14 @@
+extends ../../../components/layout/templates/index
+
+block head
+  include ../../../components/layout/templates/common_head
+
+append locals
+  - assetPackage = 'chicago'
+
+block body
+  #chicago
+    header
+      .heading.faux-underline-large Visualizations of crime data
+      .sub-heading The goal of this project is to display crime data in a readable and interesting way
+    svg#chicago-svg( height='500px', width='400px' )

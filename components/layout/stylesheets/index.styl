@@ -1,0 +1,182 @@
+@import './stylus_lib'
+@import '../header'
+@import '../footer'
+
+global-reset()
+
+body
+  padding: 0px
+  margin: 0px  
+  letter-spacing: 0.01rem
+  font-weight: 400
+  font-style: normal
+  font-size: 20px
+  line-height: 1.6em
+  color: #fff
+  background: #eee
+  garamond() 
+  a, h1, h2, h1 a, h2 a, h1, h3, h4, h5, h6
+    color: #fff
+
+html.wf-active body
+  color: rgba(0,0,0,0.8)
+  a
+    color: #39c
+
+  h1, h2, h1 a, h2 a, h1
+    color: #222
+
+  h3, h4, h5, h6
+    color: #494949
+
+h1, h2, h3, h4, h5, h6
+  margin: 0 0 20px
+
+p, ul, ol, table, pre, dl
+  margin: 0 0 20px
+
+pre
+  margin-bottom: 30px
+
+p
+  line-height:  1.6em
+  word-wrap: break-word
+
+p.nomargin
+  margin: 0 0 20px
+
+ol
+  margin: 0 0 50px
+
+ol:last-child, p:last-child
+  margin-bottom: 0px
+
+h1, h2
+  franklin-gothic()
+  line-height: 148%
+  font-weight: normal
+  
+
+h1
+  font-size: 28px
+  text-align: center
+  letter-spacing: 2px
+
+h2
+  font-size: 16px
+  text-transform: uppercase
+  letter-spacing: 1px
+
+h3
+  margin-bottom: 3px
+
+a
+  font-weight: 400
+  text-decoration: none
+
+.wrapper
+  margin: 0 auto
+
+code, pre
+  font-family: Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal
+  color: #333
+  font-size: 12px
+
+pre
+  padding: 8px 15px
+  background:  #f8f8f8
+  border: 1px solid #e5e5e5
+  overflow-x: auto
+  line-height: 192%
+
+table
+  width: 100%
+  border-collapse: collapse
+
+th, td
+  text-align: left
+  padding: 5px 10px
+  border-bottom: 1px solid #e5e5e5
+
+dt
+  color: #444
+  font-weight: 700
+
+th
+  color: #444
+
+img
+  max-width: 100%
+
+.column
+  display: inline-block
+  vertical-align: top
+  text-align: left
+
+strong
+  font-weight: 700
+
+.wrapper
+  margin: 0px auto
+
+.content
+  width: 700px
+  margin: 0px auto
+
+small
+  font-size: 11px
+
+hr
+  border: 0
+  background: #e5e5e5
+  height: 1px
+  margin: 0 0 20px
+
+#main-layout-container
+  min-height: 100%
+  height: auto !important
+  height: 100%
+  margin-top: 100px
+  margin-bottom: 200px
+
+.responsive-layout-container
+  margin 0px 55px
+  @media screen and (min-width: 1440px)
+    margin 0px 150px
+  @media screen and (min-width: 1660px)
+    margin 0px 200px
+
+.faux-underline-large
+  &
+    display: inline-block
+    position: relative
+    text-decoration: none
+  &:before
+    content: ''
+    position: absolute
+    left: 0
+    display: inline-block
+    height: 1em
+    width: 100%
+    margin-top: 0.4em
+    border-bottom: 2px solid #333
+    color: rgb(80, 80, 80)
+
+  &:hover
+    text-decoration: none
+
+.heading
+  franklin-gothic()
+  font-size: 28px
+  text-align: center
+  letter-spacing: 2px
+  color: #333
+  margin-bottom: 28px
+  line-height: 148%
+  font-weight: normal
+
+.sub-heading
+  width: 670px
+  margin: 0 auto
+  margin-bottom: 21px
+  text-align center
