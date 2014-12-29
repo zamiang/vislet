@@ -11,6 +11,6 @@ client = require '../../lib/redis.coffee'
       else
         sales = new SalesCollection(data)
         counts = sales.getCommercialResidentialCounts()
-        client.set(key, JSON.stringify(counts))
+        client.set(key, counts)
         counts
     res.render "index"

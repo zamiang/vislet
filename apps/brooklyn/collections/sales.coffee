@@ -1,5 +1,6 @@
 Backbone = require 'backbone'
 Sale = require '../models/sale.coffee'
+neighborhoodNames = require('../data/nyc-neighborhood-names.json')
 
 module.exports = class Sales extends Backbone.Collection
 
@@ -17,33 +18,36 @@ module.exports = class Sales extends Backbone.Collection
       hash[year] = monthHash
     hash
 
+  createNeighborhoodDataHash: ->
+    data = {}
+    for key in Object.keys(neighborhoodNames)
+      data[key] =
+        commercialSaleTally: @createHash()
+        commercialSaleWithPriceTally: @createHash()
+        commercialPriceTally: @createHash()
+        residentialSaleTally: @createHash()
+        residentialSaleWithPriceTally: @createHash()
+        residentialPriceTally: @createHash()
+    data
+
   # Counts number of commercial and residential sales. Does not count
   # number of units - just number of sales.
   getCommercialResidentialCounts: ->
-    commercialSaleTally = @createHash()
-    commercialSaleWithPriceTally = @createHash()
-    commercialPriceTally = @createHash()
-    residentialSaleTally = @createHash()
-    residentialSaleWithPriceTally = @createHash()
-    residentialPriceTally = @createHash()
-
+    data = @createNeighborhoodDataHash()
     for sale in @models
-      if sale.get('residentialUnits')
-        residentialSaleTally[sale.get('year')][sale.get('month')]++
-        if sale.get('price') > 0
-          residentialPriceTally[sale.get('year')][sale.get('month')] += Number(sale.get('price'))
-          residentialSaleWithPriceTally[sale.get('year')][sale.get('month')]++
-      else if sale.get('commercialUnits')
-        commercialSaleTally[sale.get('year')][sale.get('month')]++
-        if sale.get('price') > 0
-          commercialPriceTally[sale.get('year')][sale.get('month')] += Number(sale.get('price'))
-          commercialSaleWithPriceTally[sale.get('year')][sale.get('month')]++
+      @tallyCounts sale, data, 'ALL'
+      @tallyCounts sale, data, sale.get('ntaCode')
+    data
 
-    {
-      commercialSaleTally: commercialSaleTally
-      commercialSaleWithPriceTally: commercialSaleWithPriceTally
-      commercialPriceTally: commercialPriceTally
-      residentialSaleTally: residentialSaleTally
-      residentialSaleWithPriceTally: residentialSaleWithPriceTally
-      residentialPriceTally: residentialPriceTally
-    }
+  tallyCounts: (sale, data, key) ->
+    return unless data[key]
+    if sale.get('residentialUnits')
+      data[key].residentialSaleTally[sale.get('year')][sale.get('month')]++
+      if sale.get('price') > 0
+        data[key].residentialPriceTally[sale.get('year')][sale.get('month')] += Number(sale.get('price'))
+        data[key].residentialSaleWithPriceTally[sale.get('year')][sale.get('month')]++
+    else if sale.get('commercialUnits')
+      data[key].commercialSaleTally[sale.get('year')][sale.get('month')]++
+      if sale.get('price') > 0
+        data[key].commercialPriceTally[sale.get('year')][sale.get('month')] += Number(sale.get('price'))
+        data[key].commercialSaleWithPriceTally[sale.get('year')][sale.get('month')]++

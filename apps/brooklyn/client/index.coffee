@@ -1,7 +1,7 @@
 Backbone = require "backbone"
 $ = require 'jquery'
 Backbone.$ = $
-nycTopoJson = require('./nyc-neighborhoods.json')
+nycTopoJson = require('../data/nyc-neighborhoods.json')
 svgMapView = require('../../../components/svg-map/index.coffee')
 
 module.exports.BrooklynView = class BrooklynView extends Backbone.View
@@ -10,11 +10,15 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @renderSvgMap nycTopoJson
 
   renderSvgMap: (topojson) ->
+    neighborhoods = []
     topojson.objects.nycneighborhoods.geometries = topojson.objects.nycneighborhoods.geometries.filter (neighborhood) ->
       neighborhood.id = neighborhood.id.split('-')[0]
-      unless neighborhood.id and neighborhood.properties.BoroCode == 3
+      neighborhoods.push neighborhood.id
+      unless neighborhood.id and neighborhood.properties.BoroCode == 3 and neighborhood.id != 'park'
         return false
       true
+
+    @neighborhoods = neighborhoods
 
     new svgMapView
       el: $('#brooklyn-svg')
