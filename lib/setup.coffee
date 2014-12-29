@@ -22,7 +22,7 @@ module.exports = (app) ->
   app.use sharify
 
   # Development only
-  if 'development' is sd.NODE_ENV
+  if 'development' is NODE_ENV
     # Compile assets on request in development
     app.use require('stylus').middleware
       src: path.resolve(__dirname, '../')
@@ -32,7 +32,7 @@ module.exports = (app) ->
       transforms: [require('jadeify'), require('caching-coffeeify')]
 
   # Test only
-  if 'test' is sd.NODE_ENV
+  if 'test' is NODE_ENV
     # Mount fake API server
     app.use '/__api', require('../test/helpers/integration.coffee').api
 

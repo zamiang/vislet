@@ -1,15 +1,13 @@
 Backbone = require "backbone"
 $ = require 'jquery'
 Backbone.$ = $
-# nycTopoJson = require('./nyc-neighborhoods.json')
-# svgMapView = require('../../../components/svg-map/index.coffee')
-{ nycApiFetch } = require('../../../components/datautil/nycapi-fetch.coffee')
+nycTopoJson = require('./nyc-neighborhoods.json')
+svgMapView = require('../../../components/svg-map/index.coffee')
 
 module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   initialize: ->
-    # @renderSvgMap nycTopoJson
-    nycApiFetch()
+    @renderSvgMap nycTopoJson
 
   renderSvgMap: (topojson) ->
     topojson.objects.nycneighborhoods.geometries = topojson.objects.nycneighborhoods.geometries.filter (neighborhood) ->

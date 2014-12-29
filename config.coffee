@@ -5,6 +5,7 @@ module.exports =
   ASSET_PATH: '/assets/'
   NYC_API_ID: null
   NYC_API_KEY: null
+  REDIS_URL: null
 
 # Override any values with env variables if they exist.
 # You can set JSON-y values for env variables as well such as "true" or
