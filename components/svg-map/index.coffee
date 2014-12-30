@@ -9,6 +9,7 @@ module.exports = class SvgMap extends Backbone.View
     @key = options.key
     @topojson = options.topojson
     @ignoredId = options.ignoredId
+    @customOnClick = options.onClick
     @width = @$el.width()
     @height = @$el.height()
     @render()
@@ -48,6 +49,8 @@ module.exports = class SvgMap extends Backbone.View
       return @reset d3.select('data-id', item.id), g
     else
       @activeId = item.id
+
+    @customOnClick item.id
 
     d3.select('data-id', item.id).classed("active", true)
 
