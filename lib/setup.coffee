@@ -5,7 +5,7 @@ path = require 'path'
 bucketAssets = require('bucket-assets')
 fs = require 'fs'
 
-{ NODE_ENV, CDN_URL, S3_ID, S3_SECRET } = config = require "../config"
+{ NODE_ENV, CDN_URL, S3_KEY, S3_SECRET } = config = require "../config"
 
 module.exports = (app) ->
 
@@ -24,7 +24,7 @@ module.exports = (app) ->
   app.use(bucketAssets(
     files: __dirname + '/**/*/public/**/*'
     root: 'public'
-    key: S3_ID
+    key: S3_KEY
     secret: S3_SECRET
     bucket: 'vislet-production'
     cdnUrl: CDN_URL

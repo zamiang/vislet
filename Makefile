@@ -42,7 +42,8 @@ verify:
 # Runs all the necessary build tasks to push to staging or production.
 # Run with `make deploy env=staging` or `make deploy env=production`.
 deploy: assets verify
-	$(BIN)/bucketassets --files **/public/** --secret $(S3_SECRET) --key $(S3_ID) --bucket vislet-production
+	$(BIN)/bucketassets --files **/public/** -s $(S3_SECRET) -k $(S3_KEY) -b vislet-production
 	git push git@heroku.com:vislet-production.git master
+	heroku config:add COMMIT_HASH=$(shell git rev-parse --short HEAD) --app=vislet-production
 
 .PHONY: test assets

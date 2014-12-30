@@ -6,7 +6,7 @@ module.exports =
   NYC_API_KEY: null
   REDIS_URL: null
   CDN_URL: '//d150vr5z67ra23.cloudfront.net/'
-  S3_ID: null
+  S3_KEY: null
   S3_SECRET: null
 
 for key, val of module.exports
