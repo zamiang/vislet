@@ -20,12 +20,14 @@ module.exports = class Sales extends Backbone.Collection
     data = {}
     for key in Object.keys(neighborhoodNames)
       data[key] =
-        commercialSaleTally: @createHash()
-        commercialSaleWithPriceTally: @createHash()
-        commercialPriceTally: @createHash()
         residentialSaleTally: @createHash()
         residentialSaleWithPriceTally: @createHash()
         residentialPriceTally: @createHash()
+        residentialPriceAverage: @createHash()
+        commercialSaleTally: @createHash()
+        commercialSaleWithPriceTally: @createHash()
+        commercialPriceTally: @createHash()
+        commercialPriceAverage: @createHash()
     data
 
   # Counts number of commercial and residential sales for each NTA
@@ -34,7 +36,28 @@ module.exports = class Sales extends Backbone.Collection
     for sale in @models
       @tallyCounts sale, data, 'ALL'
       @tallyCounts sale, data, sale.get('ntaCode')
+
+    @computePriceAverage(
+      {
+        totalKey: 'commercialPriceTally'
+        countKey: 'commercialSaleWithPriceTally'
+        dataKey: 'commercialPriceAverage'
+      }, data)
+    @computePriceAverage(
+      {
+        totalKey: 'residentialPriceTally'
+        countKey: 'residentialSaleWithPriceTally'
+        dataKey: 'residentialPriceAverage'
+      }, data)
+
     data
+
+  computePriceAverage: (options, data) ->
+    for key in Object.keys(neighborhoodNames)
+      for date in Object.keys(data[key][options.dataKey])
+        data[key][options.dataKey][date] = if data[key][options.countKey][date] > 0 then data[key][options.totalKey][date] / data[key][options.countKey][date] else 0
+        delete data[key][options.countKey][date]
+        delete data[key][options.totalKey][date]
 
   tallyCounts: (sale, data, key) ->
     return unless data[key]

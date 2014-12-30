@@ -25,7 +25,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       height: height
       data: sd.SALE_COUNTS
       startingDataset: startingDataset
-      keys: ['residentialSaleTally'] #, 'commercialSaleTally']
+      keys: ['residentialSaleTally']
       el: $('#brooklyn-residential-tally')
       label: '# Residential Sales'
 
@@ -34,9 +34,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       height: height
       data: sd.SALE_COUNTS
       startingDataset: startingDataset
-      keys: ['residentialPriceTally']
+      keys: ['residentialPriceAverage']
       el: $('#brooklyn-residential-price-tally')
-      label: '$ Residential Sales'
+      label: 'Average Residential Sale Price'
 
     @lineGraphs.push new lineGraph
       width: width
@@ -52,9 +52,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       height: height
       data: sd.SALE_COUNTS
       startingDataset: startingDataset
-      keys: ['commercialPriceTally']
+      keys: ['residentialPriceAverage']
       el: $('#brooklyn-commercial-price-tally')
-      label: '$ Commercial Sales'
+      label: 'Average Commercial Sale Price'
 
   renderSvgMap: (topojson) ->
     neighborhoods = []
