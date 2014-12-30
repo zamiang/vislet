@@ -2,7 +2,6 @@ module.exports =
   NODE_ENV: 'development'
   PORT: '4000'
   APP_URL: 'http://www.vislet.com'
-  ASSET_PATH: '/assets/'
   NYC_API_ID: null
   NYC_API_KEY: null
   REDIS_URL: null

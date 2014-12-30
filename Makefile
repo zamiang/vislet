@@ -43,9 +43,6 @@ verify:
 # Run with `make deploy env=staging` or `make deploy env=production`.
 deploy: assets verify
 	$(BIN)/bucketassets --files **/public/** --secret $(S3_SECRET) --key $(S3_ID) --bucket vislet-production
-	heroku config:add \
-		ASSET_PATH=//$(CDN_DOMAIN_production).cloudfront.net/assets/$(shell git rev-parse --short HEAD)/ \
-			--app=vislet-production
 	git push git@heroku.com:vislet-production.git master
 
 .PHONY: test assets

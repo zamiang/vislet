@@ -5,7 +5,7 @@ path = require 'path'
 bucketAssets = require('bucket-assets')
 fs = require 'fs'
 
-{ ASSET_PATH, NODE_ENV, CDN_URL, S3_ID, S3_SECRET } = config = require "../config"
+{ NODE_ENV, CDN_URL, S3_ID, S3_SECRET } = config = require "../config"
 
 module.exports = (app) ->
 
