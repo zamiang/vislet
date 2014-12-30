@@ -6,16 +6,14 @@ module.exports = class Sales extends Backbone.Collection
 
   model: Sale
 
-  months: [0...12]
+  months: [1..12]
   years: [2003..2014]
 
   createHash: ->
     hash = {}
     for year in @years
-      monthHash = {}
       for month in @months
-        monthHash[month] = 0
-      hash[year] = monthHash
+        hash["#{month}-01-#{year}"] = 0
     hash
 
   createNeighborhoodDataHash: ->
@@ -30,8 +28,7 @@ module.exports = class Sales extends Backbone.Collection
         residentialPriceTally: @createHash()
     data
 
-  # Counts number of commercial and residential sales. Does not count
-  # number of units - just number of sales.
+  # Counts number of commercial and residential sales for each NTA
   getCommercialResidentialCounts: ->
     data = @createNeighborhoodDataHash()
     for sale in @models
@@ -41,13 +38,14 @@ module.exports = class Sales extends Backbone.Collection
 
   tallyCounts: (sale, data, key) ->
     return unless data[key]
+    dateKey = "#{sale.get('month') + 1}-01-#{sale.get('year')}"
     if sale.get('residentialUnits')
-      data[key].residentialSaleTally[sale.get('year')][sale.get('month')]++
+      data[key].residentialSaleTally[dateKey]++
       if sale.get('price') > 0
-        data[key].residentialPriceTally[sale.get('year')][sale.get('month')] += Number(sale.get('price'))
-        data[key].residentialSaleWithPriceTally[sale.get('year')][sale.get('month')]++
+        data[key].residentialPriceTally[dateKey] += Number(sale.get('price'))
+        data[key].residentialSaleWithPriceTally[dateKey]++
     else if sale.get('commercialUnits')
-      data[key].commercialSaleTally[sale.get('year')][sale.get('month')]++
+      data[key].commercialSaleTally[dateKey]++
       if sale.get('price') > 0
-        data[key].commercialPriceTally[sale.get('year')][sale.get('month')] += Number(sale.get('price'))
-        data[key].commercialSaleWithPriceTally[sale.get('year')][sale.get('month')]++
+        data[key].commercialPriceTally[dateKey] += Number(sale.get('price'))
+        data[key].commercialSaleWithPriceTally[dateKey]++

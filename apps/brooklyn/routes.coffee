@@ -7,10 +7,10 @@ client = require '../../lib/redis.coffee'
   client.get key, (err, cachedJSON) ->
     res.locals.sd.SALE_COUNTS =
       if cachedJSON
-        cachedJSON
+        JSON.parse(cachedJSON)
       else
         sales = new SalesCollection(data)
         counts = sales.getCommercialResidentialCounts()
-        client.set(key, counts)
+        client.set(key, JSON.stringify(counts))
         counts
     res.render "index"
