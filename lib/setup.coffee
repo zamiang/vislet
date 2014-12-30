@@ -12,8 +12,8 @@ module.exports = (app) ->
   # Inject some configuration & constant data into sharify
   sd = sharify.data =
     NODE_ENV: NODE_ENV
-    JS_EXT: (if 'production' is NODE_ENV then '.min.js.gz' else '.js')
-    CSS_EXT: (if 'production' is NODE_ENV then '.min.css.gz' else '.css')
+    JS_EXT: '.js'
+    CSS_EXT: '.css'
 
   # Override Backbone to use server-side sync
   Backbone.sync = require 'backbone-super-sync'
