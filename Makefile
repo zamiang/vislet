@@ -42,11 +42,10 @@ verify:
 # Runs all the necessary build tasks to push to staging or production.
 # Run with `make deploy env=staging` or `make deploy env=production`.
 deploy: assets verify
-	$(BIN)/bucketassets -d public/assets -b vislet-$(env)
-	$(BIN)/bucketassets -d public/images -b vislet-$(env)
+	$(BIN)/bucketassets --files **/public/** --secret $(S3_SECRET) --key $(S3_ID) --bucket vislet-production
 	heroku config:add \
-		ASSET_PATH=//$(CDN_DOMAIN_$(env)).cloudfront.net/assets/$(shell git rev-parse --short HEAD)/ \
-			--app=vislet-$(env)
-	git push git@heroku.com:vislet-$(env).git master
+		ASSET_PATH=//$(CDN_DOMAIN_production).cloudfront.net/assets/$(shell git rev-parse --short HEAD)/ \
+			--app=vislet-production
+	git push git@heroku.com:vislet-production.git master
 
 .PHONY: test assets
