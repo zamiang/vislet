@@ -84,16 +84,18 @@ module.exports = class SvgMap extends Backbone.View
       .orient("left")
 
     svg.append("g")
-      .attr("class", "x axis")
+      .attr("class", "x-axis axis")
       .attr("transform", "translate(0,#{@height})")
       .call(xAxis)
 
     svg.append("g")
-      .attr("class", "y axis")
+      .attr("class", "y-axis axis")
       .call(yAxis)
       .append("text")
-      .attr("x", 302)
+      .attr("x", @width)
+      .attr("y", @margin.top)
       .style("text-anchor", "end")
+      .attr('class', 'label-text')
       .text(@label)
 
   drawLines: (lines, line, color, svg) ->

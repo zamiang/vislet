@@ -1,11 +1,12 @@
 .svg-line-graph
   font-size: 12px
+  fill: #333
   .axis path, .axis line
     fill: none
-    stroke: #000
+    stroke: #333
     shape-rendering: crispEdges
-  
-  .x.axis path
+
+  .x-axis path
     display: none
   
   .line 
@@ -14,3 +15,8 @@
     stroke-width: 1.5px
     &.mean-line
       stroke: lightgrey
+
+  .label-text
+    franklin-gothic()
+    text-transform: uppercase
+    fill: lightgrey
