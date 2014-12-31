@@ -103,9 +103,8 @@ module.exports = class SvgMap extends Backbone.View
       .attr("class", "sales")
 
     @svgLines.append("path")
-      .attr("class", "line")
+      .attr("class", (d) -> if d.name.indexOf('-mean') > -1 then 'line mean-line' else 'line')
       .attr("d", (d) -> line(d.values) )
-      .style("stroke", (d) -> color(d.name) )
 
   animateNewArea: (startingDataset) ->
     flattenedData = @getFlattenedData startingDataset
