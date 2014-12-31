@@ -10,6 +10,7 @@ sd = require('sharify').data
 module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   initialize: ->
+    @$label = @$('.graph-heading')
     @renderSvgMap nycTopoJson
     @renderLineGraph()
     @reverseNeighborhoodHash()
@@ -76,12 +77,16 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   reverseNeighborhoodHash: ->
     @neighborhoodHash = {}
+    @fullNeighborhoodHash = {}
     for key in Object.keys(neighborhoodNames)
       @neighborhoodHash[neighborhoodNames[key].split('-')[0]] = key
+      @fullNeighborhoodHash[neighborhoodNames[key].split('-')[0]] = neighborhoodNames[key]
 
   handleNeighborhoodClick: (id) ->
     for lineGraph in @lineGraphs
       lineGraph.animateNewArea @neighborhoodHash[id]
+
+    @$label.text @fullNeighborhoodHash[id]
 
 module.exports.init = ->
   new BrooklynView

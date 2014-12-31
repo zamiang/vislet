@@ -11,10 +11,13 @@ block body
     header
       .heading.faux-underline-large Visualizations of apartment sales
       .sub-heading The goal of this project is to display sales in a readable and interesting way
+    .graph-heading Neighborhood Name
     svg#brooklyn-svg( height='600px', width='600px' )
     .svg-graphs
+      .svg-label Residential
       svg#brooklyn-residential-tally.svg-line-graph
       svg#brooklyn-residential-price-tally.svg-line-graph
+      .svg-label Commercial
       svg#brooklyn-commercial-tally.svg-line-graph
       svg#brooklyn-commercial-price-tally.svg-line-graph
 
