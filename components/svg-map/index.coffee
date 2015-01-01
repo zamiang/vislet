@@ -52,7 +52,8 @@ module.exports = class SvgMap extends Backbone.View
 
     @customOnClick item.id
 
-    d3.select('data-id', item.id).classed("active", true)
+    @$(".tract").attr('class', 'tract')
+    @$(".tract[data-id='#{item.id}']").attr('class', 'tract selected')
 
     bounds = path.bounds(item)
     dx = bounds[1][0] - bounds[0][0]
@@ -63,12 +64,12 @@ module.exports = class SvgMap extends Backbone.View
     translate = [@width / 2 - scale * x, @height / 2 - scale * y]
 
     g.transition()
-      .duration(750)
-      .style("stroke-width", 1.5 / scale + "px")
-      .attr("transform", "translate(" + translate + ")scale(" + scale + ")")
+      .duration(550)
+      .style("stroke-width", "#{1.5 / scale}px")
+      .attr("transform", "translate(#{translate})scale(#{scale})")
 
   reset: (active, g) ->
-    active.classed("active", false)
+    @$('.tract.selected').attr('class', 'tract')
     active = d3.select(null)
 
     g.transition().duration(750).style("stroke-width", "1px").attr("transform", "")

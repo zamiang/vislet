@@ -8,26 +8,36 @@ module.exports = class Sales extends Backbone.Collection
 
   months: [1..12]
   years: [2003..2014]
+  buildingClasses: ["01  ONE FAMILY DWELLINGS","02  TWO FAMILY DWELLINGS","03  THREE FAMILY DWELLINGS","04  TAX CLASS 1 CONDOS","05  TAX CLASS 1 VACANT LAND","06  TAX CLASS 1 - OTHER","07  RENTALS - WALKUP APARTMENTS","09  COOPS - WALKUP APARTMENTS","10  COOPS - ELEVATOR APARTMENTS","12  CONDOS - WALKUP APARTMENTS","13  CONDOS - ELEVATOR APARTMENTS","14  RENTALS - 4-10 UNIT","15  CONDOS - 2-10 UNIT RESIDENTIAL","17  CONDO COOPS","22  STORE BUILDINGS","28  COMMERCIAL CONDOS","29  COMMERCIAL GARAGES","43  CONDO OFFICE BUILDINGS","44  CONDO PARKING","08  RENTALS - ELEVATOR APARTMENTS","18  TAX CLASS 3 - UNTILITY PROPERTIES","21  OFFICE BUILDINGS","30  WAREHOUSES","47  CONDO NON-BUSINESS STORAGE","16  CONDOS - 2-10 UNIT WITH COMMERCIAL UNIT","23  LOFT BUILDINGS","27  FACTORIES","31  COMMERCIAL VACANT LAND","32  HOSPITAL AND HEALTH FACILITIES","33  EDUCATIONAL FACILITIES","35  INDOOR PUBLIC AND CULTURAL FACILITIES","37  RELIGIOUS FACILITIES","38  ASYLUMS AND HOMES","41  TAX CLASS 4 - OTHER","46  CONDO STORE BUILDINGS","26  OTHER HOTELS","11  SPECIAL CONDO BILLING LOTS","48  CONDO TERRACES/GARDENS/CABANAS","42  CONDO CULTURAL/MEDICAL/EDUCATIONAL/ETC","25  LUXURY HOTELS","36  OUTDOOR RECREATIONAL FACILITIES","11A CONDO-RENTALS","34  THEATRES","49  CONDO WAREHOUSES/FACTORY/INDUS","01  ONE FAMILY HOMES","02  TWO FAMILY HOMES","03  THREE FAMILY HOMES","17  CONDOPS","40  SELECTED GOVERNMENTAL FACILITIES","18  TAX CLASS 3 - UTILITY PROPERTIES","39  TRANSPORTATION FACILITIES"]
 
-  createHash: ->
+  createMonthlyHash: ->
     hash = {}
     for year in @years
       for month in @months
         hash["#{month}-01-#{year}"] = 0
     hash
 
+  createYearlyBuildingClassHash: ->
+    hash = {}
+    for year in @years
+      hash[year] = {}
+      for buildingClass in @buildingClasses
+        hash[year][buildingClass] = 0
+    hash
+
   createNeighborhoodDataHash: ->
     data = {}
     for key in Object.keys(neighborhoodNames)
       data[key] =
-        residentialSaleTally: @createHash()
-        residentialSaleWithPriceTally: @createHash()
-        residentialPriceTally: @createHash()
-        residentialPriceAverage: @createHash()
-        commercialSaleTally: @createHash()
-        commercialSaleWithPriceTally: @createHash()
-        commercialPriceTally: @createHash()
-        commercialPriceAverage: @createHash()
+        residentialSaleTally: @createMonthlyHash()
+        residentialSaleWithPriceTally: @createMonthlyHash()
+        residentialPriceTally: @createMonthlyHash()
+        residentialPriceAverage: @createMonthlyHash()
+        commercialSaleTally: @createMonthlyHash()
+        commercialSaleWithPriceTally: @createMonthlyHash()
+        commercialPriceTally: @createMonthlyHash()
+        commercialPriceAverage: @createMonthlyHash()
+        buildingClass: @createYearlyBuildingClassHash()
     data
 
   # Counts number of commercial and residential sales for each NTA
@@ -49,7 +59,6 @@ module.exports = class Sales extends Backbone.Collection
         countKey: 'residentialSaleWithPriceTally'
         dataKey: 'residentialPriceAverage'
       }, data)
-
     data
 
   computePriceAverage: (options, data) ->
@@ -72,3 +81,7 @@ module.exports = class Sales extends Backbone.Collection
       if sale.get('price') > 0
         data[key].commercialPriceTally[dateKey] += Number(sale.get('price'))
         data[key].commercialSaleWithPriceTally[dateKey]++
+
+    # Tally building class
+    if sale.get('buildingClass')?.length > 0
+      data[key].buildingClass[sale.get('year')][sale.get('buildingClass')]++
