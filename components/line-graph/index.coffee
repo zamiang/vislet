@@ -2,7 +2,7 @@ d3 = require 'd3'
 Backbone = require "backbone"
 moment = require 'moment'
 
-module.exports = class SvgMap extends Backbone.View
+module.exports = class LineGraph extends Backbone.View
 
   margin:
     top: 10

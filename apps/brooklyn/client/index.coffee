@@ -4,6 +4,7 @@ Backbone.$ = $
 nycTopoJson = require('../data/nyc-neighborhoods.json')
 svgMapView = require('../../../components/svg-map/index.coffee')
 lineGraph = require('../../../components/line-graph/index.coffee')
+areaChart = require('../../../components/area-chart/index.coffee')
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
 sd = require('sharify').data
 
@@ -13,7 +14,20 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @$label = @$('.graph-heading')
     @renderSvgMap nycTopoJson
     @renderLineGraph()
+    @renderAreaChart()
     @reverseNeighborhoodHash()
+
+  renderAreaChart: ->
+    width = 500
+    height = 120
+    startingDataset = 'BK60'
+    @areaChart = new areaChart
+      width: width
+      height: height
+      data: sd.SALE_COUNTS
+      startingDataset: startingDataset
+      keys: ['buildingClass']
+      el: $('#brooklyn-building-class')
 
   renderLineGraph: ->
     width = 500
