@@ -26,7 +26,7 @@ module.exports = class AreaChart extends Backbone.View
       .y0((d) -> y(d.y0))
       .y1((d) -> y(d.y0 + d.y) )
 
-    svg = d3.select("body").append("svg")
+    svg = d3.select("##{@$el.attr('id')}")
       .attr("width", @width)
       .attr("height", @height)
       .append("g")
@@ -34,29 +34,39 @@ module.exports = class AreaChart extends Backbone.View
 
     flattenedData = @getFlattenedData @startingDataset
 
+    console.log flattenedData
+
     @color = d3.scale.category20()
     @color.domain Object.keys(flattenedData)
 
-    stack = d3.layout.stack()
-      .values((d) -> d.values )
+    years = for year in @years
+      moment("1-01-#{year}", 'M-DD-YYYY')
 
-    x.domain(d3.extent(flattenedData[Object.keys(flattenedData)[0]], (d) -> d.date ))
+    x.domain(d3.extent(years))
 
-    @drawLines buildingTypes, @area, color, svg
+    @drawKey svg, x, y
+    @drawLines flattenedData, @area, @color, svg, x, y
 
   getFlattenedData: (startingDataset) ->
-    flattenedData = {}
+    stack = d3.layout.stack().values((d) -> d.values )
+    parseDate = d3.time.format("%Y").parse
+    flattenedData = []
+
     for key in @keys
       data = @data[startingDataset][key]
-      flattenedData[key] =
-        for itemKey in Object.keys(data)
-          {
-            date: moment(itemKey, 'M'),
-            value: data[itemKey]
-          }
-    flattenedData
+      @years ||= Object.keys(data)
+      dataKeys = Object.keys(data[@years[0]])
+      for dataKey in dataKeys
+        values =
+          for year in @years
+            {
+                date: parseDate(year)
+                y: data[year][dataKey] / 100
+            }
+        flattenedData.push { name: dataKey, values: values }
+    stack(flattenedData)
 
-  drawLines: (buildingTypes, area, color, svg) ->
+  drawLines: (buildingTypes, area, color, svg, x, y) ->
     @svgBuildingType = svg.selectAll(".building-type")
       .data(buildingTypes)
       .enter().append("g")
@@ -76,15 +86,25 @@ module.exports = class AreaChart extends Backbone.View
 
   animateNewArea: (startingDataset) ->
     flattenedData = @getFlattenedData startingDataset
-    buildingTypes = @color.domain().map (name) ->
-      { name: name, values: flattenedData[name] }
-
     svg = d3.select("##{@$el.attr('id')}")
 
-    svg.selectAll(".building-type")
-      .data(buildingTypes).transition().duration(500)
-      .ease("linear")
-      .attr("d", (d) => @line(d.values))
+    buildingTypes = svg.selectAll(".building-type")
+    transition = buildingTypes.transition().duration(500)
+    postTransition = transition.transition()
+
+    # .data(flattenedData)
+
+    transition.selectAll("text")
+      .attr("transform", (d) -> "translate(" + x(d.value.date) + "," + y(d.value.y0 + d.value.y) + ")" )
+
+    # .ease("linear")
+    # .selectAll('path')
+    # .attr("d", (d) => @area(d.values))
+
+  shapeTween: (shape, direction) ->
+    (d, i, a) ->
+      (t) ->
+        shape(if direction then t else 1.0 - t)(d.values)
 
   drawKey: (svg, x, y) ->
     formatPercent = d3.format(".0%")
@@ -100,7 +120,7 @@ module.exports = class AreaChart extends Backbone.View
 
     svg.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0,#{height})")
+      .attr("transform", "translate(0,#{@height - @margin.top - @margin.bottom})")
       .call(xAxis)
 
     svg.append("g")

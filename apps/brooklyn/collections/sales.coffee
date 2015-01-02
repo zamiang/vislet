@@ -22,7 +22,7 @@ module.exports = class Sales extends Backbone.Collection
     for year in @years
       hash[year] = {}
       for buildingClass in @buildingClasses
-        hash[year][buildingClass] = 0
+        hash[year][buildingClass.substring(0,2)] = 0
     hash
 
   createNeighborhoodDataHash: ->
@@ -47,6 +47,8 @@ module.exports = class Sales extends Backbone.Collection
       @tallyCounts sale, data, 'ALL'
       @tallyCounts sale, data, sale.get('ntaCode')
 
+    @computeBuildingClassPercent data, 'buildingClass'
+
     @computePriceAverage(
       {
         totalKey: 'commercialPriceTally'
@@ -60,6 +62,19 @@ module.exports = class Sales extends Backbone.Collection
         dataKey: 'residentialPriceAverage'
       }, data)
     data
+
+  computeBuildingClassPercent: (data, dataKey) ->
+    for key in Object.keys(neighborhoodNames)
+      for date in Object.keys(data[key][dataKey])
+        buildingClasses = data[key][dataKey][date]
+        total = 0
+        for buildingClass in Object.keys(buildingClasses)
+          total += buildingClasses[buildingClass]
+
+        for buildingClass in Object.keys(buildingClasses)
+          if buildingClasses[buildingClass] > 0
+            value = (buildingClasses[buildingClass] / total * 100).toFixed(2)
+            buildingClasses[buildingClass] = if value > 1 then value else 0
 
   computePriceAverage: (options, data) ->
     for key in Object.keys(neighborhoodNames)
@@ -84,4 +99,4 @@ module.exports = class Sales extends Backbone.Collection
 
     # Tally building class
     if sale.get('buildingClass')?.length > 0
-      data[key].buildingClass[sale.get('year')][sale.get('buildingClass')]++
+      data[key].buildingClass[sale.get('year')][sale.get('buildingClass').substring(0,2)]++

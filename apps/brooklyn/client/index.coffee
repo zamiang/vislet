@@ -4,7 +4,7 @@ Backbone.$ = $
 nycTopoJson = require('../data/nyc-neighborhoods.json')
 svgMapView = require('../../../components/svg-map/index.coffee')
 lineGraph = require('../../../components/line-graph/index.coffee')
-areaChart = require('../../../components/area-chart/index.coffee')
+percentGraph = require('../../../components/line-graph/percent-graph.coffee')
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
 sd = require('sharify').data
 
@@ -19,9 +19,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   renderAreaChart: ->
     width = 500
-    height = 120
+    height = 460
     startingDataset = 'BK60'
-    @areaChart = new areaChart
+    @percentGraph = new percentGraph
       width: width
       height: height
       data: sd.SALE_COUNTS
@@ -100,6 +100,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     for lineGraph in @lineGraphs
       lineGraph.animateNewArea @neighborhoodHash[id]
 
+    @percentGraph.animateNewArea @neighborhoodHash[id]
     @$label.text @fullNeighborhoodHash[id]
 
 module.exports.init = ->

@@ -72,6 +72,7 @@ module.exports = class LineGraph extends Backbone.View
             date: moment(totalKey, 'M-DD-YYYY'),
             value: d3.mean(totals[totalKey])
           }
+
     flattenedData
 
   drawKey: (svg, x, y) ->
