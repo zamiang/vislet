@@ -84,20 +84,25 @@ module.exports = class LineGraph extends Backbone.View
       .scale(y)
       .orient("left")
 
+    if @yAxisFormat
+      yAxis.tickFormat(@yAxisFormat)
+
     svg.append("g")
       .attr("class", "x-axis axis")
       .attr("transform", "translate(0,#{@height})")
       .call(xAxis)
 
-    svg.append("g")
+    g = svg.append("g")
       .attr("class", "y-axis axis")
       .call(yAxis)
-      .append("text")
-      .attr("x", @width)
-      .attr("y", @margin.top)
-      .style("text-anchor", "end")
-      .attr('class', 'label-text')
-      .text(@label)
+    if @label
+      g
+        .append("text")
+        .attr("x", @width)
+        .attr("y", @margin.top)
+        .style("text-anchor", "end")
+        .attr('class', 'label-text')
+        .text(@label)
 
   drawLines: (lines, line, color, svg) ->
     @svgLines = svg.selectAll(".labels")
@@ -105,9 +110,12 @@ module.exports = class LineGraph extends Backbone.View
       .enter().append("g")
       .attr("class", "sales")
 
-    @svgLines.append("path")
+    paths = @svgLines.append("path")
       .attr("class", (d) -> if d.name.indexOf('-mean') > -1 then 'line mean-line' else 'line')
       .attr("d", (d) -> line(d.values) )
+
+    if @addColor
+      paths.style("stroke", (d) -> color(d.name) )
 
   animateNewArea: (startingDataset) ->
     flattenedData = @getFlattenedData startingDataset

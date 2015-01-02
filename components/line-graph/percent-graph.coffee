@@ -6,6 +6,8 @@ lineGraph = require './index.coffee'
 module.exports = class PercentGraph extends lineGraph
 
   parseYear: d3.time.format("%Y").parse
+  addColor: true
+  yAxisFormat: d3.format(".0%")
 
   render: ->
     x = d3.time.scale().range([0, @width])
@@ -50,24 +52,3 @@ module.exports = class PercentGraph extends lineGraph
         for year in @years
           flattenedData[dataKey].push { date: @parseYear(year), value: data[year][dataKey] / 100 }
     flattenedData
-
-  drawKey: (svg, x, y) ->
-    formatPercent = d3.format(".0%")
-
-    xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom")
-
-    yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .tickFormat(formatPercent)
-
-    svg.append("g")
-      .attr("class", "x-axis axis")
-      .attr("transform", "translate(0,#{@height})")
-      .call(xAxis)
-
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
