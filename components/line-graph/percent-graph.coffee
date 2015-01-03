@@ -7,6 +7,7 @@ module.exports = class PercentGraph extends lineGraph
 
   addColor: true
   yAxisFormat: d3.format(".0%")
+
   margin:
     top: 10
     left: 40
@@ -30,7 +31,7 @@ module.exports = class PercentGraph extends lineGraph
 
     flattenedData = @getFlattenedData(@startingDataset)
 
-    @color = d3.scale.category20()
+    @color = d3.scale.category10()
     @color.domain Object.keys(flattenedData)
     lines = @color.domain().map (name) ->
       { name: name, values: flattenedData[name] }
@@ -44,6 +45,8 @@ module.exports = class PercentGraph extends lineGraph
 
     @drawKey svg, x, y
     @drawLines lines, @line, @color, svg, x, y
+    @appendLineLabels lines, @color, x, y
 
   getFlattenedData: (startingDataset) ->
     flattenedData = @data[startingDataset][@keys[0]]
+    if @filterDataset then @filterDataset(flattenedData) else flattenedData

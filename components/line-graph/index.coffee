@@ -11,7 +11,7 @@ module.exports = class LineGraph extends Backbone.View
     bottom: 20
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @label } = options
+    { @data, @width, @height, @keys, @startingDataset, @label, @filterDataset } = options
     @render()
 
   getFlattenedData: (startingDataset) ->
@@ -74,6 +74,7 @@ module.exports = class LineGraph extends Backbone.View
 
     @yAxis = yAxis
     @y = y
+    @x = x
 
     @addLabel(g, @label) if @label
 
@@ -98,6 +99,17 @@ module.exports = class LineGraph extends Backbone.View
     if @addColor
       paths.style("stroke", (d) -> color(d.name) )
 
+  appendLineLabels: (lines, color, x, y) ->
+    @svgLines.append("text")
+      .datum((d) -> { name: d.name, value: d.values[d.values.length - 1] } )
+      .attr("transform", (d) -> "translate(#{x(d.value.date)},#{y(d.value.value)})" )
+      .attr("x", 3)
+      .attr('class', 'line-label')
+      .style("fill", (d) -> color(d.name) )
+      .text((d) -> d.name )
+
+    @appendedLineLabels = true
+
   animateNewArea: (startingDataset) ->
     flattenedData = @getFlattenedData startingDataset
     lines = @color.domain().map (name) ->
@@ -111,6 +123,14 @@ module.exports = class LineGraph extends Backbone.View
       .data(lines).transition().duration(@speed)
       .ease("linear")
       .attr("d", (d) => @line(d.values))
+
+    if @appendedLineLabels
+      svg.selectAll(".line-label")
+        .data(lines)
+        .datum((d) -> { name: d.name, value: d.values[d.values.length - 1] } )
+        .transition().duration(@speed)
+        .attr("transform", (d) =>
+          "translate(#{@x(d.value.date)}, #{@y(d.value.value)})")
 
   rescaleYAxis: (lines, svg) ->
     @y.domain([
