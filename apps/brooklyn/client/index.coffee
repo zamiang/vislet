@@ -6,7 +6,7 @@ svgMapView = require('../../../components/svg-map/index.coffee')
 lineGraph = require('../../../components/line-graph/index.coffee')
 percentGraph = require('../../../components/line-graph/percent-graph.coffee')
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
-sd = require('sharify').data
+salesData = require('../data/brooklyn-sales-display-data.json')
 
 module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
@@ -18,13 +18,13 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @reverseNeighborhoodHash()
 
   renderAreaChart: ->
-    width = 500
+    width = 430
     height = 460
     startingDataset = 'BK60'
     @percentGraph = new percentGraph
       width: width
       height: height
-      data: sd.SALE_COUNTS
+      data: salesData
       startingDataset: startingDataset
       keys: ['buildingClass']
       el: $('#brooklyn-building-class')
@@ -38,36 +38,36 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @lineGraphs.push new lineGraph
       width: width
       height: height
-      data: sd.SALE_COUNTS
+      data: salesData
       startingDataset: startingDataset
-      keys: ['residentialSaleTally']
+      keys: ['residentialSaleTally', 'residentialSaleTally-mean']
       el: $('#brooklyn-residential-tally')
       label: '# Sales'
 
     @lineGraphs.push new lineGraph
       width: width
       height: height
-      data: sd.SALE_COUNTS
+      data: salesData
       startingDataset: startingDataset
-      keys: ['residentialPriceAverage']
+      keys: ['residentialPriceAverage', 'residentialPriceAverage-mean']
       el: $('#brooklyn-residential-price-tally')
       label: 'Average Sale Price'
 
     @lineGraphs.push new lineGraph
       width: width
       height: height
-      data: sd.SALE_COUNTS
+      data: salesData
       startingDataset: startingDataset
-      keys: ['commercialSaleTally']
+      keys: ['commercialSaleTally', 'commercialSaleTally-mean']
       el: $('#brooklyn-commercial-tally')
       label: '# Sales'
 
     @lineGraphs.push new lineGraph
       width: width
       height: height
-      data: sd.SALE_COUNTS
+      data: salesData
       startingDataset: startingDataset
-      keys: ['residentialPriceAverage']
+      keys: ['residentialPriceAverage', 'residentialPriceAverage-mean']
       el: $('#brooklyn-commercial-price-tally')
       label: 'Average Sale Price'
 

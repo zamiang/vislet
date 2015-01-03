@@ -5,9 +5,13 @@ lineGraph = require './index.coffee'
 
 module.exports = class PercentGraph extends lineGraph
 
-  parseYear: d3.time.format("%Y").parse
   addColor: true
   yAxisFormat: d3.format(".0%")
+  margin:
+    top: 10
+    left: 40
+    right: 0
+    bottom: 20
 
   render: ->
     x = d3.time.scale().range([0, @width])
@@ -24,7 +28,7 @@ module.exports = class PercentGraph extends lineGraph
       .append("g")
       .attr("transform", "translate(#{@margin.left}, #{@margin.top})")
 
-    flattenedData = @getFlattenedData @startingDataset
+    flattenedData = @getFlattenedData(@startingDataset)
 
     @color = d3.scale.category20()
     @color.domain Object.keys(flattenedData)
@@ -42,13 +46,4 @@ module.exports = class PercentGraph extends lineGraph
     @drawLines lines, @line, @color, svg, x, y
 
   getFlattenedData: (startingDataset) ->
-    flattenedData = {}
-    for key in @keys
-      data = @data[startingDataset][key]
-      @years ||= Object.keys(data)
-      dataKeys = Object.keys(data[@years[0]])
-      for dataKey in dataKeys
-        flattenedData[dataKey] = []
-        for year in @years
-          flattenedData[dataKey].push { date: @parseYear(year), value: data[year][dataKey] / 100 }
-    flattenedData
+    flattenedData = @data[startingDataset][@keys[0]]

@@ -1,9 +1,9 @@
 d3 = require 'd3'
 Backbone = require "backbone"
-moment = require 'moment'
 
 module.exports = class LineGraph extends Backbone.View
 
+  speed: 500
   margin:
     top: 10
     left: 80
@@ -13,6 +13,12 @@ module.exports = class LineGraph extends Backbone.View
   initialize: (options) ->
     { @data, @width, @height, @keys, @startingDataset, @label } = options
     @render()
+
+  getFlattenedData: (startingDataset) ->
+    flattenedData = {}
+    for key in @keys
+      flattenedData[key] = @data[startingDataset][key]
+    flattenedData
 
   render: ->
     x = d3.time.scale().range([0, @width])
@@ -46,35 +52,6 @@ module.exports = class LineGraph extends Backbone.View
     @drawKey svg, x, y
     @drawLines lines, @line, @color, svg
 
-  getFlattenedData: (startingDataset) ->
-    flattenedData = {}
-    for key in @keys
-      data = @data[startingDataset][key]
-      flattenedData[key] =
-        for itemKey in Object.keys(data)
-          {
-            date: moment(itemKey, 'M-DD-YYYY'),
-            value: data[itemKey]
-          }
-
-      # Compute averages
-      totals = {}
-      for dataSetKey in Object.keys(@data)
-        unless dataSetKey == 'ALL'
-          data = @data[dataSetKey][key]
-          for itemKey in Object.keys(data)
-            totals[itemKey] ||= []
-            totals[itemKey].push data[itemKey]
-
-      flattenedData["#{key}-mean"] =
-        for totalKey in Object.keys(totals)
-          {
-            date: moment(totalKey, 'M-DD-YYYY'),
-            value: d3.mean(totals[totalKey])
-          }
-
-    flattenedData
-
   drawKey: (svg, x, y) ->
     xAxis = d3.svg.axis()
       .scale(x)
@@ -84,8 +61,7 @@ module.exports = class LineGraph extends Backbone.View
       .scale(y)
       .orient("left")
 
-    if @yAxisFormat
-      yAxis.tickFormat(@yAxisFormat)
+    yAxis.tickFormat(@yAxisFormat) if @yAxisFormat
 
     svg.append("g")
       .attr("class", "x-axis axis")
@@ -95,14 +71,19 @@ module.exports = class LineGraph extends Backbone.View
     g = svg.append("g")
       .attr("class", "y-axis axis")
       .call(yAxis)
-    if @label
-      g
-        .append("text")
-        .attr("x", @width)
-        .attr("y", @margin.top)
-        .style("text-anchor", "end")
-        .attr('class', 'label-text')
-        .text(@label)
+
+    @yAxis = yAxis
+    @y = y
+
+    @addLabel(g, @label) if @label
+
+  addLabel: (g, label) ->
+    g.append("text")
+      .attr("x", @width)
+      .attr("y", @margin.top)
+      .style("text-anchor", "end")
+      .attr('class', 'label-text')
+      .text(label)
 
   drawLines: (lines, line, color, svg) ->
     @svgLines = svg.selectAll(".labels")
@@ -124,7 +105,18 @@ module.exports = class LineGraph extends Backbone.View
 
     svg = d3.select("##{@$el.attr('id')}")
 
+    @rescaleYAxis(lines, svg)
+
     svg.selectAll(".sales .line")
-      .data(lines).transition().duration(500)
+      .data(lines).transition().duration(@speed)
       .ease("linear")
       .attr("d", (d) => @line(d.values))
+
+  rescaleYAxis: (lines, svg) ->
+    @y.domain([
+      d3.min(lines, (c) -> d3.min(c.values, (v) -> v.value ))
+      d3.max(lines, (c) -> d3.max(c.values, (v) -> v.value ))
+    ])
+    svg.select(".y-axis")
+      .transition().duration(@speed).ease("sin-in-out")
+      .call(@yAxis)
