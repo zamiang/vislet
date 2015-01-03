@@ -1,7 +1,12 @@
 d3 = require 'd3'
+_ = require 'underscore'
 Backbone = require "backbone"
+Tooltips = require './tooltips.coffee'
+Transition = require './transition.coffee'
 
 module.exports = class LineGraph extends Backbone.View
+  _.extend @prototype, Tooltips
+  _.extend @prototype, Transition
 
   speed: 500
   margin:
@@ -11,7 +16,7 @@ module.exports = class LineGraph extends Backbone.View
     bottom: 20
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @label, @filterDataset } = options
+    { @data, @width, @height, @keys, @startingDataset, @label, @filterDataset, @displayLineLabels } = options
     @render()
 
   getFlattenedData: (startingDataset) ->
@@ -21,13 +26,13 @@ module.exports = class LineGraph extends Backbone.View
     flattenedData
 
   render: ->
-    x = d3.time.scale().range([0, @width])
-    y = d3.scale.linear().range([@height, 0])
+    @x = d3.time.scale().range([0, @width])
+    @y = d3.scale.linear().range([@height, 0])
 
     @line = d3.svg.line()
-      .interpolate("basis")
-      .x((d) -> x(d.date))
-      .y((d) -> y(d.value))
+      .interpolate("cardinal")
+      .x((d) => @x(d.date))
+      .y((d) => @y(d.value))
 
     svg = d3.select("##{@$el.attr('id')}")
       .attr("width", @width + @margin.left + @margin.right)
@@ -39,42 +44,39 @@ module.exports = class LineGraph extends Backbone.View
 
     @color = d3.scale.category10()
     @color.domain Object.keys(flattenedData)
-    lines = @color.domain().map (name) ->
+    @lines = @color.domain().map (name) ->
       { name: name, values: flattenedData[name] }
 
-    x.domain(d3.extent(flattenedData[Object.keys(flattenedData)[0]], (d) -> d.date ))
+    @x.domain(d3.extent(flattenedData[Object.keys(flattenedData)[0]], (d) -> d.date ))
 
-    y.domain([
-      d3.min(lines, (c) -> d3.min(c.values, (v) -> v.value ))
-      d3.max(lines, (c) -> d3.max(c.values, (v) -> v.value ))
+    @y.domain([
+      d3.min(@lines, (c) -> d3.min(c.values, (v) -> v.value ))
+      d3.max(@lines, (c) -> d3.max(c.values, (v) -> v.value ))
     ])
 
-    @drawKey svg, x, y
-    @drawLines lines, @line, @color, svg
+    @drawKey svg
+    @drawLines @line, @color, svg
+    @drawLineLabels(@color) if @displayLineLabels
 
-  drawKey: (svg, x, y) ->
-    xAxis = d3.svg.axis()
-      .scale(x)
+  drawKey: (svg) ->
+    @xAxis = d3.svg.axis()
+      .scale(@x)
       .orient("bottom")
 
-    yAxis = d3.svg.axis()
-      .scale(y)
+    @yAxis = d3.svg.axis()
+      .scale(@y)
       .orient("left")
 
-    yAxis.tickFormat(@yAxisFormat) if @yAxisFormat
+    @yAxis.tickFormat(@yAxisFormat) if @yAxisFormat
 
     svg.append("g")
       .attr("class", "x-axis axis")
       .attr("transform", "translate(0,#{@height})")
-      .call(xAxis)
+      .call(@xAxis)
 
     g = svg.append("g")
       .attr("class", "y-axis axis")
-      .call(yAxis)
-
-    @yAxis = yAxis
-    @y = y
-    @x = x
+      .call(@yAxis)
 
     @addLabel(g, @label) if @label
 
@@ -86,9 +88,9 @@ module.exports = class LineGraph extends Backbone.View
       .attr('class', 'label-text')
       .text(label)
 
-  drawLines: (lines, line, color, svg) ->
+  drawLines: (line, color, svg) ->
     @svgLines = svg.selectAll(".labels")
-      .data(lines)
+      .data(@lines)
       .enter().append("g")
       .attr("class", "sales")
 
@@ -99,44 +101,13 @@ module.exports = class LineGraph extends Backbone.View
     if @addColor
       paths.style("stroke", (d) -> color(d.name) )
 
-  appendLineLabels: (lines, color, x, y) ->
+    @appendTooltips color, svg
+
+  drawLineLabels: (color) ->
     @svgLines.append("text")
       .datum((d) -> { name: d.name, value: d.values[d.values.length - 1] } )
-      .attr("transform", (d) -> "translate(#{x(d.value.date)},#{y(d.value.value)})" )
+      .attr("transform", (d) => "translate(#{@x(d.value.date)},#{@y(d.value.value)})" )
       .attr("x", 3)
       .attr('class', 'line-label')
       .style("fill", (d) -> color(d.name) )
       .text((d) -> d.name )
-
-    @appendedLineLabels = true
-
-  animateNewArea: (startingDataset) ->
-    flattenedData = @getFlattenedData startingDataset
-    lines = @color.domain().map (name) ->
-      { name: name, values: flattenedData[name] }
-
-    svg = d3.select("##{@$el.attr('id')}")
-
-    @rescaleYAxis(lines, svg)
-
-    svg.selectAll(".sales .line")
-      .data(lines).transition().duration(@speed)
-      .ease("linear")
-      .attr("d", (d) => @line(d.values))
-
-    if @appendedLineLabels
-      svg.selectAll(".line-label")
-        .data(lines)
-        .datum((d) -> { name: d.name, value: d.values[d.values.length - 1] } )
-        .transition().duration(@speed)
-        .attr("transform", (d) =>
-          "translate(#{@x(d.value.date)}, #{@y(d.value.value)})")
-
-  rescaleYAxis: (lines, svg) ->
-    @y.domain([
-      d3.min(lines, (c) -> d3.min(c.values, (v) -> v.value ))
-      d3.max(lines, (c) -> d3.max(c.values, (v) -> v.value ))
-    ])
-    svg.select(".y-axis")
-      .transition().duration(@speed).ease("sin-in-out")
-      .call(@yAxis)

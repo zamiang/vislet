@@ -35,6 +35,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       startingDataset: startingDataset
       keys: ['buildingClass']
       filterDataset: filterDataset
+      displayLineLabels: true
       el: $('#brooklyn-building-class')
 
   renderLineGraph: ->
