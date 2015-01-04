@@ -36,9 +36,9 @@ module.exports =
           .attr("transform", "translate(#{@x(d.date) + 8},#{@y(d.value) + 5})")
           .text(@formatOutput(d))
 
-    # append the rectangle to capture mouse
     throttledMouseMove = _.throttle(mousemove, 100)
 
+    # append the rectangle to capture mouse events
     svg.append("rect")
       .attr("width", @width)
       .attr("height", @height)
@@ -47,6 +47,7 @@ module.exports =
       .on("mouseover", => @mouseover() )
       .on("mouseout", => @mouseout() )
 
+    # Use jquery event handling because d3's doesn't work if throttled
     @$('rect')
       .on("mousemove", throttledMouseMove)
 

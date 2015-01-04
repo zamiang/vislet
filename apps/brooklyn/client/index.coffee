@@ -18,7 +18,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @renderAreaChart()
     @reverseNeighborhoodHash()
 
-  validBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "22", "44"]
+  validBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15"]
   renderAreaChart: ->
     width = 480
     height = 200
@@ -30,15 +30,16 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       data
 
     @percentGraph = new percentGraph
+      el: $('#brooklyn-building-class')
       width: width
       height: height
       data: salesData
       startingDataset: startingDataset
       keys: ['buildingClass']
       filterDataset: filterDataset
-      displayLineLabels: true
-      el: $('#brooklyn-building-class')
+      displayLineLabels: false
       label: 'Building Class'
+      displayKey: (id) -> buildingClasses[id]
 
   renderLineGraph: ->
     width = 500

@@ -3,10 +3,12 @@ _ = require 'underscore'
 Backbone = require "backbone"
 Tooltips = require './tooltips.coffee'
 Transition = require './transition.coffee'
+Key = require './key.coffee'
 
 module.exports = class LineGraph extends Backbone.View
   _.extend @prototype, Tooltips
   _.extend @prototype, Transition
+  _.extend @prototype, Key
 
   speed: 500
   margin:
@@ -16,7 +18,8 @@ module.exports = class LineGraph extends Backbone.View
     bottom: 20
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @label, @filterDataset, @displayLineLabels } = options
+    { @data, @width, @height, @keys, @startingDataset,
+      @label, @filterDataset, @displayLineLabels, @displayKey } = options
     @render()
 
   getFlattenedData: (startingDataset) ->
@@ -57,11 +60,12 @@ module.exports = class LineGraph extends Backbone.View
       d3.max(@lines, (c) -> d3.max(c.values, (v) -> v.value ))
     ])
 
-    @drawKey svg
+    @drawAxis svg
     @drawLines @line, @color, svg
     @drawLineLabels(@color) if @displayLineLabels
+    @drawKey() if @displayKey
 
-  drawKey: (svg) ->
+  drawAxis: (svg) ->
     @xAxis = d3.svg.axis()
       .scale(@x)
       .orient("bottom")
