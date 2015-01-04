@@ -12,9 +12,9 @@ module.exports =
       .attr("class", (line) -> "tooltip-label label-#{line.name}" )
 
     tooltips.append("circle")
-      .attr("class", (line) -> "y circle-#{line.name}" )
+      .attr("class", (d) -> "y circle-#{d.name}")
       .style("fill", "none")
-      .style("stroke", (line) -> color(line.name) )
+      .style("stroke", (d) -> if d.name.indexOf('-mean') > -1 then 'lightgrey' else color(d.name) )
       .attr("r", 4)
 
     mousemove = (event) =>

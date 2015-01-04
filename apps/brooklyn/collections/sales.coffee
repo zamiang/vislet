@@ -1,8 +1,9 @@
+d3 = require 'd3'
+moment = require 'moment'
 Backbone = require 'backbone'
 Sale = require '../models/sale.coffee'
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
-d3 = require 'd3'
-moment = require 'moment'
+buildingClasses = require('../data/building-class.json')
 
 module.exports = class Sales extends Backbone.Collection
 
@@ -10,7 +11,6 @@ module.exports = class Sales extends Backbone.Collection
 
   months: [1..12]
   years: [2003..2014]
-  buildingClasses: ["01  ONE FAMILY DWELLINGS","02  TWO FAMILY DWELLINGS","03  THREE FAMILY DWELLINGS","04  TAX CLASS 1 CONDOS","05  TAX CLASS 1 VACANT LAND","06  TAX CLASS 1 - OTHER","07  RENTALS - WALKUP APARTMENTS","09  COOPS - WALKUP APARTMENTS","10  COOPS - ELEVATOR APARTMENTS","12  CONDOS - WALKUP APARTMENTS","13  CONDOS - ELEVATOR APARTMENTS","14  RENTALS - 4-10 UNIT","15  CONDOS - 2-10 UNIT RESIDENTIAL","17  CONDO COOPS","22  STORE BUILDINGS","28  COMMERCIAL CONDOS","29  COMMERCIAL GARAGES","43  CONDO OFFICE BUILDINGS","44  CONDO PARKING","08  RENTALS - ELEVATOR APARTMENTS","18  TAX CLASS 3 - UNTILITY PROPERTIES","21  OFFICE BUILDINGS","30  WAREHOUSES","47  CONDO NON-BUSINESS STORAGE","16  CONDOS - 2-10 UNIT WITH COMMERCIAL UNIT","23  LOFT BUILDINGS","27  FACTORIES","31  COMMERCIAL VACANT LAND","32  HOSPITAL AND HEALTH FACILITIES","33  EDUCATIONAL FACILITIES","35  INDOOR PUBLIC AND CULTURAL FACILITIES","37  RELIGIOUS FACILITIES","38  ASYLUMS AND HOMES","41  TAX CLASS 4 - OTHER","46  CONDO STORE BUILDINGS","26  OTHER HOTELS","11  SPECIAL CONDO BILLING LOTS","48  CONDO TERRACES/GARDENS/CABANAS","42  CONDO CULTURAL/MEDICAL/EDUCATIONAL/ETC","25  LUXURY HOTELS","36  OUTDOOR RECREATIONAL FACILITIES","11A CONDO-RENTALS","34  THEATRES","49  CONDO WAREHOUSES/FACTORY/INDUS","01  ONE FAMILY HOMES","02  TWO FAMILY HOMES","03  THREE FAMILY HOMES","17  CONDOPS","40  SELECTED GOVERNMENTAL FACILITIES","18  TAX CLASS 3 - UTILITY PROPERTIES","39  TRANSPORTATION FACILITIES"]
 
   salesDataKeys: [
     'residentialSaleTally'
@@ -36,8 +36,8 @@ module.exports = class Sales extends Backbone.Collection
     hash = {}
     for year in @years
       hash[year] = {}
-      for buildingClass in @buildingClasses
-        hash[year][buildingClass.substring(0,2)] = 0
+      for buildingClass in Object.keys(buildingClasses)
+        hash[year][buildingClass] = 0
     hash
 
   createNeighborhoodDataHash: ->
@@ -94,7 +94,8 @@ module.exports = class Sales extends Backbone.Collection
   computePriceAverage: (options, data) ->
     for key in Object.keys(neighborhoodNames)
       for date in Object.keys(data[key][options.dataKey])
-        data[key][options.dataKey][date] = if data[key][options.countKey][date] > 0 then data[key][options.totalKey][date] / data[key][options.countKey][date] else 0
+        value = if data[key][options.countKey][date] > 0 then data[key][options.totalKey][date] / data[key][options.countKey][date] else 0
+        data[key][options.dataKey][date] = value
         delete data[key][options.countKey][date]
         delete data[key][options.totalKey][date]
 
@@ -120,11 +121,10 @@ module.exports = class Sales extends Backbone.Collection
     # Compute averages
     totals = {}
     for ntaID in Object.keys(originalData)
-      unless ntaID == 'ALL'
-        data = originalData[ntaID][key]
-        for itemKey in Object.keys(data)
-          totals[itemKey] ||= []
-          totals[itemKey].push data[itemKey]
+      data = originalData[ntaID][key]
+      for itemKey in Object.keys(data)
+        totals[itemKey] ||= []
+        totals[itemKey].push data[itemKey]
     totals
 
   formatSalesDataForDisplay: (originalData) ->
@@ -140,13 +140,14 @@ module.exports = class Sales extends Backbone.Collection
               value: Number(data[itemKey].toFixed(2))
             }
 
-        totals = @getSalesTotals(originalData, key)
-        flattenedData["#{key}-mean"] =
-          for totalKey in Object.keys(totals)
-            {
-              date: moment(totalKey, 'M-DD-YYYY').valueOf()
-              value: Number(d3.mean(totals[totalKey]).toFixed(2))
-            }
+        if ntaID == 'ALL'
+          totals = @getSalesTotals(originalData, key)
+          flattenedData["#{key}-mean"] =
+            for totalKey in Object.keys(totals)
+              {
+                date: moment(totalKey, 'M-DD-YYYY').valueOf()
+                value: Number(d3.mean(totals[totalKey]).toFixed(2))
+              }
 
       flattenedData['buildingClass'] = @formatBuildingClassData flattenedData, originalData[ntaID]['buildingClass']
       formattedData[ntaID] = flattenedData

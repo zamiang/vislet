@@ -6,10 +6,7 @@ Backbone = require "backbone"
 module.exports = class SvgMap extends Backbone.View
 
   initialize: (options) ->
-    @key = options.key
-    @topojson = options.topojson
-    @ignoredId = options.ignoredId
-    @customOnClick = options.onClick
+    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick } = options
     @width = @$el.width()
     @height = @$el.height()
     @render()
@@ -55,18 +52,19 @@ module.exports = class SvgMap extends Backbone.View
     @$(".tract").attr('class', 'tract')
     @$(".tract[data-id='#{item.id}']").attr('class', 'tract selected')
 
-    bounds = path.bounds(item)
-    dx = bounds[1][0] - bounds[0][0]
-    dy = bounds[1][1] - bounds[0][1]
-    x = (bounds[0][0] + bounds[1][0]) / 2
-    y = (bounds[0][1] + bounds[1][1]) / 2
-    scale = .9 / Math.max(dx / @width, dy / @height)
-    translate = [@width / 2 - scale * x, @height / 2 - scale * y]
+    if @zoomOnClick
+      bounds = path.bounds(item)
+      dx = bounds[1][0] - bounds[0][0]
+      dy = bounds[1][1] - bounds[0][1]
+      x = (bounds[0][0] + bounds[1][0]) / 2
+      y = (bounds[0][1] + bounds[1][1]) / 2
+      scale = .9 / Math.max(dx / @width, dy / @height)
+      translate = [@width / 2 - scale * x, @height / 2 - scale * y]
 
-    g.transition()
-      .duration(550)
-      .style("stroke-width", "#{1.5 / scale}px")
-      .attr("transform", "translate(#{translate})scale(#{scale})")
+      g.transition()
+        .duration(550)
+        .style("stroke-width", "#{1.5 / scale}px")
+        .attr("transform", "translate(#{translate})scale(#{scale})")
 
   reset: (active, g) ->
     @$('.tract.selected').attr('class', 'tract')
