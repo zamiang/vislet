@@ -1,26 +1,26 @@
 extends ../../../components/layout/templates/index
 
 block head
-  include ../../../components/layout/templates/common_head
+  include meta
 
 append locals
   - assetPackage = 'brooklyn'
-  - title = 'Brooklyn Building Sales 2002-2014'
 
 block body
   #brooklyn
     header
-      .heading.faux-underline-large Brooklyn Building Sales 2002-2014
+      .heading.faux-underline-large Brooklyn Building Sales 2003-2014
       .sub-heading The goal of this project is to display sales in a readable and interesting way
     .graph-heading Neighborhood Name
     svg#brooklyn-svg( height='600px', width='600px' )
     .svg-graphs
-      .residential-sales
-        .svg-label Residential
+      .tabs
+        .tab( data-class="commercial-sales" ) Commercial
+        .tab.active( data-class="residential-sales" ) Residential
+      .residential-sales.sales-group
         svg#brooklyn-residential-tally.svg-line-graph
         svg#brooklyn-residential-price-tally.svg-line-graph
-      .commercial-sales
-        .svg-label Commercial
+      .commercial-sales.sales-group
         svg#brooklyn-commercial-tally.svg-line-graph
         svg#brooklyn-commercial-price-tally.svg-line-graph
       svg#brooklyn-building-class.svg-line-graph
