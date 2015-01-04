@@ -8,9 +8,8 @@ module.exports =
       .append("g")
       .attr('class', 'tooltips')
 
-    tooltips.append("text")
+    text = tooltips.append("text")
       .attr("class", (line) -> "tooltip-label label-#{line.name}" )
-      .attr("dy", "-1em")
 
     tooltips.append("circle")
       .attr("class", (line) -> "y circle-#{line.name}" )
@@ -33,8 +32,8 @@ module.exports =
         @svgLines.select(".circle-#{line.name}")
           .attr("transform", "translate(#{@x(d.date)},#{@y(d.value)})")
 
-        @svgLines.select(".label-#{line.name}")
-          .attr("transform", "translate(#{@x(d.date) + 8},#{@y(d.value) + 15})")
+        text = @svgLines.select(".tooltip-label.label-#{line.name}")
+          .attr("transform", "translate(#{@x(d.date) + 8},#{@y(d.value) + 5})")
           .text(@formatOutput(d))
 
     # append the rectangle to capture mouse

@@ -27,7 +27,9 @@ module.exports = class Sales extends Backbone.Collection
     hash = {}
     for year in @years
       for month in @months
-        hash["#{month}-01-#{year}"] = 0
+        # We don't have data for the last month of 2014
+        unless year == 2014 && month == 12
+          hash["#{month}-01-#{year}"] = 0
     hash
 
   createYearlyBuildingClassHash: ->
