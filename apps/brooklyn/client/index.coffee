@@ -19,8 +19,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   validBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "22", "44"]
   renderAreaChart: ->
-    width = 430
-    height = 460
+    width = 500
+    height = 200
     startingDataset = 'BK60'
     filterDataset = (dataset) =>
       data = {}
@@ -37,6 +37,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       filterDataset: filterDataset
       displayLineLabels: true
       el: $('#brooklyn-building-class')
+      label: 'Building Class'
 
   renderLineGraph: ->
     width = 500
