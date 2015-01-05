@@ -11,32 +11,63 @@ buildingClasses = require('../data/building-class.json')
 
 module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
+  startingDataset: 'BK60'
+  lineGraphs: []
+  events:
+    'click .tab' : 'tabClick'
+
   initialize: ->
     @$label = @$('.graph-heading')
     @renderSvgMap nycTopoJson
     @renderLineGraph()
-    @renderAreaChart()
+    @renderBuildingClassGraphs()
     @reverseNeighborhoodHash()
 
-  validBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15"]
-  renderAreaChart: ->
+  tabClick: (event) ->
+    $target = $(event.target)
+    return if $target.hasClass('active')
+    @$('.tab').removeClass 'active'
+    $target.addClass 'active'
+    @$('.sales-group').hide()
+    @$(".#{$target.attr('data-class')}").show()
+
+  validResidentialBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "28"]
+  validCommercialBuildingClasses: ["22","43", "21", "30", "27", "31", "32", "18", "29"]
+  renderBuildingClassGraphs: ->
     width = 480
     height = 200
-    startingDataset = 'BK60'
-    filterDataset = (dataset) =>
+    filterResidentialDataset = (dataset) =>
       data = {}
-      for buildingClass in @validBuildingClasses
+      for buildingClass in @validResidentialBuildingClasses
         data[buildingClass] = dataset[buildingClass]
       data
 
-    @percentGraph = new percentGraph
-      el: $('#brooklyn-building-class')
+    filterCommercialDataset = (dataset) =>
+      data = {}
+      for buildingClass in @validCommercialBuildingClasses
+        data[buildingClass] = dataset[buildingClass]
+      data
+
+    @lineGraphs.push new percentGraph
+      el: $('#brooklyn-residential-building-class')
       width: width
       height: height
       data: salesData
-      startingDataset: startingDataset
+      startingDataset: @startingDataset
       keys: ['buildingClass']
-      filterDataset: filterDataset
+      filterDataset: filterResidentialDataset
+      displayLineLabels: false
+      label: 'Building Class'
+      displayKey: (id) -> buildingClasses[id]
+
+    @lineGraphs.push new percentGraph
+      el: $('#brooklyn-commercial-building-class')
+      width: width
+      height: height
+      data: salesData
+      startingDataset: @startingDataset
+      keys: ['buildingClass']
+      filterDataset: filterCommercialDataset
       displayLineLabels: false
       label: 'Building Class'
       displayKey: (id) -> buildingClasses[id]
@@ -44,13 +75,11 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
   renderLineGraph: ->
     width = 500
     height = 120
-    startingDataset = 'BK60'
-    @lineGraphs = []
     @lineGraphs.push new lineGraph
       width: width
       height: height
       data: salesData
-      startingDataset: startingDataset
+      startingDataset: @startingDataset
       keys: ['residentialSaleTally', 'residentialSaleTally-mean']
       el: $('#brooklyn-residential-tally')
       label: '# Sales'
@@ -59,28 +88,28 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       width: width
       height: height
       data: salesData
-      startingDataset: startingDataset
+      startingDataset: @startingDataset
       keys: ['residentialPriceAverage', 'residentialPriceAverage-mean']
       el: $('#brooklyn-residential-price-tally')
       label: 'Average Sale Price'
 
-    # @lineGraphs.push new lineGraph
-    #   width: width
-    #   height: height
-    #   data: salesData
-    #   startingDataset: startingDataset
-    #   keys: ['commercialSaleTally', 'commercialSaleTally-mean']
-    #   el: $('#brooklyn-commercial-tally')
-    #   label: '# Sales'
+    @lineGraphs.push new lineGraph
+      width: width
+      height: height
+      data: salesData
+      startingDataset: @startingDataset
+      keys: ['commercialSaleTally', 'commercialSaleTally-mean']
+      el: $('#brooklyn-commercial-tally')
+      label: '# Sales'
 
-    # @lineGraphs.push new lineGraph
-    #   width: width
-    #   height: height
-    #   data: salesData
-    #   startingDataset: startingDataset
-    #   keys: ['commercialPriceAverage', 'commercialPriceAverage-mean']
-    #   el: $('#brooklyn-commercial-price-tally')
-    #   label: 'Average Sale Price'
+    @lineGraphs.push new lineGraph
+      width: width
+      height: height
+      data: salesData
+      startingDataset: @startingDataset
+      keys: ['commercialPriceAverage', 'commercialPriceAverage-mean']
+      el: $('#brooklyn-commercial-price-tally')
+      label: 'Average Sale Price'
 
   renderSvgMap: (topojson) ->
     neighborhoods = []
@@ -110,9 +139,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   handleNeighborhoodClick: (id) ->
     for lineGraph in @lineGraphs
-      lineGraph.animateNewArea @neighborhoodHash[id]
+      lineGraph.animateNewArea(@neighborhoodHash[id]) if lineGraph.$el.is(':visible')
 
-    @percentGraph.animateNewArea @neighborhoodHash[id]
     @$label.text @fullNeighborhoodHash[id]
 
 module.exports.init = ->
