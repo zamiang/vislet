@@ -23,6 +23,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @renderBuildingClassGraphs()
     @reverseNeighborhoodHash()
 
+    d3.select("[data-id='Clinton Hill']").attr('class', 'tract selected')
+    @handleNeighborhoodClick 'Clinton Hill'
+
   tabClick: (event) ->
     $target = $(event.target)
     return if $target.hasClass('active')
