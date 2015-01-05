@@ -39,7 +39,7 @@ module.exports = class SvgMap extends Backbone.View
       .on("click", (item) => @onClick(item, path, g) )
       .append("title")
 
-    @labelSvg g, neighborhoods, path
+    @drawLabels(g, neighborhoods, path) if @shouldLabel
 
   onClick: (item, path, g) ->
     if item.id == @activeId
@@ -72,7 +72,7 @@ module.exports = class SvgMap extends Backbone.View
 
     g.transition().duration(750).style("stroke-width", "1px").attr("transform", "")
 
-  labelSvg: (svg, neighborhoods, path) ->
+  drawLabels: (svg, neighborhoods, path) ->
     svg.selectAll(".subunit-label")
       .data(neighborhoods.features.filter((d) -> return (d.id / 10000 | 0) % 100 != 99 ))
       .enter().append("text")

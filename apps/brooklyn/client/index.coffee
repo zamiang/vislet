@@ -128,6 +128,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       key: 'nycneighborhoods'
       ignoredId: 'park'
       customOnClick: (id) => @handleNeighborhoodClick(id)
+      drawLabels: false
       zoomOnClick: false
 
   reverseNeighborhoodHash: ->
