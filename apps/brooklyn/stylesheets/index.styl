@@ -8,9 +8,27 @@
     vertical-align: top
     display: inline-block
     width: 600px
+    margin-top: -34px
   #brooklyn-svg
     border: 1px solid #f2f2f2
     background: url('/images/brooklyn.png')
+  .graph-heading-container
+    margin-bottom: 14px
+    .circle-key, .graph-heading
+      display: inline-block
+      vertical-align: top
+    .circle-key
+      width: 40px
+      height: 40px
+      border-radius: 20px
+      background: steelblue
+    .graph-heading
+      franklin-gothic()
+      font-size: 32px
+      letter-spacing: 1px
+      text-transform: uppercase
+      margin-left: 12px
+      margin-top: 5px
 
 .markdown-text
   font-size: 15px
@@ -19,26 +37,23 @@
 .commercial-sales
   display: none
 
-.graph-heading
-  franklin-gothic()
-  letter-spacing: 1px
-  text-align: center
-  text-transform: uppercase
-
 .svg-building-class
   height: 250px
   width: 600px
   vertical-align: top
   display: inline-block
 
+.sales-group
+  margin-top: 10px
+
 .tabs
   position: relative
-  text-align: center
-  border-bottom: 1px solid #ccc
+  text-align: right
+  border-bottom: 1px solid #f2f2f2
   line-height: 150%
   .tab
     border: 1px solid #ddd
-    border-bottom: 1px solid #ccc
+    border-bottom: 1px solid #E4E4E4
     display: inline-block
     franklin-gothic()
     letter-spacing: 1px
@@ -51,10 +66,12 @@
     cursor: pointer
     margin-bottom: -1px
     &.active
-      border: 1px solid #ccc
+      border: 1px solid #f2f2f2
       border-bottom: 1px solid white
       background-color: white
       color: #333
       margin-bottom: -1px
     &:last-child
-      border-left: 0px solid      
+      margin-right: 10px
+      .active
+        border-left: 0px solid

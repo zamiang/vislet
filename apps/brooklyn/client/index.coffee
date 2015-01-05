@@ -59,7 +59,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       startingDataset: @startingDataset
       keys: ['buildingClass']
       filterDataset: filterResidentialDataset
-      displayLineLabels: false
       label: 'Building Class'
       displayKey: (id) -> buildingClasses[id]
 
@@ -71,7 +70,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       startingDataset: @startingDataset
       keys: ['buildingClass']
       filterDataset: filterCommercialDataset
-      displayLineLabels: false
       label: 'Building Class'
       displayKey: (id) -> buildingClasses[id]
 

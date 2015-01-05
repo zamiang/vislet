@@ -17,9 +17,12 @@ module.exports = class LineGraph extends Backbone.View
     right: 0
     bottom: 20
 
+  defaults:
+    interpolate: 'cardinal'
+
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset,
-      @label, @filterDataset, @displayLineLabels, @displayKey } = options
+    { @data, @width, @height, @keys, @startingDataset, @interpolate,
+      @label, @filterDataset, @displayLineLabels, @displayKey } = _.defaults(options, @defaults)
     @render()
 
   getFlattenedData: (startingDataset) ->
@@ -36,7 +39,7 @@ module.exports = class LineGraph extends Backbone.View
     @y = d3.scale.linear().range([@height, 0])
 
     @line = d3.svg.line()
-      .interpolate("cardinal")
+      .interpolate(@interpolate)
       .x((d) => @x(d.date))
       .y((d) => @y(d.value))
 
