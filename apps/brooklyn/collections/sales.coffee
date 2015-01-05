@@ -9,7 +9,7 @@ module.exports = class Sales extends Backbone.Collection
 
   model: Sale
 
-  months: [1..12]
+  quarters: [1..4]
   years: [2003..2014]
 
   salesDataKeys: [
@@ -23,35 +23,33 @@ module.exports = class Sales extends Backbone.Collection
     'commercialPriceAverage'
   ]
 
-  createMonthlyHash: ->
+  createQuarterlyHash: ->
     hash = {}
     for year in @years
-      for month in @months
-        # We don't have data for the last month of 2014
-        unless year == 2014 && month == 12
-          hash["#{month}-01-#{year}"] = 0
+      for quarter in @quarters
+        hash["#{quarter}-#{year}"] = 0
     hash
 
   createYearlyBuildingClassHash: ->
     hash = {}
     for year in @years
-      hash[year] = {}
-      for buildingClass in Object.keys(buildingClasses)
-        hash[year][buildingClass] = 0
+     hash[year] = {}
+     for buildingClass in Object.keys(buildingClasses)
+       hash[year][buildingClass] = 0
     hash
 
   createNeighborhoodDataHash: ->
     data = {}
     for key in Object.keys(neighborhoodNames)
       data[key] =
-        residentialSaleTally: @createMonthlyHash()
-        residentialSaleWithPriceTally: @createMonthlyHash()
-        residentialPriceTally: @createMonthlyHash()
-        residentialPriceAverage: @createMonthlyHash()
-        commercialSaleTally: @createMonthlyHash()
-        commercialSaleWithPriceTally: @createMonthlyHash()
-        commercialPriceTally: @createMonthlyHash()
-        commercialPriceAverage: @createMonthlyHash()
+        residentialSaleTally: @createQuarterlyHash()
+        residentialSaleWithPriceTally: @createQuarterlyHash()
+        residentialPriceTally: @createQuarterlyHash()
+        residentialPriceAverage: @createQuarterlyHash()
+        commercialSaleTally: @createQuarterlyHash()
+        commercialSaleWithPriceTally: @createQuarterlyHash()
+        commercialPriceTally: @createQuarterlyHash()
+        commercialPriceAverage: @createQuarterlyHash()
         buildingClass: @createYearlyBuildingClassHash()
     data
 
@@ -101,7 +99,7 @@ module.exports = class Sales extends Backbone.Collection
 
   tallyCounts: (sale, data, key) ->
     return unless data[key]
-    dateKey = "#{sale.get('month') + 1}-01-#{sale.get('year')}"
+    dateKey = "#{sale.get('quarter')}-#{sale.get('year')}"
     if sale.get('residentialUnits')
       data[key].residentialSaleTally[dateKey]++
       if sale.get('price') > 0
@@ -115,7 +113,7 @@ module.exports = class Sales extends Backbone.Collection
 
     # Tally building class
     if sale.get('buildingClass')?.length > 0
-      data[key].buildingClass[sale.get('year')][sale.get('buildingClass').substring(0,2)]++
+      data[key].buildingClass["#{sale.get('year')}"][sale.get('buildingClass').substring(0,2)]++
 
   getSalesTotals: (originalData, key) ->
     # Compute averages
@@ -136,7 +134,7 @@ module.exports = class Sales extends Backbone.Collection
         flattenedData[key] =
           for itemKey in Object.keys(data)
             {
-              date: moment(itemKey, 'M-DD-YYYY').valueOf()
+              date: moment(itemKey, 'Q-YYYY').valueOf()
               value: Number(data[itemKey].toFixed(2))
             }
 
@@ -145,7 +143,7 @@ module.exports = class Sales extends Backbone.Collection
           flattenedData["#{key}-mean"] =
             for totalKey in Object.keys(totals)
               {
-                date: moment(totalKey, 'M-DD-YYYY').valueOf()
+                date: moment(totalKey, 'Q-YYYY').valueOf()
                 value: Number(d3.mean(totals[totalKey]).toFixed(2))
               }
 
@@ -156,9 +154,11 @@ module.exports = class Sales extends Backbone.Collection
   parseYear: d3.time.format("%Y").parse
   formatBuildingClassData: (flattenedData, data) ->
     flattenedData = {}
-    dataKeys = Object.keys(data[@years[0]])
+    dateKeys = Object.keys(data)
+    dataKeys = Object.keys(data[dateKeys[0]])
     for dataKey in dataKeys
       flattenedData[dataKey] = []
-      for year in @years
-        flattenedData[dataKey].push { date: @parseYear(String(year)).valueOf(), value: Number(data[year][dataKey] / 100) }
+      for dateKey in dateKeys
+        date = moment(dateKey, 'YYYY').valueOf()
+        flattenedData[dataKey].push { date: date, value: Number(data[dateKey][dataKey] / 100) }
     flattenedData

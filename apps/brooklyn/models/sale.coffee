@@ -32,5 +32,6 @@ module.exports = class Sale extends Backbone.Model
     # Dates are 5 hours off (EST) and need to be reset to GMT
     date = moment(@get('date')).add(5, 'hours')
     @set
+      quarter: date.quarter()
       month: date.months()
       year: date.year()
