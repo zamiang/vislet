@@ -3,7 +3,9 @@
   width: 1102px
   margin: 0px auto
   header
-    text-align center
+    .sub-heading
+      text-align: left
+      width: 100%
   .svg-graphs
     vertical-align: top
     display: inline-block
@@ -48,7 +50,6 @@
 
 .tabs
   position: relative
-  text-align: right
   border-bottom: 1px solid #f2f2f2
   line-height: 150%
   .tab
@@ -71,7 +72,8 @@
       background-color: white
       color: #333
       margin-bottom: -1px
+    &:first-child
+      margin-left: 10px
     &:last-child
-      margin-right: 10px
       .active
         border-left: 0px solid
