@@ -21,7 +21,7 @@ module.exports = class LineGraph extends Backbone.View
     interpolate: 'cardinal'
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @interpolate,
+    { @data, @width, @height, @keys, @startingDataset, @interpolate, @handleHover
       @label, @filterDataset, @displayLineLabels, @displayKey } = _.defaults(options, @defaults)
     @render()
 

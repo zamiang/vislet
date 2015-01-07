@@ -1,6 +1,7 @@
 Backbone = require "backbone"
 $ = require 'jquery'
 Backbone.$ = $
+moment = require 'moment'
 nycTopoJson = require('../data/nyc-neighborhoods.json')
 svgMapView = require('../../../components/svg-map/index.coffee')
 lineGraph = require('../../../components/line-graph/index.coffee')
@@ -23,8 +24,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @renderBuildingClassGraphs()
     @reverseNeighborhoodHash()
 
-    d3.select("[data-id='Clinton Hill']").attr('class', 'tract selected')
-    @handleNeighborhoodClick 'Clinton Hill'
+    @svgMap.onClick({id: 'Clinton Hill'})
 
   tabClick: (event) ->
     $target = $(event.target)
@@ -33,6 +33,18 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     $target.addClass 'active'
     @$('.sales-group').hide()
     @$(".#{$target.attr('data-class')}").show()
+
+  handleHover: (date, dataset) =>
+    data = for NTA in Object.keys(salesData)
+      value = 0
+      for item in salesData[NTA][dataset]
+        if item.date == date
+          value = item.value
+      {
+        id: neighborhoodNames[NTA]
+        value: value
+      }
+    @svgMap.colorMap data
 
   validResidentialBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "28"]
   validCommercialBuildingClasses: ["22","43", "21", "30", "27", "31", "32", "18", "29"]
@@ -84,6 +96,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       keys: ['residentialSaleTally', 'residentialSaleTally-mean']
       el: $('#brooklyn-residential-tally')
       label: '# Sales'
+      handleHover: @handleHover
 
     @lineGraphs.push new lineGraph
       width: width
@@ -93,6 +106,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       keys: ['residentialPriceAverage', 'residentialPriceAverage-mean']
       el: $('#brooklyn-residential-price-tally')
       label: 'Average Sale Price'
+      handleHover: @handleHover
 
     @lineGraphs.push new lineGraph
       width: width
@@ -102,6 +116,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       keys: ['commercialSaleTally', 'commercialSaleTally-mean']
       el: $('#brooklyn-commercial-tally')
       label: '# Sales'
+      handleHover: @handleHover
 
     @lineGraphs.push new lineGraph
       width: width
@@ -111,6 +126,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       keys: ['commercialPriceAverage', 'commercialPriceAverage-mean']
       el: $('#brooklyn-commercial-price-tally')
       label: 'Average Sale Price'
+      handleHover: @handleHover
 
   renderSvgMap: (topojson) ->
     neighborhoods = []
@@ -123,7 +139,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
     @neighborhoods = neighborhoods
 
-    new svgMapView
+    @svgMap = new svgMapView
       el: $('#brooklyn-svg')
       topojson: topojson
       key: 'nycneighborhoods'
