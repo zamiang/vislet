@@ -11,16 +11,16 @@ block body
     header
       .heading.faux-underline-large Brooklyn Building Sales 2003-2014
       .sub-heading The goal of this project is to display sales in a readable and interesting way
-    .graph-heading-container
-      .circle-key
-      .graph-heading Neighborhood Name
     .map-svg-container
       svg#brooklyn-svg( height='600px', width='500px' )
       .brooklyn-svg-key
     .svg-graphs
-      .tabs
-        .tab( data-class="commercial-sales" ) Commercial
-        .tab.active( data-class="residential-sales" ) Residential
+      .graph-heading-container
+        .circle-key
+        .graph-heading Neighborhood Name
+      // .tabs
+      //   .tab( data-class="commercial-sales" ) Commercial
+      //   .tab.active( data-class="residential-sales" ) Residential
       .residential-sales.sales-group
         svg#brooklyn-residential-tally.svg-line-graph
         svg#brooklyn-residential-price-tally.svg-line-graph

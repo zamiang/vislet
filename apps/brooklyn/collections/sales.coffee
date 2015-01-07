@@ -17,10 +17,10 @@ module.exports = class Sales extends Backbone.Collection
     'residentialSaleWithPriceTally'
     'residentialPriceTally'
     'residentialPriceAverage'
-    'commercialSaleTally'
-    'commercialSaleWithPriceTally'
-    'commercialPriceTally'
-    'commercialPriceAverage'
+    # 'commercialSaleTally'
+    # 'commercialSaleWithPriceTally'
+    # 'commercialPriceTally'
+    # 'commercialPriceAverage'
   ]
 
   createQuarterlyHash: ->

@@ -10,7 +10,6 @@
     vertical-align: top
     display: inline-block
     width: 600px
-    margin-top: -34px
   .map-svg-container
     display: inline-block
     max-width: 500px
@@ -19,6 +18,7 @@
     background: url('/images/brooklyn.png')
   .graph-heading-container
     margin-bottom: 14px
+    margin-left: 14px
     .circle-key, .graph-heading
       display: inline-block
       vertical-align: top
@@ -28,6 +28,7 @@
       border-radius: 20px
       background: steelblue
     .graph-heading
+      width: 90%
       franklin-gothic()
       font-size: 32px
       letter-spacing: 1px
@@ -55,6 +56,7 @@
   position: relative
   border-bottom: 1px solid #f2f2f2
   line-height: 150%
+  height: 30px
   .tab
     border: 1px solid #ddd
     border-bottom: 1px solid #E4E4E4
@@ -64,11 +66,12 @@
     text-align: center
     text-transform: uppercase
     font-size: 12px
-    padding: 4px 10px 0px 10px
+    padding: 1px 10px 0px 10px
     background-color: #f3f3f3
     color: #ccc
     cursor: pointer
     margin-bottom: -1px
+    height: 28px
     &.active
       border: 1px solid #f2f2f2
       border-bottom: 1px solid white
@@ -76,7 +79,7 @@
       color: #333
       margin-bottom: -1px
     &:first-child
-      margin-left: 10px
+      margin-left: 14px
     &:last-child
       .active
         border-left: 0px solid

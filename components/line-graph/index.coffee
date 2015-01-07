@@ -13,7 +13,7 @@ module.exports = class LineGraph extends Backbone.View
   speed: 500
   margin:
     top: 10
-    left: 80
+    left: 50
     right: 0
     bottom: 20
 
@@ -76,6 +76,7 @@ module.exports = class LineGraph extends Backbone.View
     @yAxis = d3.svg.axis()
       .scale(@y)
       .orient("left")
+      .ticks(7)
 
     @yAxis.tickFormat(@yAxisFormat) if @yAxisFormat
 
