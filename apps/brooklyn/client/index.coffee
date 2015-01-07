@@ -34,7 +34,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @$('.sales-group').hide()
     @$(".#{$target.attr('data-class')}").show()
 
-  handleHover: (date, dataset) =>
+  dateFormat: "Q, YYYY"
+  handleHover: (date, dataset, label) =>
     data = for NTA in Object.keys(salesData)
       value = 0
       for item in salesData[NTA][dataset]
@@ -45,6 +46,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
         value: value
       }
     @svgMap.colorMap data
+    @svgMap.updateMapTitle "Q#{moment(date).format(@dateFormat)} #{label}"
 
   validResidentialBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "28"]
   validCommercialBuildingClasses: ["22","43", "21", "30", "27", "31", "32", "18", "29"]

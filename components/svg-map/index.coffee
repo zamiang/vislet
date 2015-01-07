@@ -8,6 +8,8 @@ Color = require './color.coffee'
 module.exports = class SvgMap extends Backbone.View
   _.extend @prototype, Color
 
+  title: ''
+
   margin:
     top: 0
     right: 0
@@ -15,7 +17,7 @@ module.exports = class SvgMap extends Backbone.View
     left: 0
 
   initialize: (options) ->
-    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @$colorKey } = options
+    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @$colorKey, @title } = options
     @width = @$el.width()
     @height = @$el.height()
     @render()
@@ -49,6 +51,18 @@ module.exports = class SvgMap extends Backbone.View
       .append("title")
 
     @drawLabels(g, neighborhoods, path) if @shouldLabel
+    @addMapTitle g, @label
+
+  addMapTitle: (g, label) ->
+    @label = g.append("text")
+      .attr("x", @width - 20)
+      .attr("y", 30)
+      .style("text-anchor", "end")
+      .attr('class', 'label-text')
+      .text(label)
+
+  updateMapTitle: (label) ->
+    @label.text(label)
 
   onClick: (item, path, g) ->
     if item.id == @activeId
@@ -89,4 +103,4 @@ module.exports = class SvgMap extends Backbone.View
       .attr("class", (d) -> "subunit-label #{d.id}" )
       .attr("transform", (d) -> "translate(#{path.centroid(d)})" )
       .attr("dy", ".35em")
-      .text((d) -> return d.id )
+      .text((d) -> d.id )

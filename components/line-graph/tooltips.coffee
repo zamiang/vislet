@@ -30,7 +30,7 @@ module.exports =
         d = if x0 - d0.date > d1.date - x0 then d1 else d0
 
         if line.name.indexOf('mean') < 0
-          @handleHover?(d.date, line.name)
+          @handleHover?(d.date, line.name, @label)
 
         @svgLines.select(".circle-#{line.name}")
           .attr("transform", "translate(#{@x(d.date)},#{@y(d.value)})")
