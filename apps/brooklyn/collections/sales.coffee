@@ -102,13 +102,13 @@ module.exports = class Sales extends Backbone.Collection
     dateKey = "#{sale.get('quarter')}-#{sale.get('year')}"
     if sale.get('residentialUnits')
       data[key].residentialSaleTally[dateKey]++
-      if sale.get('price') > 0
-        data[key].residentialPriceTally[dateKey] += Number(sale.get('price'))
+      if sale.get('pricePerSqFt') > 0
+        data[key].residentialPriceTally[dateKey] += Number(sale.get('pricePerSqFt'))
         data[key].residentialSaleWithPriceTally[dateKey]++
     else if sale.get('commercialUnits')
       data[key].commercialSaleTally[dateKey]++
-      if sale.get('price') > 0
-        data[key].commercialPriceTally[dateKey] += Number(sale.get('price'))
+      if sale.get('pricePerSqFt') > 0
+        data[key].commercialPriceTally[dateKey] += Number(sale.get('pricePerSqFt'))
         data[key].commercialSaleWithPriceTally[dateKey]++
 
     # Tally building class

@@ -46,6 +46,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       }
     @svgMap.colorMap data
 
+  handleMouseOut: =>
+    @svgMap.removeMapColor()
+
   validResidentialBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "28"]
   validCommercialBuildingClasses: ["22","43", "21", "30", "27", "31", "32", "18", "29"]
   renderBuildingClassGraphs: ->
@@ -105,7 +108,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       startingDataset: @startingDataset
       keys: ['residentialPriceAverage', 'residentialPriceAverage-mean']
       el: $('#brooklyn-residential-price-tally')
-      label: 'Average Sale Price'
+      label: 'Average Price Per SqFt'
       handleHover: @handleHover
 
     @lineGraphs.push new lineGraph
@@ -125,7 +128,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       startingDataset: @startingDataset
       keys: ['commercialPriceAverage', 'commercialPriceAverage-mean']
       el: $('#brooklyn-commercial-price-tally')
-      label: 'Average Sale Price'
+      label: 'Average Price Per SqFt'
       handleHover: @handleHover
 
   renderSvgMap: (topojson) ->
@@ -147,6 +150,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       customOnClick: (id) => @handleNeighborhoodClick(id)
       drawLabels: false
       zoomOnClick: false
+      $colorKey: $('.brooklyn-svg-key')
 
   reverseNeighborhoodHash: ->
     @neighborhoodHash = {}

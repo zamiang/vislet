@@ -1,0 +1,8 @@
+.graph-keys( style="margin-left: #{margin.left}px" )
+  - for key in keys
+    .graph-key
+      if key.color
+        .key-circle( style="background-color: #{key.color}" )
+      if key.colorClass
+        .key-circle( class=key.colorClass )
+      .key-text= key.text

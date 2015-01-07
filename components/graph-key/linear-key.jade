@@ -1,0 +1,8 @@
+.linear-graph-key( style="margin-left: #{margin.left}px" )
+  .key-bars
+    for cls in classes
+      .key-bar( class=cls, style="width: #{width}px" )
+
+  .key-bar-values
+    for value in values
+      .key-bar-value( style="width: #{width}px" )= value

@@ -1,12 +1,21 @@
 d3 = require 'd3'
+_ = require 'underscore'
 topojson = require 'topojson'
 Backbone = require "backbone"
+Color = require './color.coffee'
 { uniqueId } = require 'underscore'
 
 module.exports = class SvgMap extends Backbone.View
+  _.extend @prototype, Color
+
+  margin:
+    top: 0
+    right: 0
+    bottom: 0
+    left: 0
 
   initialize: (options) ->
-    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick } = options
+    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @$colorKey } = options
     @width = @$el.width()
     @height = @$el.height()
     @render()
@@ -51,6 +60,7 @@ module.exports = class SvgMap extends Backbone.View
 
     @$(".tract").attr('class', 'tract')
     @$(".tract[data-id='#{item.id}']").attr('class', 'tract selected')
+    @$colorKey?.find('.key-bar-values').hide()
 
     if @zoomOnClick
       bounds = path.bounds(item)
@@ -80,45 +90,3 @@ module.exports = class SvgMap extends Backbone.View
       .attr("transform", (d) -> "translate(#{path.centroid(d)})" )
       .attr("dy", ".35em")
       .text((d) -> return d.id )
-
-  # Split into 2 groups
-  # - greater than selected
-  # - smaller than selected
-  # @param {Array} Array of objects - id value
-  colorMap: (data) =>
-    return unless @activeId
-
-    compare = (a, b) ->
-      if (a.value < b.value)
-        -1
-      else if (a.value > b.value)
-        1
-      else 0
-
-    values =
-      for item in data
-        if item.id != 'ALL'
-          item.value
-
-    max = d3.max(values)
-    min = d3.min(values)
-    hash = {}
-    getColorClass = @getColorClass(min, max)
-    for item in data
-      hash[item.id.split('-')[0]] = getColorClass(item.value)
-
-    selectColor = (item) =>
-      return 'tract selected' if item.id == @activeId
-      "tract #{hash[item.id]}"
-
-    svg = d3.select "##{@$el.attr('id')}"
-    svg.selectAll(".tract")
-      .attr('class', selectColor)
-
-  removeMapColor: ->
-    classes = ".color#{num}" for num in [0..8]
-    @$('.tract').removeClass classes.join(' ')
-
-  # Input must be sorted in ascending order
-  getColorClass: (min, max) ->
-    d3.scale.quantize().domain([min, max]).range(d3.range(9).map((i) -> "color#{i}" ))

@@ -1,4 +1,4 @@
-template = require './templates/key.jade'
+template = require '../graph-key/key.jade'
 
 module.exports =
 

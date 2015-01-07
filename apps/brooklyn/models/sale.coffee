@@ -27,6 +27,14 @@ module.exports = class Sale extends Backbone.Model
 
   initialize: ->
     @setupDate()
+    @setupPricePerSqFt()
+
+  setupPricePerSqFt: ->
+    price = Number(@get('price').replace('$', '').replace(',', '').replace(',', ''))
+    sqft = Number(@get('grossSqFt').replace(',', '').replace(',', ''))
+    return unless price > 5 && sqft > 5
+    @set
+      pricePerSqFt: price / sqft
 
   setupDate: ->
     # Dates are 5 hours off (EST) and need to be reset to GMT
