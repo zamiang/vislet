@@ -107,7 +107,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       startingDataset: @startingDataset
       keys: ['residentialPriceAverage', 'residentialPriceAverage-mean']
       el: $('#brooklyn-residential-price-tally')
-      label: 'Average Price Per SqFt'
+      label: 'Avg Price Per SqFt'
       handleHover: @handleHover
 
     # @lineGraphs.push new lineGraph
