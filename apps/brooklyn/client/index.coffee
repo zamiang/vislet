@@ -4,8 +4,9 @@ Backbone.$ = $
 moment = require 'moment'
 nycTopoJson = require('../data/nyc-neighborhoods.json')
 svgMapView = require('../../../components/svg-map/index.coffee')
-lineGraph = require('../../../components/line-graph/index.coffee')
-percentGraph = require('../../../components/line-graph/percent-graph.coffee')
+LineGraph = require('../../../components/line-graph/index.coffee')
+PercentGraph = require('../../../components/line-graph/percent-graph.coffee')
+StackedGraph = require('../../../components/area-chart/index.coffee')
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
 salesData = require('../data/brooklyn-sales-display-data.json')
 buildingClasses = require('../data/building-class.json')
@@ -65,7 +66,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
         data[buildingClass] = dataset[buildingClass]
       data
 
-    @lineGraphs.push new percentGraph
+    @lineGraphs.push new StackedGraph
       el: $('#brooklyn-residential-building-class')
       width: width
       height: height
@@ -90,7 +91,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
   renderLineGraph: ->
     width = 500
     height = 120
-    @lineGraphs.push new lineGraph
+    @lineGraphs.push new LineGraph
       width: width
       height: height
       data: salesData
@@ -100,7 +101,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       label: '# Sales'
       handleHover: @handleHover
 
-    @lineGraphs.push new lineGraph
+    @lineGraphs.push new LineGraph
       width: width
       height: height
       data: salesData
@@ -110,7 +111,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       label: 'Avg Price Per SqFt'
       handleHover: @handleHover
 
-    # @lineGraphs.push new lineGraph
+    # @lineGraphs.push new LineGraph
     #   width: width
     #   height: height
     #   data: salesData
@@ -120,7 +121,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     #   label: '# Sales'
     #   handleHover: @handleHover
 
-    # @lineGraphs.push new lineGraph
+    # @lineGraphs.push new LineGraph
     #   width: width
     #   height: height
     #   data: salesData
