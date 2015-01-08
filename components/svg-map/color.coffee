@@ -3,18 +3,15 @@ template = require '../graph-key/linear-key.jade'
 
 module.exports =
 
-  # Split into 2 groups
-  # - greater than selected
-  # - smaller than selected
   # @param {Array} Array of objects { id: 123, value: 0.5 }
-  colorMap: (data) ->
+  colorMap: (data, min, max) ->
     values =
       for item in data
         if item.id != 'ALL'
           item.value
 
     hash = {}
-    quantize = @getColorClass d3.min(values), d3.max(values)
+    quantize = @getColorClass min, max
 
     for item in data
       hash[item.id.split('-')[0]] = quantize(item.value)

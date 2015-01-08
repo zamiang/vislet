@@ -94,7 +94,7 @@ module.exports = class LineGraph extends Backbone.View
       .attr("class", "y-axis axis")
       .call(@yAxis)
 
-    @addLabel(g, @label) if @label
+    @addLabel(svg, @label) if @label
 
   addLabel: (g, label) ->
     g.append("text")

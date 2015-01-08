@@ -122,3 +122,13 @@ module.exports = class AreaChart extends Backbone.View
     svg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
+
+    @addLabel(svg, @label) if @label
+
+  addLabel: (g, label) ->
+    g.append("text")
+      .attr("x", @width)
+      .attr("y", @margin.top)
+      .style("text-anchor", "end")
+      .attr('class', 'label-text')
+      .text(label)
