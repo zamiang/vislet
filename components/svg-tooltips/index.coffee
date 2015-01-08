@@ -1,5 +1,5 @@
-d3 = require 'd3'
 _ = require 'underscore'
+d3 = require 'd3'
 
 module.exports =
   appendTooltips: (color, svg, data) ->
@@ -33,27 +33,25 @@ module.exports =
         i = bisectDate(line.values, new Date(x0))
         d0 = line.values[i - 1]
         d1 = line.values[i]
-        d = if x0 - d0.date > d1.date - x0 then d1 else d0
+        d = if x0 - d0?.date > d1?.date - x0 then d1 else d0
 
         value = @getLineValue d
         displayValue = @getLineDisplayValue d
 
-        if line.name.indexOf('mean') < 0
-          @handleHover?(d.date, line.name, @label)
-
         tooltipSvg = svg.select(".tooltip-#{line.name}")
 
         if text = @formatOutput(displayValue)
+          if line.name.indexOf('mean') < 0
+            @handleHover?(d.date, line.name, @label)
           tooltipSvg
             .attr("transform", "translate(#{@x(d.date)},#{@y(value)})")
             .style('display', 'block')
           tooltipSvg.select('.tooltip-label').text(text)
-
         else
           tooltipSvg
             .style('display', 'none')
 
-    throttledMouseMove = _.throttle(mousemove, 100)
+    throttledMouseMove = _.throttle(mousemove, 150)
 
     # append the rectangle to capture mouse events
     svg.append("rect")
@@ -65,11 +63,10 @@ module.exports =
       .on("mouseout", => @mouseout() )
 
     # Use jquery event handling because d3's doesn't work if throttled
-    @$('rect')
-      .on("mousemove", throttledMouseMove)
+    @$('rect').on("mousemove", throttledMouseMove)
 
-  getLineValue: (line) -> line.value
-  getLineDisplayValue: (line) -> line.value
+  getLineValue: (line) -> line?.value
+  getLineDisplayValue: (line) -> line?.value
 
   formatOutput: (value) ->
     if value > 100

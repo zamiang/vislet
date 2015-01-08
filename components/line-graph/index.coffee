@@ -58,6 +58,8 @@ module.exports = class LineGraph extends Backbone.View
     @lines = @color.domain().map (name) ->
       { name: name, values: flattenedData[name] }
 
+    @lines.push { name: 'compare-dataset', values: [] }
+
     @x.domain(d3.extent(flattenedData[Object.keys(flattenedData)[0]], (d) -> d.date ))
 
     @y.domain([
@@ -109,11 +111,19 @@ module.exports = class LineGraph extends Backbone.View
       .attr("class", "sales")
 
     paths = @svgLines.append("path")
-      .attr("class", (d) -> if d.name.indexOf('-mean') > -1 then 'line mean-line' else 'line')
+      .attr("class", @getLineClass)
       .attr("d", (d) -> line(d.values) )
 
     if @addColor
       paths.style("stroke", (d) -> color(d.name) )
+
+  getLineClass: (d) ->
+    if d.name.indexOf('-mean') > -1
+      'line mean-line'
+    else if d.name.indexOf('compare-') > -1
+      'line compare-line'
+    else
+      'line'
 
   drawLineLabels: (color) ->
     @svgLines.append("text")

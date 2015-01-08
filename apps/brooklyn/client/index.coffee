@@ -49,8 +49,18 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @svgMap.colorMap data
     @svgMap.updateMapTitle "Q#{moment(date).format(@dateFormat)} #{label}"
 
+  handleGraphHover: (currentId, hoverId) =>
+    hoverNTA = @neighborhoodHash[hoverId]
+    currentNTA = @neighborhoodHash[currentId]
+    for lineGraph in @lineGraphs
+      lineGraph.animateNewArea(currentNTA, hoverNTA)
+
+  handleGraphExit: (currentId) =>
+    currentNTA = @neighborhoodHash[currentId]
+    for lineGraph in @lineGraphs
+      lineGraph.animateNewArea(currentNTA)
+
   validResidentialBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "28"]
-  validCommercialBuildingClasses: ["22","43", "21", "30", "27", "31", "32", "18", "29"]
   renderBuildingClassGraphs: ->
     width = 480
     height = 200
@@ -60,13 +70,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
         data[buildingClass] = dataset[buildingClass]
       data
 
-    filterCommercialDataset = (dataset) =>
-      data = {}
-      for buildingClass in @validCommercialBuildingClasses
-        data[buildingClass] = dataset[buildingClass]
-      data
-
-    @lineGraphs.push new StackedGraph
+    @stackedGraph = new StackedGraph
       el: $('#brooklyn-residential-building-class')
       width: width
       height: height
@@ -120,6 +124,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       drawLabels: false
       zoomOnClick: false
       $colorKey: $('.brooklyn-svg-key')
+      customMouseEnter: @handleGraphHover
+      customMouseLeave: @handleGraphExit
 
   reverseNeighborhoodHash: ->
     @neighborhoodHash = {}
@@ -130,7 +136,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   handleNeighborhoodClick: (id) ->
     for lineGraph in @lineGraphs
-      lineGraph.animateNewArea(@neighborhoodHash[id]) #if lineGraph.$el.is(':visible')
+      lineGraph.animateNewArea(@neighborhoodHash[id])
+    @stackedGraph.animateNewArea(@neighborhoodHash[id])
 
     @$label.text @fullNeighborhoodHash[id].split('-').join(', ')
 

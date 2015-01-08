@@ -3,12 +3,12 @@ _ = require 'underscore'
 topojson = require 'topojson'
 Backbone = require "backbone"
 Color = require './color.coffee'
+Mouse = require './mouse.coffee'
 { uniqueId } = require 'underscore'
 
 module.exports = class SvgMap extends Backbone.View
   _.extend @prototype, Color
-
-  title: ''
+  _.extend @prototype, Mouse
 
   margin:
     top: 0
@@ -16,8 +16,15 @@ module.exports = class SvgMap extends Backbone.View
     bottom: 0
     left: 0
 
+  defaults:
+    zoomOnClick: true
+    ignoredId: null
+    title: ''
+    speed: 500
+
   initialize: (options) ->
-    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @$colorKey, @title } = options
+    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave
+      @customMouseEnter, @$colorKey, @title } = _.defaults(options, @defaults)
     @width = @$el.width()
     @height = @$el.height()
     @render()
@@ -48,7 +55,10 @@ module.exports = class SvgMap extends Backbone.View
       .attr("data-id", (d) -> d.id )
       .attr("d", path)
       .on("click", (item) => @onClick(item, path, g) )
+      .on("mouseover", (item) => @mouseover(item) )
       .append("title")
+
+    svg.on 'mouseleave', => @mouseleave()
 
     @drawLabels(g, neighborhoods, path) if @shouldLabel
     @addMapTitle g, @label
@@ -63,38 +73,6 @@ module.exports = class SvgMap extends Backbone.View
 
   updateMapTitle: (label) ->
     @label.text(label)
-
-  onClick: (item, path, g) ->
-    return if item.id == @activeId
-    #return @reset d3.select('data-id', item.id), g
-
-    @activeId = item.id
-    @customOnClick item.id
-
-    @$(".tract").attr('class', 'tract')
-    @$(".tract[data-id='#{item.id}']").attr('class', 'tract selected')
-    @$colorKey?.find('.key-bar-values').hide()
-    @updateMapTitle(@title)
-
-    if @zoomOnClick
-      bounds = path.bounds(item)
-      dx = bounds[1][0] - bounds[0][0]
-      dy = bounds[1][1] - bounds[0][1]
-      x = (bounds[0][0] + bounds[1][0]) / 2
-      y = (bounds[0][1] + bounds[1][1]) / 2
-      scale = .9 / Math.max(dx / @width, dy / @height)
-      translate = [@width / 2 - scale * x, @height / 2 - scale * y]
-
-      g.transition()
-        .duration(550)
-        .style("stroke-width", "#{1.5 / scale}px")
-        .attr("transform", "translate(#{translate})scale(#{scale})")
-
-  reset: (active, g) ->
-    @$('.tract.selected').attr('class', 'tract')
-    active = d3.select(null)
-
-    g.transition().duration(750).style("stroke-width", "1px").attr("transform", "")
 
   drawLabels: (svg, neighborhoods, path) ->
     svg.selectAll(".subunit-label")

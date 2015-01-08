@@ -16,13 +16,13 @@ module.exports = class AreaChart extends Backbone.View
     right: 0
     bottom: 20
 
-  speed: 500
   defaults:
     displayKey: false
     interpolate: 'cardinal'
+    speed: 500
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @label,
+    { @data, @width, @height, @keys, @startingDataset, @label, @speed
       @displayKey, @filterDataset, @interpolate } = _.defaults(options, @defaults)
     @render()
 
