@@ -1,28 +1,34 @@
-_ = require('underscore')
+d3 = require 'd3'
+_ = require 'underscore'
 
 module.exports =
+  appendTooltips: (color, svg, data) ->
+    @appendMouseEventsCapture color, svg
 
-  appendTooltips: (color, svg) ->
     # append the circle at the intersection
-    tooltips = @svgLines
-      .append("g")
-      .attr('class', 'tooltips')
+    tooltips = svg.selectAll(".tooltips")
+      .data(data)
+      .enter().append("g")
+      .attr("class", (d) -> "tooltips tooltip-#{d.name}" )
 
-    text = tooltips.append("text")
-      .attr("class", (line) -> "tooltip-label label-#{line.name}" )
+    tooltips.append("text")
+      .attr("class", "tooltip-label" )
+      .attr("transform", "translate(8, 5)")
 
     tooltips.append("circle")
-      .attr("class", (d) -> "y circle-#{d.name}")
-      .style("fill", "none")
+      .attr("class", "tooltip-circle")
       .style("stroke", (d) -> if d.name.indexOf('-mean') > -1 then 'lightgrey' else color(d.name) )
       .attr("r", 4)
 
+  appendMouseEventsCapture: (color, svg) ->
     mousemove = (event) =>
       return unless @tooltipsVisible
       bisectDate = d3.bisector((d) -> d.date).right
       rect = svg.select('rect')[0][0]
       x0 = @x.invert(event.offsetX - @margin.left)
 
+      # TODO
+      # Refactor this
       for line in @lines
         i = bisectDate(line.values, new Date(x0))
         d0 = line.values[i - 1]
@@ -35,12 +41,17 @@ module.exports =
         if line.name.indexOf('mean') < 0
           @handleHover?(d.date, line.name, @label)
 
-        @svgLines.select(".circle-#{line.name}")
-          .attr("transform", "translate(#{@x(d.date)},#{@y(value)})")
+        tooltipSvg = svg.select(".tooltip-#{line.name}")
 
-        text = @svgLines.select(".tooltip-label.label-#{line.name}")
-          .attr("transform", "translate(#{@x(d.date) + 8},#{@y(value) + 5})")
-          .text(@formatOutput(displayValue))
+        if text = @formatOutput(displayValue)
+          tooltipSvg
+            .attr("transform", "translate(#{@x(d.date)},#{@y(value)})")
+            .style('display', 'block')
+          tooltipSvg.select('.tooltip-label').text(text)
+
+        else
+          tooltipSvg
+            .style('display', 'none')
 
     throttledMouseMove = _.throttle(mousemove, 100)
 
@@ -74,8 +85,8 @@ module.exports =
 
   mouseover: ->
     @tooltipsVisible = true
-    @svgLines.select('.tooltips').style("display", "block")
+    @svg.selectAll('.tooltips').style("display", "block")
 
   mouseout: ->
     @tooltipsVisible = false
-    @svgLines.select('.tooltips').style("display", "none")
+    @svg.selectAll('.tooltips').style("display", "none")

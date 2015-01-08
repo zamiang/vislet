@@ -3,7 +3,7 @@ _ = require 'underscore'
 Backbone = require "backbone"
 moment = require 'moment'
 Key = require '../line-graph/key.coffee'
-Tooltips = require '../line-graph/tooltips.coffee'
+Tooltips = require '../svg-tooltips/index.coffee'
 
 module.exports = class AreaChart extends Backbone.View
 
@@ -19,9 +19,11 @@ module.exports = class AreaChart extends Backbone.View
   speed: 500
   defaults:
     displayKey: false
+    interpolate: 'cardinal'
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @label, @displayKey, @filterDataset } = _.defaults(options, @defaults)
+    { @data, @width, @height, @keys, @startingDataset, @label,
+      @displayKey, @filterDataset, @interpolate } = _.defaults(options, @defaults)
     @render()
 
   formatFixedPercent: d3.format(".1%")
@@ -32,6 +34,7 @@ module.exports = class AreaChart extends Backbone.View
     @y = d3.scale.linear().range([@height, 0])
 
     @area = d3.svg.area()
+      .interpolate(@interpolate)
       .x((d) => @x(d.date))
       .y0((d) => @y(d.y0))
       .y1((d) => @y(d.y0 + d.y))
@@ -41,6 +44,8 @@ module.exports = class AreaChart extends Backbone.View
       .attr("height", @height + @margin.top + @margin.bottom)
       .append("g")
       .attr("transform", "translate(#{@margin.left}, #{@margin.top})")
+
+    @svg = d3.select("##{@$el.attr('id')}")
 
     flattenedData = @getFlattenedData @startingDataset
 
@@ -52,9 +57,10 @@ module.exports = class AreaChart extends Backbone.View
 
     @x.domain(d3.extent(flattenedData[Object.keys(flattenedData)[0]], (d) -> d.date ))
 
-    @drawLineLabels svg
     @drawLines @lines, svg
     @drawKey() if @displayKey
+    @appendTooltips @color, svg, @lines
+    @drawLineLabels svg
 
   getLines: (data) ->
     @stack(@color.domain().map((name) ->
@@ -80,14 +86,10 @@ module.exports = class AreaChart extends Backbone.View
       .enter().append("g")
       .attr("class", "building-type")
 
-    @svgLines = svg.selectAll(".building-type")
-
     @svgBuildingType.append("path")
       .attr("class", "area")
       .attr("d", (d) => @area(d.values) )
       .style("fill", (d) => @color(d.name) )
-
-    @appendTooltips @color, svg
 
   animateNewArea: (startingDataset) ->
     flattenedData = @getFlattenedData startingDataset

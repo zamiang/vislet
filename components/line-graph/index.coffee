@@ -1,7 +1,7 @@
 d3 = require 'd3'
 _ = require 'underscore'
 Backbone = require "backbone"
-Tooltips = require './tooltips.coffee'
+Tooltips = require '../svg-tooltips/index.coffee'
 Transition = require './transition.coffee'
 Key = require './key.coffee'
 
@@ -49,6 +49,8 @@ module.exports = class LineGraph extends Backbone.View
       .append("g")
       .attr("transform", "translate(#{@margin.left}, #{@margin.top})")
 
+    @svg = d3.select("##{@$el.attr('id')}")
+
     flattenedData = @getFlattenedData @startingDataset
 
     @color = d3.scale.category10()
@@ -65,8 +67,9 @@ module.exports = class LineGraph extends Backbone.View
 
     @drawAxis svg
     @drawLines @line, @color, svg
-    @drawLineLabels(@color) if @displayLineLabels
     @drawKey() if @displayKey
+    @appendTooltips @color, svg, @lines
+    @drawLineLabels(@color) if @displayLineLabels
 
   drawAxis: (svg) ->
     @xAxis = d3.svg.axis()
@@ -111,8 +114,6 @@ module.exports = class LineGraph extends Backbone.View
 
     if @addColor
       paths.style("stroke", (d) -> color(d.name) )
-
-    @appendTooltips color, svg
 
   drawLineLabels: (color) ->
     @svgLines.append("text")
