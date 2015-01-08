@@ -14,6 +14,7 @@ module.exports = class AreaChart extends Backbone.View
     right: 0
     bottom: 20
 
+  speed: 500
   defaults:
     displayKey: false
 
@@ -41,10 +42,9 @@ module.exports = class AreaChart extends Backbone.View
 
     flattenedData = @getFlattenedData @startingDataset
 
-    @color = d3.scale.category10()
+    @color = d3.scale.category20c()
     @color.domain Object.keys(flattenedData)
-    @stack = d3.layout.stack().values((d) ->
-      d.values )
+    @stack = d3.layout.stack().values((d) -> d.values )
 
     @lines = @getLines(flattenedData)
 
@@ -81,27 +81,17 @@ module.exports = class AreaChart extends Backbone.View
       .style("fill", (d) => @color(d.name) )
 
   animateNewArea: (startingDataset) ->
-    return 'hello'
     flattenedData = @getFlattenedData startingDataset
+    @lines = @getLines flattenedData
+
     svg = d3.select("##{@$el.attr('id')}")
 
-    buildingTypes = svg.selectAll(".building-type")
-    transition = buildingTypes.transition().duration(500)
-    postTransition = transition.transition()
-
-    # .data(flattenedData)
-
-    transition.selectAll("text")
-      .attr("transform", (d) -> "translate(" + x(d.value.date) + "," + y(d.value.y0 + d.value.y) + ")" )
-
-    # .ease("linear")
-    # .selectAll('path')
-    # .attr("d", (d) => @area(d.values))
-
-  shapeTween: (shape, direction) ->
-    (d, i, a) ->
-      (t) ->
-        shape(if direction then t else 1.0 - t)(d.values)
+    buildingTypes = svg
+      .selectAll('.building-type .area')
+      .data(@lines)
+      .transition().duration(@speed)
+      .ease('linear')
+      .attr("d", (d) => @area(d.values) )
 
   drawLineLabels: (svg) ->
     xAxis = d3.svg.axis()

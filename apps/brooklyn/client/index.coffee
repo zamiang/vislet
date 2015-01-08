@@ -77,17 +77,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       label: 'Building Class'
       displayKey: (id) -> buildingClasses[id]
 
-    # @lineGraphs.push new percentGraph
-    #   el: $('#brooklyn-commercial-building-class')
-    #   width: width
-    #   height: height
-    #   data: salesData
-    #   startingDataset: @startingDataset
-    #   keys: ['buildingClass']
-    #   filterDataset: filterCommercialDataset
-    #   label: 'Building Class'
-    #   displayKey: (id) -> buildingClasses[id]
-
   renderLineGraph: ->
     width = 500
     height = 120
@@ -110,26 +99,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       el: $('#brooklyn-residential-price-tally')
       label: 'Avg Price Per SqFt'
       handleHover: @handleHover
-
-    # @lineGraphs.push new LineGraph
-    #   width: width
-    #   height: height
-    #   data: salesData
-    #   startingDataset: @startingDataset
-    #   keys: ['commercialSaleTally', 'commercialSaleTally-mean']
-    #   el: $('#brooklyn-commercial-tally')
-    #   label: '# Sales'
-    #   handleHover: @handleHover
-
-    # @lineGraphs.push new LineGraph
-    #   width: width
-    #   height: height
-    #   data: salesData
-    #   startingDataset: @startingDataset
-    #   keys: ['commercialPriceAverage', 'commercialPriceAverage-mean']
-    #   el: $('#brooklyn-commercial-price-tally')
-    #   label: 'Average Price Per SqFt'
-    #   handleHover: @handleHover
 
   renderSvgMap: (topojson) ->
     neighborhoods = []
@@ -161,7 +130,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   handleNeighborhoodClick: (id) ->
     for lineGraph in @lineGraphs
-      lineGraph.animateNewArea(@neighborhoodHash[id]) if lineGraph.$el.is(':visible')
+      lineGraph.animateNewArea(@neighborhoodHash[id]) #if lineGraph.$el.is(':visible')
 
     @$label.text @fullNeighborhoodHash[id].split('-').join(', ')
 
