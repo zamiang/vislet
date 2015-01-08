@@ -65,16 +65,16 @@ module.exports = class SvgMap extends Backbone.View
     @label.text(label)
 
   onClick: (item, path, g) ->
-    if item.id == @activeId
-      return @reset d3.select('data-id', item.id), g
-    else
-      @activeId = item.id
+    return if item.id == @activeId
+    #return @reset d3.select('data-id', item.id), g
 
+    @activeId = item.id
     @customOnClick item.id
 
     @$(".tract").attr('class', 'tract')
     @$(".tract[data-id='#{item.id}']").attr('class', 'tract selected')
     @$colorKey?.find('.key-bar-values').hide()
+    @updateMapTitle(@title)
 
     if @zoomOnClick
       bounds = path.bounds(item)
