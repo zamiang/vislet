@@ -29,15 +29,18 @@ module.exports =
         d1 = line.values[i]
         d = if x0 - d0.date > d1.date - x0 then d1 else d0
 
+        value = @getLineValue d
+        displayValue = @getLineDisplayValue d
+
         if line.name.indexOf('mean') < 0
           @handleHover?(d.date, line.name, @label)
 
         @svgLines.select(".circle-#{line.name}")
-          .attr("transform", "translate(#{@x(d.date)},#{@y(d.value)})")
+          .attr("transform", "translate(#{@x(d.date)},#{@y(value)})")
 
         text = @svgLines.select(".tooltip-label.label-#{line.name}")
-          .attr("transform", "translate(#{@x(d.date) + 8},#{@y(d.value) + 5})")
-          .text(@formatOutput(d))
+          .attr("transform", "translate(#{@x(d.date) + 8},#{@y(value) + 5})")
+          .text(@formatOutput(displayValue))
 
     throttledMouseMove = _.throttle(mousemove, 100)
 
@@ -54,13 +57,18 @@ module.exports =
     @$('rect')
       .on("mousemove", throttledMouseMove)
 
-  formatOutput: (line) ->
-    if line.value > 100
-      Number(line.value.toFixed(0)).toLocaleString()
-    else if line.value > 1
-      Number(line.value.toFixed(2)).toLocaleString()
-    else if line.value > 0
-      "#{(line.value * 100).toFixed(2)} %"
+  getLineValue: (line) -> line.value
+  getLineDisplayValue: (line) -> line.value
+
+  formatOutput: (value) ->
+    if value > 100
+      Number(value.toFixed(0)).toLocaleString()
+    else if value > 1
+      Number(value.toFixed(2)).toLocaleString()
+    else if value > 0
+      "#{(value * 100).toFixed(2)} %"
+    else if value < 1 && value > 0
+      @formatFixedPercent value
     else
       null
 

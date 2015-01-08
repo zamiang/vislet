@@ -3,10 +3,12 @@ _ = require 'underscore'
 Backbone = require "backbone"
 moment = require 'moment'
 Key = require '../line-graph/key.coffee'
+Tooltips = require '../line-graph/tooltips.coffee'
 
 module.exports = class AreaChart extends Backbone.View
 
   _.extend @prototype, Key
+  _.extend @prototype, Tooltips
 
   margin:
     top: 10
@@ -65,6 +67,9 @@ module.exports = class AreaChart extends Backbone.View
       }
     ))
 
+  getLineValue: (line) -> line.y0 + line.y
+  getLineDisplayValue: (line) -> line.y
+
   getFlattenedData: (startingDataset) ->
     flattenedData = @data[startingDataset][@keys[0]]
     if @filterDataset then @filterDataset(flattenedData) else flattenedData
@@ -75,10 +80,14 @@ module.exports = class AreaChart extends Backbone.View
       .enter().append("g")
       .attr("class", "building-type")
 
+    @svgLines = svg.selectAll(".building-type")
+
     @svgBuildingType.append("path")
       .attr("class", "area")
       .attr("d", (d) => @area(d.values) )
       .style("fill", (d) => @color(d.name) )
+
+    @appendTooltips @color, svg
 
   animateNewArea: (startingDataset) ->
     flattenedData = @getFlattenedData startingDataset
