@@ -2,14 +2,13 @@ module.exports =
 
   onClick: (item, path, g) ->
     return if item.id == @activeId
-    # return @reset d3.select('data-id', item.id), g
 
     @activeId = item.id
     @customOnClick item.id
 
     @$(".tract").attr('class', 'tract')
     @$(".tract[data-id='#{item.id}']").attr('class', 'tract selected')
-    @$colorKey?.find('.key-bar-values').hide()
+    @hideColorKey()
     @updateMapTitle(@title)
 
     if @zoomOnClick

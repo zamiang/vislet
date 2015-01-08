@@ -10,6 +10,7 @@ StackedGraph = require('../../../components/area-chart/index.coffee')
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
 salesData = require('../data/brooklyn-sales-display-data.json')
 buildingClasses = require('../data/building-class.json')
+Label = require('../models/label.coffee')
 
 module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
@@ -19,7 +20,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     'click .tab' : 'tabClick'
 
   initialize: ->
-    @$label = @$('.graph-heading')
+    @selectedLabel = new Label(visible: true, $el: @$('.selected-neighborhood-name'), selector: '.graph-heading')
+    @hoveredLabel = new Label(visible: false, $el: @$('.hover-neighborhood-name'), selector: '.graph-heading')
     @renderSvgMap nycTopoJson
     @renderLineGraph()
     @renderBuildingClassGraphs()
@@ -46,10 +48,12 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
         id: neighborhoodNames[NTA]
         value: value
       }
+
     if dataset == 'residentialPriceAverage'
       @svgMap.colorMap data, 0, 1000, label
     else
       @svgMap.colorMap data, 0, 400, label
+
     @svgMap.updateMapTitle "Q#{moment(date).format(@dateFormat)} #{label}"
 
   handleGraphHover: (currentId, hoverId) =>
@@ -58,10 +62,16 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     for lineGraph in @lineGraphs
       lineGraph.animateNewArea(currentNTA, hoverNTA)
 
+    @hoveredLabel.set
+      visible: true
+      text: @formatNeighborhoodName(@fullNeighborhoodHash[hoverId])
+
   handleGraphExit: (currentId) =>
     currentNTA = @neighborhoodHash[currentId]
     for lineGraph in @lineGraphs
       lineGraph.animateNewArea(currentNTA)
+    @hoveredLabel.set
+      visible: false
 
   validResidentialBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "28"]
   renderBuildingClassGraphs: ->
@@ -137,12 +147,13 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       @neighborhoodHash[neighborhoodNames[key].split('-')[0]] = key
       @fullNeighborhoodHash[neighborhoodNames[key].split('-')[0]] = neighborhoodNames[key]
 
+  formatNeighborhoodName: (name) -> name.split('-').join(', ')
   handleNeighborhoodClick: (id) ->
     for lineGraph in @lineGraphs
       lineGraph.animateNewArea(@neighborhoodHash[id])
     @stackedGraph.animateNewArea(@neighborhoodHash[id])
 
-    @$label.text @fullNeighborhoodHash[id].split('-').join(', ')
+    @selectedLabel.set text: @formatNeighborhoodName(@fullNeighborhoodHash[id])
 
 module.exports.init = ->
   new BrooklynView

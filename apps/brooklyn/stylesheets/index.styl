@@ -17,24 +17,32 @@
     border: 1px solid #f2f2f2
     background: url('/images/brooklyn.png')
   .graph-heading-container
-    margin-bottom: 14px
+    margin-bottom: 1px
     margin-left: 14px
+    height: 80px
     .circle-key, .graph-heading
       display: inline-block
       vertical-align: top
     .circle-key
-      width: 36px
-      height: 36px
-      border-radius: 18px
-      background: steelblue
+      width: 20px
+      height: 20px
+      border-radius: 100%
+      &.blue
+        background: steelblue
+      &.red
+        background: hsl(353, 64%, 54%)
+      &.gray
+        background: lightgrey
+
     .graph-heading
       width: 90%
       franklin-gothic()
-      font-size: 32px
+      line-height: 150%
       letter-spacing: 1px
       text-transform: uppercase
-      margin-left: 12px
-      margin-top: 2px
+      margin-left: 10px
+      margin-top: -1px
+      font-size: 14px
 
 .markdown-text
   font-size: 15px
@@ -51,35 +59,3 @@
 
 .sales-group
   margin-top: 10px
-
-.tabs
-  position: relative
-  border-bottom: 1px solid #f2f2f2
-  line-height: 150%
-  height: 30px
-  .tab
-    border: 1px solid #ddd
-    border-bottom: 1px solid #E4E4E4
-    display: inline-block
-    franklin-gothic()
-    letter-spacing: 1px
-    text-align: center
-    text-transform: uppercase
-    font-size: 12px
-    padding: 1px 10px 0px 10px
-    background-color: #f3f3f3
-    color: #ccc
-    cursor: pointer
-    margin-bottom: -1px
-    height: 28px
-    &.active
-      border: 1px solid #f2f2f2
-      border-bottom: 1px solid white
-      background-color: white
-      color: #333
-      margin-bottom: -1px
-    &:first-child
-      margin-left: 14px
-    &:last-child
-      .active
-        border-left: 0px solid

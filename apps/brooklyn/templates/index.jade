@@ -16,17 +16,17 @@ block body
       .brooklyn-svg-key
     .svg-graphs
       .graph-heading-container
-        .circle-key
-        .graph-heading Neighborhood Name
-      // .tabs
-      //   .tab( data-class="commercial-sales" ) Commercial
-      //   .tab.active( data-class="residential-sales" ) Residential
+        .selected-neighborhood-name
+          .circle-key.blue
+          .graph-heading
+        .avg-neighborhood-name
+          .circle-key.gray
+          .graph-heading Borough Average
+        .hover-neighborhood-name
+          .circle-key.red
+          .graph-heading
       .residential-sales.sales-group
         svg#brooklyn-residential-tally.svg-line-graph
         svg#brooklyn-residential-price-tally.svg-line-graph
         svg#brooklyn-residential-building-class.stacked-area-chart.svg-building-class
-      // .commercial-sales.sales-group
-      //   svg#brooklyn-commercial-tally.svg-line-graph
-      //   svg#brooklyn-commercial-price-tally.svg-line-graph
-      //   svg#brooklyn-commercial-building-class.svg-line-graph.svg-building-class
      include text.html
