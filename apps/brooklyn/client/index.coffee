@@ -47,9 +47,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
         value: value
       }
     if dataset == 'residentialPriceAverage'
-      @svgMap.colorMap data, 0, 1000
+      @svgMap.colorMap data, 0, 1000, label
     else
-      @svgMap.colorMap data, 0, 400
+      @svgMap.colorMap data, 0, 400, label
     @svgMap.updateMapTitle "Q#{moment(date).format(@dateFormat)} #{label}"
 
   handleGraphHover: (currentId, hoverId) =>

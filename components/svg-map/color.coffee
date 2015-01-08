@@ -4,7 +4,7 @@ template = require '../graph-key/linear-key.jade'
 module.exports =
 
   # @param {Array} Array of objects { id: 123, value: 0.5 }
-  colorMap: (data, min, max) ->
+  colorMap: (data, min, max, label) ->
     values =
       for item in data
         if item.id != 'ALL'
@@ -24,7 +24,7 @@ module.exports =
     svg.selectAll(".tract")
       .attr('class', selectColor)
 
-    @drawColorKey(quantize.range(), quantize.quantiles())
+    @drawColorKey(quantize.range(), quantize.quantiles(), label)
 
   # Input must be sorted in ascending order
   getColorClass: (min, max) ->
@@ -32,7 +32,7 @@ module.exports =
       .domain([min, max])
       .range(d3.range(9).map((i) -> "color#{i}" ))
 
-  drawColorKey: (classes, values) ->
+  drawColorKey: (classes, values, label) ->
     formattedValues = for value in values
       if value < 1000000
         Number(value.toFixed(0)).toLocaleString()
@@ -45,5 +45,6 @@ module.exports =
       values: formattedValues
       margin: @margin
       width: Math.floor(@width/classes.length)
+      label: label
 
     @$colorKey.html template(params)
