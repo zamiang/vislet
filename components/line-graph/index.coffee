@@ -21,7 +21,7 @@ module.exports = class LineGraph extends Backbone.View
     interpolate: 'cardinal'
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @interpolate, @handleHover
+    { @data, @width, @height, @keys, @startingDataset, @interpolate, @handleHover, @yAxisFormat
       @label, @filterDataset, @displayLineLabels, @displayKey } = _.defaults(options, @defaults)
     @render()
 
@@ -98,9 +98,10 @@ module.exports = class LineGraph extends Backbone.View
 
   addLabel: (g, label) ->
     g.append("text")
-      .attr("x", @width)
-      .attr("y", @margin.top)
-      .style("text-anchor", "end")
+      .attr("y", 5)
+      .attr('x', 10)
+      .attr("dy", "1em")
+      .style("text-anchor", "start")
       .attr('class', 'label-text')
       .text(label)
 

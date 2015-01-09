@@ -89,7 +89,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   renderLineGraph: ->
     width = 500
-    height = 120
+    height = 220
     @lineGraphs.push new LineGraph
       width: width
       height: height
@@ -108,6 +108,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       keys: ['residentialPriceAverage', 'residentialPriceAverage-mean']
       el: $('#brooklyn-residential-price-tally')
       label: 'Avg Price Per SqFt'
+      yAxisFormat: (x) -> "$#{x}"
       handleHover: @handleHover
 
   renderSvgMap: (topojson) ->

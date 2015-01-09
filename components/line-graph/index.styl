@@ -1,10 +1,10 @@
 .svg-line-graph
   font-size: 12px
-  fill: #333
+  fill: $dark-gray
 
   .axis path, .axis line
     fill: none
-    stroke: #333
+    stroke: $dark-gray
     shape-rendering: crispEdges
 
   .x-axis path
@@ -15,11 +15,10 @@
     stroke: steelblue
     stroke-width: 1.5px
     &.mean-line
-      stroke: lightgrey
+      stroke: $gray
     &.compare-line
-      stroke: hsl(353, 64%, 54%)
+      stroke: $red
 
   circle
     &.mean-circle
-      stroke: lightgrey
-
+      stroke: $gray

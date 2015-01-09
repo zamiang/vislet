@@ -127,8 +127,8 @@ module.exports = class AreaChart extends Backbone.View
 
   addLabel: (g, label) ->
     g.append("text")
-      .attr("x", @width)
+      .attr("x", 10)
       .attr("y", @margin.top)
-      .style("text-anchor", "end")
+      .style("text-anchor", "start")
       .attr('class', 'label-text')
       .text(label)
