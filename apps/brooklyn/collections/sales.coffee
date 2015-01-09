@@ -12,6 +12,8 @@ module.exports = class Sales extends Backbone.Collection
   quarters: [1..4]
   years: [2003..2014]
 
+  validResidentialBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "28"]
+
   salesDataKeys: [
     'residentialSaleTally'
     'residentialSaleWithPriceTally'
@@ -155,7 +157,7 @@ module.exports = class Sales extends Backbone.Collection
   formatBuildingClassData: (flattenedData, data) ->
     flattenedData = {}
     dateKeys = Object.keys(data)
-    dataKeys = Object.keys(data[dateKeys[0]])
+    dataKeys = @validResidentialBuildingClasses # Object.keys(data[dateKeys[0]])
     for dataKey in dataKeys
       flattenedData[dataKey] = []
       for dateKey in dateKeys

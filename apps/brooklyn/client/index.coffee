@@ -73,15 +73,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @hoveredLabel.set
       visible: false
 
-  validResidentialBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "28"]
   renderBuildingClassGraphs: ->
     width = 480
     height = 200
-    filterResidentialDataset = (dataset) =>
-      data = {}
-      for buildingClass in @validResidentialBuildingClasses
-        data[buildingClass] = dataset[buildingClass]
-      data
 
     @stackedGraph = new StackedGraph
       el: $('#brooklyn-residential-building-class')
@@ -90,7 +84,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       data: salesData
       startingDataset: @startingDataset
       keys: ['buildingClass']
-      filterDataset: filterResidentialDataset
       label: 'Building Class as % of sales'
       displayKey: (id) -> buildingClasses[id]
 
