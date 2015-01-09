@@ -29,6 +29,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
     @svgMap.onClick({id: 'Clinton Hill'})
 
+    @colorMap 1041397200000
+
   tabClick: (event) ->
     $target = $(event.target)
     return if $target.hasClass('active')
@@ -38,7 +40,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @$(".#{$target.attr('data-class')}").show()
 
   dateFormat: "Q, YYYY"
-  handleHover: (date, dataset, label) =>
+  colorMap: (date) =>
+    dataset = "residentialPriceAverage"
+    label = "Avg Price Per SqFt"
     data = for NTA in Object.keys(salesData)
       value = 0
       for item in salesData[NTA][dataset]
@@ -49,11 +53,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
         value: value
       }
 
-    if dataset == 'residentialPriceAverage'
-      @svgMap.colorMap data, 0, 1000, label
-    else
-      @svgMap.colorMap data, 0, 400, label
-
+    @svgMap.colorMap data, 0, 1000, label
     @svgMap.updateMapTitle "Q#{moment(date).format(@dateFormat)} #{label}"
 
   handleGraphHover: (currentId, hoverId) =>
@@ -131,6 +131,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       drawLabels: false
       zoomOnClick: false
       $colorKey: $('.brooklyn-svg-key')
+      colorKeyWidth: 610
       customMouseEnter: @handleGraphHover
       customMouseLeave: @handleGraphExit
 

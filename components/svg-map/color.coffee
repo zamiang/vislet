@@ -44,7 +44,7 @@ module.exports =
       classes: classes
       values: formattedValues
       margin: @margin
-      width: Math.floor(@width/classes.length)
+      width:  Math.floor((@colorKeyWidth or @width)/classes.length)
       label: label
 
     @$colorKey.html template(params)
