@@ -74,8 +74,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       visible: false
 
   renderBuildingClassGraphs: ->
-    width = 480
-    height = 200
+    width = 490
+    height = 230
 
     @stackedGraph = new StackedGraph
       el: $('#brooklyn-residential-building-class')
@@ -88,17 +88,17 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       displayKey: (id) -> buildingClasses[id]
 
   renderLineGraph: ->
-    width = 500
-    height = 220
-    @lineGraphs.push new LineGraph
-      width: width
-      height: height
-      data: salesData
-      startingDataset: @startingDataset
-      keys: ['residentialSaleTally', 'residentialSaleTally-mean']
-      el: $('#brooklyn-residential-tally')
-      label: '# Sales'
-      handleHover: @handleHover
+    width = 490
+    height = 230
+    # @lineGraphs.push new LineGraph
+    #   width: width
+    #   height: height
+    #   data: salesData
+    #   startingDataset: @startingDataset
+    #   keys: ['residentialSaleTally', 'residentialSaleTally-mean']
+    #   el: $('#brooklyn-residential-tally')
+    #   label: '# Sales'
+    #   handleHover: @handleHover
 
     @lineGraphs.push new LineGraph
       width: width
