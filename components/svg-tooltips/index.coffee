@@ -16,43 +16,11 @@ module.exports =
       .attr("transform", "translate(8, 5)")
 
     tooltips.append("circle")
-      .attr("class", "tooltip-circle")
-      .style("stroke", (d) -> if d.name.indexOf('-mean') > -1 then 'lightgrey' else color(d.name) )
       .attr("r", 4)
+      .attr("class", "tooltip-circle")
+      .style("stroke", (d) -> if d.name.indexOf('-mean') > -1 then 'lightgrey' else color(d.name))
 
   appendMouseEventsCapture: (color, svg) ->
-    mousemove = (event) =>
-      return unless @tooltipsVisible
-      bisectDate = d3.bisector((d) -> d.date).right
-      rect = svg.select('rect')[0][0]
-      x0 = @x.invert(event.offsetX - @margin.left)
-
-      # TODO
-      # Refactor this
-      for line in @lines
-        i = bisectDate(line.values, new Date(x0))
-        d0 = line.values[i - 1]
-        d1 = line.values[i]
-        d = if x0 - d0?.date > d1?.date - x0 then d1 else d0
-
-        value = @getLineValue d
-        displayValue = @getLineDisplayValue d
-
-        tooltipSvg = svg.select(".tooltip-#{line.name}")
-
-        if text = @formatOutput(displayValue)
-          if line.name.indexOf('mean') < 0
-            @handleHover?(d.date, line.name, @label)
-          tooltipSvg
-            .attr("transform", "translate(#{@x(d.date)},#{@y(value)})")
-            .style('display', 'block')
-          tooltipSvg.select('.tooltip-label').text(text)
-        else
-          tooltipSvg
-            .style('display', 'none')
-
-    throttledMouseMove = _.throttle(mousemove, 150)
-
     # append the rectangle to capture mouse events
     svg.append("rect")
       .attr("width", @width)
@@ -63,6 +31,7 @@ module.exports =
       .on("mouseout", => @mouseout() )
 
     # Use jquery event handling because d3's doesn't work if throttled
+    throttledMouseMove = _.throttle(((event) => @mousemove(event)), 150)
     @$('rect').on("mousemove", throttledMouseMove)
 
   getLineValue: (line) -> line?.value
@@ -87,3 +56,30 @@ module.exports =
   mouseout: ->
     @tooltipsVisible = false
     @svg.selectAll('.tooltips').style("display", "none")
+
+  mousemove: (event) ->
+    return unless @tooltipsVisible
+    bisectDate = d3.bisector((d) -> d.date).right
+    rect = @svg.select('rect')[0][0]
+    x0 = @x.invert(event.offsetX - @margin.left)
+
+    # TODO
+    # Refactor this
+    for line in @lines
+      i = bisectDate(line.values, new Date(x0))
+      d0 = line.values[i - 1]
+      d1 = line.values[i]
+      d = if x0 - d0?.date > d1?.date - x0 then d1 else d0
+
+      value = @getLineValue d
+      displayValue = @getLineDisplayValue d
+
+      tooltipSvg = @svg.select(".tooltip-#{line.name}")
+
+      if text = @formatOutput(displayValue)
+        tooltipSvg
+          .attr("transform", "translate(#{@x(d.date)},#{@y(value)})")
+          .style('display', 'block')
+        tooltipSvg.select('.tooltip-label').text(text)
+      else
+        tooltipSvg.style('display', 'none')
