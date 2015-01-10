@@ -15,7 +15,6 @@
         "backbone-super-sync": "*",
         "coffee-script": "*",
         "moment": "*",
-        "marked": "*",
         "node-env-file": "*"
     },
     "devDependencies": {
