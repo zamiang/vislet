@@ -150,7 +150,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       $colorKey: $('.brooklyn-svg-key')
       colorKeyWidth: 610
       customMouseEnter: @handleGraphHover
-      customClickSelectedArea: (=> @colorMap(@defaultDate))
+      customClickSelectedArea: (=> @colorMapClick())
 
   reverseNeighborhoodHash: ->
     @neighborhoodHash = {}
