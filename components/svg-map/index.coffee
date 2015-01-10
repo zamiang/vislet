@@ -55,7 +55,6 @@ module.exports = class SvgMap extends Backbone.View
       .data(neighborhoods.features)
       .enter().append("path")
       .attr("class", (d) => if d.id == @ignoredId then 'park' else 'tract' )
-      .attr('fill', (d) => if d.id == @ignoredId then "url(#pattern)" else '')
       .attr("data-id", (d) -> d.id )
       .attr("d", path)
       .on("click", (d) => if d.id != @ignoredId then @onClick(d, path, g) )
