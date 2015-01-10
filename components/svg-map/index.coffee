@@ -23,8 +23,8 @@ module.exports = class SvgMap extends Backbone.View
     speed: 500
 
   initialize: (options) ->
-    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @colorKeyWidth
-      @customMouseEnter, @$colorKey, @title } = _.defaults(options, @defaults)
+    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea,
+      @colorKeyWidth, @customMouseEnter, @$colorKey, @title } = _.defaults(options, @defaults)
     @width = @$el.width()
     @height = @$el.height()
     @render()

@@ -14,17 +14,19 @@ block body
     .map-svg-container
       svg#brooklyn-svg.svg-map( height='600px', width='500px' )
       .brooklyn-svg-key
+      a.brooklyn-svg.back.faux-underline-large( href="#" ) Back to choropleth
+      svg#brooklyn-date-slider.svg-slider( width='500px' )
     .svg-graphs
       .graph-heading-container
         .selected-neighborhood-name
           .circle-key.blue
           .graph-heading
-        .avg-neighborhood-name
-          .circle-key.gray
-          .graph-heading Borough Average
         .hover-neighborhood-name
           .circle-key.red
           .graph-heading
+        .avg-neighborhood-name
+          .circle-key.gray
+          .graph-heading Borough Average
       .residential-sales.sales-group
         svg#brooklyn-residential-price-tally.svg-line-graph
         // svg#brooklyn-residential-tally.svg-line-graph

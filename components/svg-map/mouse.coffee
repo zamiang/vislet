@@ -1,7 +1,7 @@
 module.exports =
 
   onClick: (item, path, g) ->
-    return if item.id == @activeId
+    return @customClickSelectedArea?() if item.id == @activeId
 
     @activeId = item.id
     @customOnClick item.id

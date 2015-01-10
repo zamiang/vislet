@@ -11,25 +11,51 @@ neighborhoodNames = require('../data/nyc-neighborhood-names.json')
 salesData = require('../data/brooklyn-sales-display-data.json')
 buildingClasses = require('../data/building-class.json')
 Label = require('../models/label.coffee')
+Slider = require('../../../components/slider/index.coffee')
 
 module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   startingDataset: 'BK60'
   lineGraphs: []
+  dateFormat: "Q, YYYY"
+  speed: 200
+  isCholoropleth: true
   events:
     'click .tab' : 'tabClick'
+    'click .back' : 'colorMapClick'
 
   initialize: ->
     @selectedLabel = new Label(visible: true, $el: @$('.selected-neighborhood-name'), selector: '.graph-heading')
     @hoveredLabel = new Label(visible: false, $el: @$('.hover-neighborhood-name'), selector: '.graph-heading')
+    @$back = @$('.brooklyn-svg.back')
     @renderSvgMap nycTopoJson
     @renderLineGraph()
     @renderBuildingClassGraphs()
     @reverseNeighborhoodHash()
+    @renderSlider()
 
-    @svgMap.onClick({id: 'Clinton Hill'})
+    ## Setup default state
+    @selectedLabel.set
+      visible: true
+      text: 'Click a neighborhood to see graphs for that area'
+    @hoveredLabel.set
+      visible: true
+      text: 'Hover a neighborhood to compare'
 
-    @colorMap 1041397200000
+  renderSlider: ->
+    width = 502
+    height = 38
+    data =
+      for item in salesData['ALL']['residentialPriceAverage']
+        item.date
+
+    @slider = new Slider
+      el: $('#brooklyn-date-slider')
+      width: width
+      height: height
+      data: data
+      animateStart: true
+      handleSelect: (date) => @colorMap(new Date(date).valueOf())
 
   tabClick: (event) ->
     $target = $(event.target)
@@ -39,7 +65,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @$('.sales-group').hide()
     @$(".#{$target.attr('data-class')}").show()
 
-  dateFormat: "Q, YYYY"
   colorMap: (date) =>
     dataset = "residentialPriceAverage"
     label = "Avg Price Per SqFt"
@@ -56,7 +81,15 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @svgMap.colorMap data, 0, 1000, label
     @svgMap.updateMapTitle "Q#{moment(date).format(@dateFormat)} #{label}"
 
+  colorMapClick: ->
+    @colorMap(@slider.getValue())
+    @$back.fadeOut @speed
+    @slider.$el.fadeIn(200)
+    @isCholoropleth = true
+    false
+
   handleGraphHover: (currentId, hoverId) =>
+    return if @isCholoropleth
     hoverNTA = @neighborhoodHash[hoverId]
     currentNTA = @neighborhoodHash[currentId]
     for lineGraph in @lineGraphs
@@ -65,13 +98,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @hoveredLabel.set
       visible: true
       text: @formatNeighborhoodName(@fullNeighborhoodHash[hoverId])
-
-  handleGraphExit: (currentId) =>
-    currentNTA = @neighborhoodHash[currentId]
-    for lineGraph in @lineGraphs
-      lineGraph.animateNewArea(currentNTA)
-    @hoveredLabel.set
-      visible: false
 
   renderBuildingClassGraphs: ->
     width = 490
@@ -90,15 +116,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
   renderLineGraph: ->
     width = 490
     height = 230
-    # @lineGraphs.push new LineGraph
-    #   width: width
-    #   height: height
-    #   data: salesData
-    #   startingDataset: @startingDataset
-    #   keys: ['residentialSaleTally', 'residentialSaleTally-mean']
-    #   el: $('#brooklyn-residential-tally')
-    #   label: '# Sales'
-    #   handleHover: @handleHover
 
     @lineGraphs.push new LineGraph
       width: width
@@ -133,7 +150,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       $colorKey: $('.brooklyn-svg-key')
       colorKeyWidth: 610
       customMouseEnter: @handleGraphHover
-      customMouseLeave: @handleGraphExit
+      customClickSelectedArea: (=> @colorMap(@defaultDate))
 
   reverseNeighborhoodHash: ->
     @neighborhoodHash = {}
@@ -142,13 +159,16 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       @neighborhoodHash[neighborhoodNames[key].split('-')[0]] = key
       @fullNeighborhoodHash[neighborhoodNames[key].split('-')[0]] = neighborhoodNames[key]
 
-  formatNeighborhoodName: (name) -> name.split('-').join(', ')
+  formatNeighborhoodName: (name) -> name?.split('-').join(', ')
   handleNeighborhoodClick: (id) ->
     for lineGraph in @lineGraphs
       lineGraph.animateNewArea(@neighborhoodHash[id])
     @stackedGraph.animateNewArea(@neighborhoodHash[id])
 
     @selectedLabel.set text: @formatNeighborhoodName(@fullNeighborhoodHash[id])
+    @$back.fadeIn @speed
+    @slider.$el.fadeOut(200)
+    @isCholoropleth = false
 
 module.exports.init = ->
   new BrooklynView
