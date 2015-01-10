@@ -47,11 +47,14 @@ module.exports = class SvgMap extends Backbone.View
 
     projection.scale(scale).translate(translate)
 
+    console.log neighborhoods.features
+
     g = svg.append("g")
     g.selectAll("path")
       .data(neighborhoods.features)
       .enter().append("path")
-      .attr("class", (d) => if d.id == @ignoredId then 'park' else 'tract' )
+      .attr("class", (d) => 'tract') #if d.id == @ignoredId then 'park' else 'tract' )
+      .attr('fill', (d) => if d.id == @ignoredId then "url(#pattern)" else '')
       .attr("data-id", (d) -> d.id )
       .attr("d", path)
       .on("click", (item) => @onClick(item, path, g) )
@@ -71,8 +74,7 @@ module.exports = class SvgMap extends Backbone.View
       .attr('class', 'label-text')
       .text(label)
 
-  updateMapTitle: (label) ->
-    @label.text(label)
+  updateMapTitle: (label) -> @label.text(label)
 
   drawLabels: (svg, neighborhoods, path) ->
     svg.selectAll(".subunit-label")

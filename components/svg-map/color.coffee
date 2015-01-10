@@ -17,8 +17,10 @@ module.exports =
       hash[item.id.split('-')[0]] = quantize(item.value)
 
     selectColor = (item) =>
-      # return 'tract selected' if item.id == @activeId
-      "tract #{hash[item.id]}"
+      if color = hash[item.id]
+        "tract #{color}"
+      else
+        'tract'
 
     svg = d3.select "##{@$el.attr('id')}"
     svg.selectAll(".tract")

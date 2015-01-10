@@ -10,11 +10,15 @@ block body
   #brooklyn
     header
       .heading.faux-underline-large Brooklyn Building Sales 2003-2014
-      .sub-heading The goal of this project is to display sales in a readable and interesting way
+      .sub-heading Click a neighborhood to see graphs for that area. Hover an area to compare.
     .map-svg-container
       svg#brooklyn-svg.svg-map( height='600px', width='500px' )
+        defs
+          pattern( id="Pattern" x="0" y="0" width=".25" height=".25" )
+            rect( x="0" y="0" width="50" height="50" fill="skyblue" )
+
       .brooklyn-svg-key
-      a.brooklyn-svg.back.faux-underline-large( href="#" ) Back to choropleth
+      a.brooklyn-svg.back.faux-underline-large( href="#" ) Back to overview
       svg#brooklyn-date-slider.svg-slider( width='500px' )
     .svg-graphs
       .graph-heading-container

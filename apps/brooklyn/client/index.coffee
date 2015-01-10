@@ -26,21 +26,13 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   initialize: ->
     @selectedLabel = new Label(visible: true, $el: @$('.selected-neighborhood-name'), selector: '.graph-heading')
-    @hoveredLabel = new Label(visible: false, $el: @$('.hover-neighborhood-name'), selector: '.graph-heading')
+    @hoveredLabel = new Label(visible: true, $el: @$('.hover-neighborhood-name'), selector: '.graph-heading')
     @$back = @$('.brooklyn-svg.back')
     @renderSvgMap nycTopoJson
     @renderLineGraph()
     @renderBuildingClassGraphs()
     @reverseNeighborhoodHash()
     @renderSlider()
-
-    ## Setup default state
-    @selectedLabel.set
-      visible: true
-      text: 'Click a neighborhood to see graphs for that area'
-    @hoveredLabel.set
-      visible: true
-      text: 'Hover a neighborhood to compare'
 
   renderSlider: ->
     width = 502
