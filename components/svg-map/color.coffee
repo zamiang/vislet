@@ -14,7 +14,7 @@ module.exports =
     quantize = @getColorClass min, max
 
     for item in data
-      hash[item.id.split('-')[0]] = quantize(item.value)
+      hash[item.id] = quantize(item.value)
 
     selectColor = (item) =>
       if color = hash[item.id]

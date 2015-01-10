@@ -21,10 +21,13 @@ module.exports = class SvgMap extends Backbone.View
     ignoredId: null
     title: ''
     speed: 500
+    scale: 0.95
+    translateX: 0
+    translateY: 0
 
   initialize: (options) ->
     { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea,
-      @colorKeyWidth, @customMouseEnter, @$colorKey, @title } = _.defaults(options, @defaults)
+      @colorKeyWidth, @customMouseEnter, @$colorKey, @title, @scale, @translateX, @translateY } = _.defaults(options, @defaults)
     @width = @$el.width()
     @height = @$el.height()
     @render()
@@ -42,23 +45,21 @@ module.exports = class SvgMap extends Backbone.View
     projection.scale(1).translate([0, 0])
 
     bounds = path.bounds(neighborhoods)
-    scale = .95 / Math.max((bounds[1][0] - bounds[0][0]) / @width, (bounds[1][1] - bounds[0][1]) / @height)
-    translate = [(@width - scale * (bounds[1][0] + bounds[0][0])) / 2, (@height - scale * (bounds[1][1] + bounds[0][1])) / 2]
+    scale = 1.05 / Math.max((bounds[1][0] - bounds[0][0]) / @width, (bounds[1][1] - bounds[0][1]) / @height)
+    translate = [((@width - scale * (bounds[1][0] + bounds[0][0])) / 2) + @translateX, ((@height - scale * (bounds[1][1] + bounds[0][1])) / 2) + @translateY]
 
     projection.scale(scale).translate(translate)
-
-    console.log neighborhoods.features
 
     g = svg.append("g")
     g.selectAll("path")
       .data(neighborhoods.features)
       .enter().append("path")
-      .attr("class", (d) => 'tract') #if d.id == @ignoredId then 'park' else 'tract' )
+      .attr("class", (d) => if d.id == @ignoredId then 'park' else 'tract' )
       .attr('fill', (d) => if d.id == @ignoredId then "url(#pattern)" else '')
       .attr("data-id", (d) -> d.id )
       .attr("d", path)
-      .on("click", (item) => @onClick(item, path, g) )
-      .on("mouseover", (item) => @mouseover(item) )
+      .on("click", (d) => if d.id != @ignoredId then @onClick(d, path, g) )
+      .on("mouseover", (d) => if d.id != @ignoredId then @mouseover(d) )
       .append("title")
 
     svg.on 'mouseleave', => @mouseleave()

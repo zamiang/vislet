@@ -2,7 +2,7 @@ Backbone = require "backbone"
 $ = require 'jquery'
 Backbone.$ = $
 moment = require 'moment'
-nycTopoJson = require('../data/nyc-neighborhoods.json')
+brooklynTopoJson = require('../data/brooklyn.json')
 svgMapView = require('../../../components/svg-map/index.coffee')
 LineGraph = require('../../../components/line-graph/index.coffee')
 PercentGraph = require('../../../components/line-graph/percent-graph.coffee')
@@ -28,10 +28,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @selectedLabel = new Label(visible: true, $el: @$('.selected-neighborhood-name'), selector: '.graph-heading')
     @hoveredLabel = new Label(visible: true, $el: @$('.hover-neighborhood-name'), selector: '.graph-heading')
     @$back = @$('.brooklyn-svg.back')
-    @renderSvgMap nycTopoJson
+    @renderSvgMap brooklynTopoJson
     @renderLineGraph()
     @renderBuildingClassGraphs()
-    @reverseNeighborhoodHash()
     @renderSlider()
 
   renderSlider: ->
@@ -66,7 +65,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
         if item.date == date
           value = item.value
       {
-        id: neighborhoodNames[NTA]
+        id: NTA
         value: value
       }
 
@@ -80,16 +79,16 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @isCholoropleth = true
     false
 
-  handleGraphHover: (currentId, hoverId) =>
+  handleGraphHover: (currentNTA, hoverNTA) =>
     return if @isCholoropleth
-    hoverNTA = @neighborhoodHash[hoverId]
-    currentNTA = @neighborhoodHash[currentId]
+
+    neighborhoodName = neighborhoodNames[hoverNTA]
     for lineGraph in @lineGraphs
       lineGraph.animateNewArea(currentNTA, hoverNTA)
 
     @hoveredLabel.set
       visible: true
-      text: @formatNeighborhoodName(@fullNeighborhoodHash[hoverId])
+      text: @formatNeighborhoodName(neighborhoodName)
 
   renderBuildingClassGraphs: ->
     width = 490
@@ -121,43 +120,31 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       handleHover: @handleHover
 
   renderSvgMap: (topojson) ->
-    neighborhoods = []
-    topojson.objects.nycneighborhoods.geometries = topojson.objects.nycneighborhoods.geometries.filter (neighborhood) ->
-      neighborhood.id = neighborhood.id.split('-')[0]
-      neighborhoods.push neighborhood.id
-      unless neighborhood.id and neighborhood.properties.BoroCode == 3 and neighborhood.id != 'park'
-        return false
-      true
-
-    @neighborhoods = neighborhoods
-
     @svgMap = new svgMapView
       el: $('#brooklyn-svg')
       topojson: topojson
       key: 'nycneighborhoods'
-      ignoredId: 'park'
+      ignoredId: 'BK99'
       customOnClick: (id) => @handleNeighborhoodClick(id)
       drawLabels: false
       zoomOnClick: false
       $colorKey: $('.brooklyn-svg-key')
+      scale: 1.05
+      translateX: 37
+      translateY: 0
       colorKeyWidth: 610
       customMouseEnter: @handleGraphHover
       customClickSelectedArea: (=> @colorMapClick())
 
-  reverseNeighborhoodHash: ->
-    @neighborhoodHash = {}
-    @fullNeighborhoodHash = {}
-    for key in Object.keys(neighborhoodNames)
-      @neighborhoodHash[neighborhoodNames[key].split('-')[0]] = key
-      @fullNeighborhoodHash[neighborhoodNames[key].split('-')[0]] = neighborhoodNames[key]
-
   formatNeighborhoodName: (name) -> name?.split('-').join(', ')
   handleNeighborhoodClick: (id) ->
+    neighbornoodName = neighborhoodNames[id]
     for lineGraph in @lineGraphs
-      lineGraph.animateNewArea(@neighborhoodHash[id])
-    @stackedGraph.animateNewArea(@neighborhoodHash[id])
+      lineGraph.animateNewArea(id)
+    @stackedGraph.animateNewArea(id)
 
-    @selectedLabel.set text: @formatNeighborhoodName(@fullNeighborhoodHash[id])
+    @selectedLabel.set text: @formatNeighborhoodName(neighbornoodName)
+
     @$back.fadeIn @speed
     @slider.$el.fadeOut(200)
     @isCholoropleth = false
