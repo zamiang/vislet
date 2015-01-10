@@ -1,9 +1,7 @@
-var core                     = require("../level1/core").dom.level1.core;
+var core         = require("../level1/core");
 var defineGetter = require('../utils').defineGetter;
 var defineSetter = require('../utils').defineSetter;
-
-// modify cloned instance for more info check: https://github.com/tmpvar/jsdom/issues/325
-core = Object.create(core);
+var memoizeQuery = require('../utils').memoizeQuery;
 
 var INVALID_STATE_ERR        = core.INVALID_STATE_ERR        = 11,
     SYNTAX_ERR               = core.SYNTAX_ERR               = 12,
@@ -397,7 +395,7 @@ core.Element.prototype.setAttributeNodeNS = function(/* Attr */ newAttr)
   return this._attributes.$setNode(newAttr);
 };
 
-core.Element.prototype.getElementsByTagNameNS = core.memoizeQuery(function(/* String */ namespaceURI,
+core.Element.prototype.getElementsByTagNameNS = memoizeQuery(function(/* String */ namespaceURI,
                                                          /* String */ localName)
 {
   var nsPrefixCache = {};
@@ -620,12 +618,4 @@ defineGetter(core.Element.prototype, "id", function() {
 core.Document.prototype.getElementById = function(id) {
   // return the first element
   return (this._ids && this._ids[id] && this._ids[id].length > 0 ? this._ids[id][0] : null);
-};
-
-
-exports.dom =
-{
-  level2 : {
-    core : core
-  }
 };

@@ -5,21 +5,17 @@ var URL = require('url');
 var toFileUrl = require('./jsdom/utils').toFileUrl;
 var defineGetter = require('./jsdom/utils').defineGetter;
 var defineSetter = require('./jsdom/utils').defineSetter;
-var style = require('./jsdom/level2/style');
 var features = require('./jsdom/browser/documentfeatures');
-var dom = require('./jsdom/living/index').dom;
-var createWindow = require('./jsdom/browser/index').createWindow;
+var dom = require('./jsdom/living');
 var browserAugmentation = require('./jsdom/browser/index').browserAugmentation;
-var windowAugmentation = require('./jsdom/browser/index').windowAugmentation;
 
 var domToHtml = require('./jsdom/browser/domtohtml').domToHtml;
 
-var request = function(options, cb) {
+var request = function() { // lazy loading request
   request = require('request');
-  return request(options, cb);
+  return request.apply(undefined, arguments);
 }
 
-exports.defaultLevel = dom.living.html;
 exports.debugMode = false;
 
 // Proxy feature functions to features module.
@@ -34,27 +30,9 @@ exports.debugMode = false;
   });
 });
 
-var level2Html = require('./jsdom/level2/html');
-exports.level = function (level, feature) {
-  if(!feature) {
-    feature = 'core';
-  }
-
-  if (String(level) === '1' || String(level) === '2' || String(level) === '3') {
-    level = 'level' + level;
-  }
-
-  return require('./jsdom/' + level + '/' + feature).dom[level][feature];
-};
-
 exports.jsdom = function (html, options) {
   options = options || {};
 
-  if (typeof options.level === 'string') {
-    options.level = exports.level(options.level, 'html');
-  } else {
-    options.level = options.level || exports.defaultLevel;
-  }
   options.parsingMode = options.parsingMode || "auto";
 
   if (!options.url) {
@@ -70,14 +48,12 @@ exports.jsdom = function (html, options) {
     }
   }
 
-  var browser = browserAugmentation(options.level, options);
+  var browser = browserAugmentation(dom, options);
   var doc = browser.HTMLDocument ? new browser.HTMLDocument(options) : new browser.Document(options);
 
   if (options.created) {
     options.created(null, doc.parentWindow);
   }
-
-  require('./jsdom/selectors/index').applyQuerySelectorPrototype(options.level);
 
   features.applyDocumentFeatures(doc, options.features);
 
@@ -219,8 +195,7 @@ function processHTML(config) {
     url: config.url,
     parser: config.parser,
     parsingMode: config.parsingMode,
-    created: config.created,
-    level: config.level
+    created: config.created
   };
 
   if (config.document) {

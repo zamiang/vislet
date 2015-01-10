@@ -14,8 +14,8 @@
         "underscore.string": "*",
         "backbone-super-sync": "*",
         "coffee-script": "*",
-        "redis": "*",
         "moment": "*",
+        "marked": "*",
         "node-env-file": "*"
     },
     "devDependencies": {

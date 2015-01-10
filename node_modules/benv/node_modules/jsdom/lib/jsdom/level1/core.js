@@ -2,6 +2,9 @@
   ServerJS Javascript DOM Level 1
 */
 var inheritFrom = require("../utils").inheritFrom;
+var domToHtml = require("../browser/domtohtml").domToHtml;
+var defineGetter = require("../utils").defineGetter;
+var memoizeQuery = require("../utils").memoizeQuery;
 
 // utility functions
 var attachId = function(id,elm,doc) {
@@ -30,40 +33,102 @@ var detachId = function(id,elm,doc) {
   }
 };
 
-var core = {
+var DOC_HTML5 = /<!doctype html>/i,
+    DOC_TYPE = /<!DOCTYPE (\w(.|\n)*)">/i,
+    DOC_TYPE_START = '<!DOCTYPE ',
+    DOC_TYPE_END = '">';
 
+function parseDocType(dom, doc, html) {
+  var publicID = '',
+      systemID = '',
+      fullDT = '',
+      name = 'html',
+      set = true,
+      doctype = html.match(DOC_HTML5);
+
+  //Default, No doctype === null
+  doc._doctype = null;
+
+  if (doctype && doctype[0]) { //Handle the HTML shorty doctype
+    fullDT = doctype[0];
+  } else { //Parse the doctype
+    // find the start
+    var start = html.indexOf(DOC_TYPE_START),
+        end = html.indexOf(DOC_TYPE_END),
+        docString;
+
+    if (start < 0 || end < 0) {
+      return;
+    }
+
+    docString = html.substr(start, (end - start) + DOC_TYPE_END.length);
+    doctype = docString.replace(/[\n\r]/g, '').match(DOC_TYPE);
+
+    if (!doctype) {
+      return;
+    }
+
+    fullDT = doctype[0];
+    doctype = doctype[1].split(' "');
+    var _id1 = doctype.length ? doctype.pop().replace(/"/g, '') : '',
+        _id2 = doctype.length ? doctype.pop().replace(/"/g, '') : '';
+
+    if (_id1.indexOf('-//') !== -1) {
+      publicID = _id1;
+    }
+    if (_id2.indexOf('-//') !== -1) {
+      publicID = _id2;
+    }
+    if (_id1.indexOf('://') !== -1) {
+      systemID = _id1;
+    }
+    if (_id2.indexOf('://') !== -1) {
+      systemID = _id2;
+    }
+    if (doctype.length) {
+      doctype = doctype[0].split(' ');
+      name = doctype[0];
+    }
+  }
+  doc._doctype = new dom._domImpl().createDocumentType(name, publicID, systemID);
+  doc._doctype._ownerDocument = doc;
+  doc._doctype._parentNode = doc;
+  doc._doctype._fullDT = fullDT;
+  doc._doctype.toString = function () {
+    return this._fullDT;
+  };
+}
+
+function setInnerHTML(dom, node, html) {
+  //Clear the children first:
+  var child;
+  while ((child = node._childNodes[0])) {
+    node.removeChild(child);
+  }
+
+  var isDoc = node.nodeName === '#document';
+  if (isDoc) {
+    parseDocType(dom, node, html);
+
+    if (node._doctype) {
+      node._childNodes[0] = node._doctype;
+    }
+  }
+  if (html !== "" && html != null) {
+    if (isDoc) {
+      dom._htmlToDom.appendHtmlToDocument(html, node);
+    } else {
+      dom._htmlToDom.appendHtmlToElement(html, node);
+    }
+  }
+}
+
+// TODO: move all of these to utils.js. Right now they are exposed on window, which is bizarre.
+var core = module.exports = {
   mapper: function(parent, filter, recursive) {
     return function() {
       return core.mapDOMNodes(parent, recursive !== false, filter);
     };
-  },
-
-  memoizeQuery: function(fn) {
-    var type = core.memoizeQueryType = core.memoizeQueryType || 1;
-    core.memoizeQueryType++;
-    // Only memoize query functions with arity <= 2
-    if (fn.length > 2) {
-      return fn;
-    }
-    return function() {
-      if (!this._memoizedQueries) {
-        return fn.apply(this, arguments);
-      }
-      if (!this._memoizedQueries[type]) {
-        this._memoizedQueries[type] = {};
-      }
-      if (arguments.length !== 0 && typeof arguments[0] === 'string' && (arguments.length === 1 || (typeof arguments[1] === 'string' && arguments.length === 2))) {
-        var k = String(arguments[0]);
-        if (arguments.length === 2) {
-          k += '::' + String(arguments[1]);
-        }
-        if (this._memoizedQueries[type].hasOwnProperty(k)) {
-          return this._memoizedQueries[type][k];
-        }
-        return (this._memoizedQueries[type][k] = fn.apply(this, arguments));
-      }
-      return fn.apply(this, arguments);
-    }
   },
 
   // Returns Array
@@ -1396,10 +1461,61 @@ inheritFrom(core.Node, core.Element, {
     }
     return this.nodeName;
   },
+
+  get nodeName() {
+    return this._nodeName.toUpperCase();
+  },
+
   nodeType : ELEMENT_NODE,
   get attributes() {
     return this._attributes;
   },
+
+  get sourceIndex() {
+    /*
+    * According to QuirksMode:
+    * Get the sourceIndex of element x. This is also the index number for
+    * the element in the document.getElementsByTagName('*') array.
+    * http://www.quirksmode.org/dom/w3c_core.html#t77
+    */
+    var items = this.ownerDocument.getElementsByTagName('*'),
+        len = items.length;
+
+    for (var i = 0; i < len; i++) {
+      if (items[i] === this) {
+        return i;
+      }
+    }
+  },
+
+  get outerHTML() {
+    return domToHtml(this, true);
+  },
+
+  get innerHTML() {
+    if (/^(?:script|style)$/.test(this._tagName)) {
+      var type = this.getAttribute('type');
+      if (!type || /^text\//i.test(type) || /\/javascript$/i.test(type)) {
+        return domToHtml(this._childNodes, true, true);
+      }
+    }
+
+    // In case of <template> we should pass it's content fragment as a serialization root if we have one
+    if(this._tagName === 'template' &&
+       this._namespaceURI === 'http://www.w3.org/1999/xhtml' &&
+       this._childNodes[0] && this._childNodes[0]._templateContent) {
+      return domToHtml(this._childNodes[0]._childNodes, true);
+    }
+
+    return domToHtml(this._childNodes, true);
+  },
+
+  set innerHTML(html) {
+    setInnerHTML(this.ownerDocument, this, html);
+  },
+
+  scrollTop: 0,
+  scrollLeft: 0,
 
   /* returns string */
   getAttribute: function(/* string */ name) {
@@ -1455,7 +1571,7 @@ inheritFrom(core.Node, core.Element, {
   }, //raises: function(DOMException) {},
 
   /* returns NodeList */
-  getElementsByTagName: core.memoizeQuery(function(/* string */ name) {
+  getElementsByTagName: memoizeQuery(function(/* string */ name) {
     name = name.toLowerCase();
 
     function filterByTagName(child) {
@@ -1471,6 +1587,33 @@ inheritFrom(core.Node, core.Element, {
     }
     return new core.NodeList(this._ownerDocument || this, core.mapper(this, filterByTagName, true));
   }),
+
+  getElementsByClassName: function (className) {
+
+    function filterByClassName(child) {
+      if (!child) {
+        return false;
+      }
+
+      if (child.nodeType &&
+          child.nodeType === core.Node.ENTITY_REFERENCE_NODE) {
+        child = child._entity;
+      }
+
+      var classString = child.className;
+      if (classString) {
+        var s = classString.split(" ");
+        for (var i = 0; i < s.length; i++) {
+          if (s[i] === className) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    return new core.NodeList(this.ownerDocument || this, core.mapper(this, filterByClassName));
+  }
 });
 
 core.DocumentFragment = function DocumentFragment(document) {
@@ -1565,6 +1708,27 @@ inheritFrom(core.Node, core.Document, {
   get attributes() { return null;},
   get ownerDocument() { return null;},
   get readonly() { return this._readonly;},
+
+  set parentWindow(window) {
+    // Contextify does not support getters and setters, so we have to set them
+    // on the original object instead.
+    window._frame = function (name, frame) {
+      if (typeof frame === 'undefined') {
+        delete window[name];
+      } else {
+        defineGetter(window, name, function () { return frame.contentWindow; });
+      }
+    };
+    this._parentWindow = window.getGlobal();
+  },
+
+  get defaultView() {
+    return this.parentWindow;
+  },
+
+  toString: function () {
+    return '[object HTMLDocument]';
+  },
 
   /* returns Element */
   _createElementNoTagNameValidation: function(/*string*/ tagName) {
@@ -1739,7 +1903,7 @@ inheritFrom(core.Node, core.Document, {
   },
 
   /* returns NodeList */
-  getElementsByTagName: core.memoizeQuery(function(/* string */ name) {
+  getElementsByTagName: memoizeQuery(function(/* string */ name) {
     function filterByTagName(child) {
       if (child.nodeType && child.nodeType === ENTITY_REFERENCE_NODE)
       {
@@ -1764,7 +1928,64 @@ inheritFrom(core.Node, core.Document, {
       return false;
     }
     return new core.NodeList(this.documentElement || this, core.mapper(this, filterByTagName, true));
-  })
+  }),
+
+  getElementsByClassName: function (className) {
+
+    function filterByClassName(child) {
+      if (!child) {
+        return false;
+      }
+
+      if (child.nodeType &&
+          child.nodeType === core.Node.ENTITY_REFERENCE_NODE) {
+        child = child._entity;
+      }
+
+      var classString = child.className;
+      if (classString) {
+        var s = classString.split(" ");
+        for (var i = 0; i < s.length; i++) {
+          if (s[i] === className) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    return new core.NodeList(this.ownerDocument || this, core.mapper(this, filterByClassName));
+  },
+
+  write: function (text) {
+    if (this._writeAfterElement) {
+      // If called from an script element directly (during the first tick),
+      // the new elements are inserted right after that element.
+      var tempDiv = this.createElement('div');
+      setInnerHTML(this, tempDiv, text);
+
+      var child = tempDiv.firstChild;
+      var previous = this._writeAfterElement;
+      var parent = this._writeAfterElement.parentNode;
+
+      while (child) {
+        var node = child;
+        child = child.nextSibling;
+        parent.insertBefore(node, previous.nextSibling);
+        previous = node;
+      }
+    } else if (this.readyState === "loading") {
+      // During page loading, document.write appends to the current element
+      // Find the last child that has been added to the document.
+      var node = this;
+      while (node.lastChild && node.lastChild.nodeType === this.ELEMENT_NODE) {
+        node = node.lastChild;
+      }
+      setInnerHTML(this, node, text || "<html><head></head><body></body></html>");
+    } else if (text) {
+      setInnerHTML(this, this, text);
+    }
+  }
 });
 
 core.CharacterData = function CharacterData(document, value) {
@@ -2126,5 +2347,3 @@ inheritFrom(core.Node, core.EntityReference, {
   get lastChild() { return this._entity.lastChild || null;},
   normalize: function(){ /*noop*/ }
 });
-
-exports.dom = { "level1" : { "core" : core }};

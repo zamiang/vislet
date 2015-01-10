@@ -1,12 +1,8 @@
-var events        = require("../level2/events"),
-    core          = require("../level2/core").dom.level2.core,
+var core          = require("../level1/core"),
     defineGetter  = require('../utils').defineGetter,
     defineSetter  = require('../utils').defineSetter,
     HtmlToDom     = require('../browser/htmltodom').HtmlToDom,
     domToHtml     = require('../browser/domtohtml').domToHtml;
-
-// modify cloned instance for more info check: https://github.com/tmpvar/jsdom/issues/325
-core = Object.create(core);
 
 /*
   valuetype DOMString sequence<unsigned short>;
@@ -670,9 +666,3 @@ defineGetter(core.Document.prototype, 'inputEncoding', function() {
 
 #endif // _DOM_IDL_
 */
-
-exports.dom = {
-  level3 : {
-    core: core
-  }
-};
