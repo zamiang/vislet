@@ -35,6 +35,10 @@ module.exports =
       .range(d3.range(9).map((i) -> "color#{i}" ))
 
   drawColorKey: (classes, values, label) ->
+    if @reverseColorKey
+      classes = classes.reverse()
+      values = values.reverse()
+
     formattedValues = for value in values
       if value < 1000000
         Number(value.toFixed(0)).toLocaleString()

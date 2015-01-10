@@ -9,7 +9,7 @@ following Fort Green and so on. What I found was just how incredibly
 different each and every neighborhood in Brooklyn is. They just aren't
 comparable - but contrastable.
 
-## Brownstones vs Lofts: Buswick vs Brooklyn heights
+## Brownstones vs Lofts
 
 Visually, Bushwick and Brooklyn Heights could not be more
 different. Brooklyn Heights is historically the wealthiest
@@ -29,7 +29,7 @@ The building class data is some of the most difficult to compare so
 this serves as a good example for getting started looking at those
 graphs.
 
-## 2008 Recovery: Clinton Hill vs Canarsie
+## 2008 Recovery
 
 One trend you will notice throughout the data is the impact
 of the 2008 financial crisis on Brooklyn. While some neighborhoods

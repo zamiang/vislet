@@ -24,9 +24,10 @@ module.exports = class SvgMap extends Backbone.View
     scale: 0.95
     translateX: 0
     translateY: 0
+    reverseColorKey: true
 
   initialize: (options) ->
-    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea,
+    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea, @reverseColorKey
       @colorKeyWidth, @customMouseEnter, @$colorKey, @title, @scale, @translateX, @translateY } = _.defaults(options, @defaults)
     @width = @$el.width()
     @height = @$el.height()
