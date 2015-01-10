@@ -384,6 +384,11 @@
         }
       }
     },
+    "marked": {
+      "version": "0.3.2",
+      "from": "marked@*",
+      "resolved": "https://registry.npmjs.org/marked/-/marked-0.3.2.tgz"
+    },
     "moment": {
       "version": "2.9.0",
       "from": "moment@*",

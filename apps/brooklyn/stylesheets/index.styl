@@ -14,6 +14,11 @@
     display: inline-block
     max-width: 500px
     position: relative
+  .svg-container
+    width: 100%
+    &.third-width
+      width: 700px
+
   #brooklyn-svg
     border: 1px solid $border-color
     background: url('/images/brooklyn.png')
@@ -53,7 +58,10 @@
 
 .markdown-text
   font-size: 15px
-  max-width: 550px
+  h1, h2, p
+    max-width: 548px
+  .svg-building-class
+    width: 548px
 
 .commercial-sales
   display: none
@@ -63,6 +71,8 @@
   width: 600px
   vertical-align: top
   display: inline-block
+  &.third-width
+    width: 700px
 
 .sales-group
   margin-top: 10px

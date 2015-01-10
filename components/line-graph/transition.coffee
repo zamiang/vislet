@@ -1,16 +1,7 @@
 module.exports =
   animateNewArea: (startingDataset, compareDataset) ->
     flattenedData = @getFlattenedData startingDataset
-    @lines = @color.domain().map (name) ->
-      { name: name, values: flattenedData[name] }
-
-    if compareDataset
-      flattenedData = @getFlattenedData compareDataset
-      for line in @lines
-        if line.name == 'compare-dataset'
-          line.values = flattenedData[@keys[0]]
-    else
-      @removeComparisonLine()
+    @lines = @getLines flattenedData, startingDataset, compareDataset
 
     svg = d3.select("##{@$el.attr('id')}")
 
@@ -22,14 +13,6 @@ module.exports =
       .attr("d", (d) => @line(d.values))
 
     @transitionLineLabels svg if @displayLineLabels
-
-  removeComparisonLine: ->
-    for line in @lines
-      if line.name == 'compare-dataset'
-        line.values = []
-
-  addComparisonLine: (dataset) ->
-    flattenedData = @getFlattenedData(dataSet)
 
   transitionLineLabels: (svg) ->
     svg.selectAll(".line-label")
@@ -46,10 +29,7 @@ module.exports =
 
     return if Math.abs(max - @maxY) < threshhold and Math.abs(min - @minY) < threshhold
 
-    @y.domain([
-      max,
-      min
-    ])
+    @y.domain([max, min])
     svg.select(".y-axis")
       .transition().duration(@speed).ease("sin-in-out")
       .call(@yAxis)

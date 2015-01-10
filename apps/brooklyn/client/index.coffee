@@ -104,6 +104,26 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       label: 'Building Class as % of sales'
       displayKey: (id) -> buildingClasses[id]
 
+    # For blog post
+    new StackedGraph
+      el: $('#bushwick-building-class')
+      width: 460
+      height: height
+      data: salesData
+      startingDataset: 'BK77'
+      keys: ['buildingClass']
+      label: 'Bushwick Building Class as % of sales'
+      displayKey: (id) -> buildingClasses[id]
+
+    new StackedGraph
+      el: $('#heights-building-class')
+      width: 460
+      height: height
+      data: salesData
+      startingDataset: 'BK09'
+      keys: ['buildingClass']
+      label: 'Brooklyn Heights Building Class as % of sales'
+
   renderLineGraph: ->
     width = 490
     height = 230
@@ -118,6 +138,24 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       label: 'Avg Price Per SqFt'
       yAxisFormat: (x) -> "$#{x}"
       handleHover: @handleHover
+
+    recoveryGraph = new LineGraph
+      width: 620
+      height: height
+      data: salesData
+      startingDataset: 'BK69'
+      keys: ['residentialPriceAverage', 'residentialPriceAverage-mean']
+      el: $('#clinton-price')
+      label: 'Avg Price Per SqFt'
+      yAxisFormat: (x) -> "$#{x}"
+      displayKey: (id) ->
+        if neighborhoodNames[id]
+          neighborhoodNames[id]
+        else if id == 'compare-dataset'
+          neighborhoodNames['BK50']
+        else
+          'Borough Average'
+    recoveryGraph.animateNewArea('BK69', 'BK50')
 
   renderSvgMap: (topojson) ->
     @svgMap = new svgMapView

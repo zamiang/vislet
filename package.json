@@ -13,6 +13,7 @@
         "underscore": "*",
         "underscore.string": "*",
         "backbone-super-sync": "*",
+        "marked": "*",
         "coffee-script": "*",
         "moment": "*",
         "node-env-file": "*"

@@ -53,12 +53,7 @@ module.exports = class LineGraph extends Backbone.View
 
     flattenedData = @getFlattenedData @startingDataset
 
-    @color = d3.scale.category10()
-    @color.domain Object.keys(flattenedData)
-    @lines = @color.domain().map (name) ->
-      { name: name, values: flattenedData[name] }
-
-    @lines.push { name: 'compare-dataset', values: [] }
+    @lines = @getLines flattenedData, @startingDataset
 
     @x.domain(d3.extent(flattenedData[Object.keys(flattenedData)[0]], (d) -> d.date ))
 
@@ -72,6 +67,33 @@ module.exports = class LineGraph extends Backbone.View
     @drawKey() if @displayKey
     @appendTooltips @color, svg, @lines
     @drawLineLabels(@color) if @displayLineLabels
+
+  getLines: (flattenedData, startingDataset, compareDataset) ->
+    lines = for name in Object.keys(flattenedData)
+      {
+        id: if name.indexOf('-mean') > -1 then 'Borough Average' else startingDataset
+        name: name,
+        values: flattenedData[name]
+      }
+
+    if compareDataset
+      flattenedData = @getFlattenedData compareDataset
+      lines.push {
+        name: 'compare-dataset'
+        id: compareDataset
+        values: flattenedData[@keys[0]]
+      }
+    else
+      lines.push { name: 'compare-dataset', values: [] }
+    lines
+
+  color: (name) ->
+    if name.indexOf('-mean') > -1
+      'lightgray'
+    else if name.indexOf('compare-') > -1
+      '#D53F50'
+    else
+      'steelblue'
 
   drawAxis: (svg) ->
     @xAxis = d3.svg.axis()
@@ -112,19 +134,10 @@ module.exports = class LineGraph extends Backbone.View
       .attr("class", "sales")
 
     paths = @svgLines.append("path")
-      .attr("class", @getLineClass)
+      .attr("class", 'line')
       .attr("d", (d) -> line(d.values) )
 
-    if @addColor
-      paths.style("stroke", (d) -> color(d.name) )
-
-  getLineClass: (d) ->
-    if d.name.indexOf('-mean') > -1
-      'line mean-line'
-    else if d.name.indexOf('compare-') > -1
-      'line compare-line'
-    else
-      'line'
+    paths.style("stroke", (d) -> color(d.name) )
 
   drawLineLabels: (color) ->
     @svgLines.append("text")

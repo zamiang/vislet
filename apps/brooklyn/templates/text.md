@@ -9,7 +9,7 @@ following Fort Green and so on. What I found was just how incredibly
 different each and every neighborhood in Brooklyn is. They just aren't
 comparable - but contrastable.
 
-## Buswick vs Brooklyn heights - Brownstones vs Lofts
+## Brownstones vs Lofts: Buswick vs Brooklyn heights
 
 Visually, Bushwick and Brooklyn Heights could not be more
 different. Brooklyn Heights is historically the wealthiest
@@ -17,7 +17,13 @@ neighborhood in Brooklyn and it shows. They disguise a vent from the
 underground subway as a brownstone so that it is more visually
 consistent. Bushwick is a…less visually consistent industrial
 neighborhood that over the past decade or so, have been converted into
-artist studios and lofts.
+artist studios and lofts. The types of buildings being sold in each
+neighborhood could not be more different.
+
+<div class="svg-container">
+<svg id="heights-building-class" class="stacked-area-chart svg-building-class" />
+<svg id="bushwick-building-class" class="stacked-area-chart svg-building-class" />
+</div>
 
 The building class data is some of the most difficult to compare so
 this serves as a good example for getting started looking at those
@@ -25,19 +31,23 @@ graphs.
 
 ## 2008 Recovery: Clinton Hill vs Canarsie
 
-One trend you will notice throughout looking at the data is the impact
-of the 2008 real-estate crisis on Brooklyn. While some neighborhoods
+One trend you will notice throughout the data is the impact
+of the 2008 financial crisis on Brooklyn. While some neighborhoods
 like Greenpoint barely let it dent their meteoric climb, others, like
 Canarsie are only beginning to recover. Lets take a look at two
 neighborhoods here - Clinton Hill and Canarsie which both felt the
-impact of 2008 but have had very different paths since. Up until about
+impact of 2008 but have had very different recoveries. Up until about
 2011, your money would buy you just about the same amount of indoor
 space in Clinton Hill as in Canarsie.
+
+<div class="svg-container third-width">
+<svg id="clinton-price" class="svg-line-graph third-width" />
+</div>
 
 While I would love to chart a neighborhood's 'number of mentions in
 the NYTimes real estate section', Clinton Hill has been getting a
 tremendous amount of press over the past few years and is undoubtably
-'Rapidly Gentrifying'.  Due to its classification as a historic
+'Rapidly Gentrifying'. Due to its classification as a historic
 neighborhood, the types of units solid in sold in Clinton Hill doesn't
 change very much. Canarsie is similarly stable. It has consistently
 had the largest percentage of Two Family Homes in all of Brooklyn at
@@ -45,7 +55,6 @@ around 55% of ALL sales. While neither neighborhood has visually
 changed all much from 2008 until now where each was about $300
 persqft, they have had very different paths since. Clinton Hill is now
 nearing $600 while Canarsie is still below peak at around $250.
-
 
 ## The Williamsburg spike
 
