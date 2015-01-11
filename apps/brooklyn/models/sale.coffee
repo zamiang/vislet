@@ -32,7 +32,7 @@ module.exports = class Sale extends Backbone.Model
   setupPricePerSqFt: ->
     price = Number(@get('price').replace('$', '').replace(',', '').replace(',', ''))
     sqft = Number(@get('grossSqFt').replace(',', '').replace(',', ''))
-    return unless price > 100 && sqft > 100
+    return unless price > 10000 && sqft > 100
     @set
       pricePerSqFt: price / sqft
 
