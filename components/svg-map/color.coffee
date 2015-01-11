@@ -5,11 +5,6 @@ module.exports =
 
   # @param {Array} Array of objects { id: 123, value: 0.5 }
   colorMap: (data, min, max, label) ->
-    values =
-      for item in data
-        if item.id != 'ALL'
-          item.value
-
     hash = {}
     quantize = @getColorClass min, max
 
@@ -22,11 +17,12 @@ module.exports =
       else
         'tract'
 
-    svg = d3.select "##{@$el.attr('id')}"
-    svg.selectAll(".tract")
+    @svg.selectAll(".tract")
       .attr('class', selectColor)
 
-    @drawColorKey(quantize.range(), quantize.quantiles(), label)
+    # Only draw once
+    unless @drawnColorKey
+      @drawColorKey(quantize.range(), quantize.quantiles(), label)
 
   # Input must be sorted in ascending order
   getColorClass: (min, max) ->
@@ -55,6 +51,7 @@ module.exports =
 
     @$colorKey.html template(params)
     @showColorKey()
+    @drawnColorKey = true
 
   showColorKey: -> @$colorKey.fadeIn(100)
   hideColorKey: -> @$colorKey.fadeOut(100)

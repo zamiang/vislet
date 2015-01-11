@@ -28,8 +28,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @selectedLabel = new Label(visible: true, $el: @$('.selected-neighborhood-name'), selector: '.graph-heading')
     @hoveredLabel = new Label(visible: true, $el: @$('.hover-neighborhood-name'), selector: '.graph-heading')
     @$back = @$('.brooklyn-svg.back')
-    @renderSvgMap brooklynTopoJson
     @NTAs = Object.keys(salesData)
+    @mapColorHash = @getMapColorHash()
+    @renderSvgMap brooklynTopoJson
     @renderLineGraph()
     @renderBuildingClassGraphs()
     @renderSlider()
@@ -57,19 +58,22 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @$('.sales-group').hide()
     @$(".#{$target.attr('data-class')}").show()
 
-  colorMap: (date) =>
+  # Allows for easy referencing of map values for coloring the map
+  getMapColorHash: ->
+    mapColorHash = {}
     dataset = "residentialPrices"
-    label = "Avg Price Per SqFt"
-    data = for NTA in @NTAs
-      value = 0
-      for item in salesData[NTA][dataset]
-        if item.date == date
-          value = item.value
-      {
-        id: NTA
-        value: value
-      }
+    for NTA in @NTAs
+      unless NTA == 'ALL'
+        for item in salesData[NTA][dataset]
+          mapColorHash[item.date] ||= []
+          mapColorHash[item.date].push
+            id: NTA
+            value: item.value
+    mapColorHash
 
+  colorMap: (date) =>
+    label = "Avg Price Per SqFt"
+    data = @mapColorHash[date]
     @svgMap.colorMap data, 0, 1000, label
     @svgMap.updateMapTitle "Q#{moment(date).format(@dateFormat)} #{label}"
 

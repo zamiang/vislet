@@ -41,7 +41,7 @@ module.exports = class SvgMap extends Backbone.View
 
     path = d3.geo.path().projection(projection)
 
-    svg = d3.select "##{@$el.attr('id')}"
+    svg = @svg = d3.select "##{@$el.attr('id')}"
 
     projection.scale(1).translate([0, 0])
 

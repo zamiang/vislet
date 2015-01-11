@@ -1,6 +1,7 @@
 .svg-map
   .tract:hover
     fill: $red
+    transition fill 0.1s
 
   .tract.selected
     fill: hsla(207, 44%, 50%, 0.9)
@@ -24,7 +25,6 @@
 .tract, .park
   fill: rgba(250, 250, 250, 0.2)
   stroke: rgb(180, 180, 180)
-  transition fill 0.1s
 
 .park
   fill: url(#diagonalHatch)

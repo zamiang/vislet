@@ -31,18 +31,16 @@ module.exports = class Slider extends Backbone.View
 
   bisectDate: d3.bisector((d) -> d).right
   setupSlider: (svg) ->
+    debouncedSelect = _.throttle @handleSelect, 150
     brushed = (item) =>
-      if d3.event.sourceEvent
-        value = @x.invert(d3.mouse(item)[0])
-
-        v = new Date(value).valueOf()
-        i = @bisectDate(@data, v)
-        d0 = @data[i - 1]
-        d1 = @data[i]
-        d = if v - d0 > d1 - v then d1 else d0
-
-        @handle.attr("cx", @x(d))
-        @handleSelect d
+      value = @x.invert(d3.mouse(item)[0])
+      v = new Date(value).valueOf()
+      i = @bisectDate(@data, v)
+      d0 = @data[i - 1]
+      d1 = @data[i]
+      d = if v - d0 > d1 - v then d1 else d0
+      @handle.attr("cx", @x(d))
+      debouncedSelect d
 
     @brush = d3.svg.brush()
       .x(@x)
