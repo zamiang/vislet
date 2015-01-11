@@ -1,1 +1,1 @@
-require('jquery') require("../apps/chicago/client/index.coffee").init
+require("../apps/chicago/client/index.coffee").init()

@@ -25,18 +25,16 @@ assets:
 	$(foreach file, $(shell find assets -name '*.coffee' | cut -d '.' -f 1), \
 		$(BIN)/browserify $(file).coffee -t jadeify -t caching-coffeeify > public/$(file).js; \
 		$(BIN)/uglifyjs public/$(file).js > public/$(file).min.js; \
-		gzip -f public/$(file).min.js; \
 	)
 	$(BIN)/stylus assets -o public/assets
 	$(foreach file, $(shell find assets -name '*.styl' | cut -d '.' -f 1), \
 		$(BIN)/sqwish public/$(file).css -o public/$(file).min.css; \
-		gzip -f public/$(file).min.css; \
 	)
 
 # TODO: Put this in a foreach and iterate through all js and css files
 verify:
-	if [ $(shell wc -c < public/assets/chicago.min.css.gz) -gt $(MIN_FILE_SIZE) ] ; then echo ; echo "Chicago CSS exists" ; else echo ; echo "Chicago CSS asset compilation failed" ; exit 1 ; fi
-	if [ $(shell wc -c < public/assets/chicago.min.js.gz) -gt  $(MIN_FILE_SIZE) ] ; then echo ; echo "Chicago JS exists" ; else echo; echo "Chicago JS asset compilation failed" ; exit 1 ; fi
+	if [ $(shell wc -c < public/assets/chicago.min.css) -gt $(MIN_FILE_SIZE) ] ; then echo ; echo "Chicago CSS exists" ; else echo ; echo "Chicago CSS asset compilation failed" ; exit 1 ; fi
+	if [ $(shell wc -c < public/assets/chicago.min.js) -gt  $(MIN_FILE_SIZE) ] ; then echo ; echo "Chicago JS exists" ; else echo; echo "Chicago JS asset compilation failed" ; exit 1 ; fi
 
 # Runs all the necessary build tasks to push to staging or production.
 # Run with `make deploy env=staging` or `make deploy env=production`.

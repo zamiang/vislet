@@ -1,6 +1,4 @@
 Backbone = require "backbone"
-$ = require 'jquery'
-Backbone.$ = $
 chicagoTopojson = require('./neighborhoods.json')
 svgMapView = require('../../../components/svg-map/index.coffee')
 

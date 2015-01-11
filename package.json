@@ -5,6 +5,9 @@
     "scripts": {
         "start": "make s"
     },
+    "engines": {
+        "node": "0.10.x"
+    },
     "dependencies": {
         "express": "*",
         "jade": "*",
