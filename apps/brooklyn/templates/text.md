@@ -94,7 +94,7 @@ work. All things perfect, the correct way to do this would be to
 import and merge the datasets in PostGIS.
 
 If you would like to download the dataset. It can be found
-[https://github.com/zamiang/vislet/blob/master/apps/brooklyn/data/brooklyn-sales.json](datset). This
+[datset](https://github.com/zamiang/vislet/blob/master/apps/brooklyn/data/brooklyn-sales.json). This
 post mostly serves to document how the dataset was created if there
 are any issues.
 
