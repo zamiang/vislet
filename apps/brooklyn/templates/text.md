@@ -1,49 +1,25 @@
 # A look at the NYC Department of Finance Sales Data
 
-First off, why look at the sales data. I've lived in Brooklyn
-for about 5 years and wanted to better understand the wave of
-Gentrification currently washing over Brooklyn. What I expected to see
-was Bushwick being similar to Williamsburg 5 years ago, Clinton Hill
-following Fort Green and so on. What I found was just how incredibly
-different each and every neighborhood in Brooklyn is. They just aren't
-comparable - but contrastable.
+First off, why look at the sales data? Well, I've lived in Brooklyn for about 5 years and want to better understand the wave of Gentrification currently washing over Brooklyn. What I expected to see was Bushwick trailing Williamsburg, Clinton Hill following Fort Green and so on. What I found was just how incredibly different each neighborhood in Brooklyn is. It is obvious from walking around but incredible that the differences comes across in residential sales data.
 
-Here are three 'data vignetts' that should help with how to interpret
-and use the visualization above.
+Here are three 'data vignettes' that should help to
+understand and use the visualization above.
 
 ## 1. Brownstones vs Lofts
 
-Visually, Bushwick and Brooklyn Heights could not be more
-different. Brooklyn Heights is historically the wealthiest
-neighborhood in Brooklyn and it shows. They disguise a vent from the
-underground subway as a brownstone so that it is more visually
-consistent. Bushwick is a…less visually consistent industrial
-neighborhood that over the past decade or so, have been converted into
-artist studios and lofts. The types of buildings being sold in each
-neighborhood could not be more different.
+Bushwick and Brooklyn Heights could not be more different. Historically, Brooklyn Heights is the wealthiest neighborhood in Brooklyn and it shows. They disguise a vent from the underground subway as a brownstone so that it is more visually consistent. Bushwick is a…less visually consistent industrial
+neighborhood that over the past decade or so, has converted into artist studios and lofts. The types of property sold in each neighborhood could not be more different.
 
 <div class="svg-container">
 <svg id="heights-building-class" class="stacked-area-chart svg-building-class" />
 <svg id="bushwick-building-class" class="stacked-area-chart svg-building-class" />
 </div>
 
-The building class data is some of the most difficult to compare so
-this serves as a good example for getting started looking at those
-graphs.
-
+The building class data is some of the most difficult to compare. This serves as a good example for getting started looking at those graphs.
 
 ## 2. The Williamsburg spike
 
-If you are looking for an interesting real estate graph, Williamsburg
-is probably one of the first places people look. It has truly
-transformed over the past decade from one of the most affordable
-places in Brooklyn (~$150 per sqft) to one of the most expensive
-(~$550). But when you look at the graph, you don't see a nice gradual
-climb. You see a slow climb that slightly beats the Borough average
-until 2012 where there is a huge spike. While it does coincide with a
-rise in the number of Elevator Condos being sold, nothing in these
-graphs explains that spike. I'm going to take a look at the raw sales
-data to look at what actually happened here.
+If you are looking for an interesting real estate graph, Williamsburg is probably one of the first places people look. It has transformed over the past decade from one of the most affordable places in Brooklyn (~$150 per sqft) to one of the most expensive (~$550).
 
 <div class="svg-container third-width">
 <svg id="williamsburg-sales" class="svg-line-graph third-width" />
@@ -54,49 +30,30 @@ the % of commercial sales - but this is a good start.
 
 ## 3. 2008 Recovery
 
-One trend you will notice throughout the data is the impact
-of the 2008 financial crisis on Brooklyn. While some neighborhoods
-like Greenpoint barely let it dent their meteoric climb, others, like
-Canarsie are only beginning to recover. Lets take a look at two
-neighborhoods here - Clinton Hill and Canarsie which both felt the
-impact of 2008 but have had very different recoveries. Up until about
-2011, your money would buy you just about the same amount of indoor
-space in Clinton Hill as in Canarsie.
+One trend you will notice throughout the data is the impact of the 2008 financial crisis on Brooklyn. While some neighborhoods, like Greenpoint, barely let it dent their meteoric climb, others, like Canarsie are only beginning to recover. Lets take a look at two neighborhoods here - Clinton Hill and Canarsie - which both felt the impact of 2008 but had very different recoveries. Up until about 2011, your money would buy you just about the same amount of indoor space in Clinton Hill as in Canarsie.
 
 <div class="svg-container third-width">
 <svg id="clinton-price" class="svg-line-graph third-width" />
 </div>
 
-While I would love to chart a neighborhood's 'number of mentions in
-the NYTimes real estate section', Clinton Hill has been getting a
-tremendous amount of press over the past few years and is undoubtably
-'Rapidly Gentrifying'. Due to its classification as a historic
-neighborhood, the types of units solid in sold in Clinton Hill doesn't
-change very much. Canarsie is similarly stable. It has consistently
-had the largest percentage of Two Family Homes in all of Brooklyn at
-around 55% of ALL sales. While neither neighborhood has visually
-changed all much from 2008 until now where each was about $300
-persqft, they have had very different paths since. Clinton Hill is now
-nearing $600 while Canarsie is still below peak at around $250.
+While, I would love to chart a neighborhood's 'number of mentions in the NYTimes real estate section', it is safe to say Clinton Hill received a tremendous amount of press over the past few years. Due to its classification as a historic neighborhood, the type of units solid in sold in Clinton Hill doesn't change very much. Canarsie is similarly stable. It consistently had the largest percentage of Two Family Homes in all of Brooklyn at around 55% of ALL sales. While neither neighborhood has visually changed all much from 2008 until now, they have had very different paths since. Clinton Hill is over $650 while Canarsie is still below peak at around $250.
 
 # Where the data comes from
 
-This is a quick writeup of how to geocode property sales in New York
-and then associate each sale with a neighborhood. The raw sales data
-is on the department of Finance website
-[here](http://www.nyc.gov/html/dof/html/property/rolling_sales_data.shtml)
+This is a quick writeup of how to geocode property sales in New York and then associate each sale with a neighborhood. The raw sales data is on the department of Finance website [here](http://www.nyc.gov/html/dof/html/property/rolling_sales_data.shtml)
 and the neighborhood tabulation areas are
-[here](http://www.nyc.gov/html/dcp/html/bytes/dwn_nynta.shtml). I am
-very new to the toolchain for geo work and prefer methods that give me
-visual feedback. Because of this, I use Node for data processing and
-[QGIS](http://www.qgis.org/en/site/) for merging datasets and checking
-work. All things perfect, the correct way to do this would be to
-import and merge the datasets in PostGIS.
+[here](http://www.nyc.gov/html/dcp/html/bytes/dwn_nynta.shtml). I am very new to the toolchain for geo work and prefer methods that give visual feedback. Because of this, I use Node for data processing and
+[QGIS](http://www.qgis.org/en/site/) for merging datasets and checking work. All things perfect, the correct way to do this would be to import and merge the datasets in PostGIS.
 
-If you would like to download the dataset. It can be found
-[datset](https://s3.amazonaws.com/vislet-production/data/brooklyn-sales.json). This
-post mostly serves to document how the dataset was created if there
-are any issues.
+There are some caveats with the data. For example, out of 487,874 residential sales only 223,529 had enough to get a sane price per square foot. Even then, the data measuring the actual square footage of a property is the 'Gross Square Feet'. It is total area of all the
+floors of a building as measured from the exterior surfaces of the outside walls of the building, including the land area and space within any building or structure on the property. A significant portion of the missing sales do not have a sale price, indicating it was a transfer of ownership 'without a cash consideration' possibly
+from parent to child. Another excluded portion are residential lots
+with small structures on them.
+
+If you would like to download the dataset used for the visualizations
+above. It can be found
+[here](https://s3.amazonaws.com/vislet-production/data/brooklyn-sales.json). The
+description below to document how that dataset was created.
 
 ## Gather
 
