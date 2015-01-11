@@ -30,11 +30,12 @@ module.exports = class Sale extends Backbone.Model
     @setupPricePerSqFt()
 
   setupPricePerSqFt: ->
-    price = Number(@get('price').replace('$', '').replace(',', '').replace(',', ''))
+    price = Number(@get('price').replace('$', '').replace(',', '').replace(',', '').replace(',', ''))
     sqft = Number(@get('grossSqFt').replace(',', '').replace(',', ''))
-    return unless price > 10000 && sqft > 100
-    @set
-      pricePerSqFt: price / sqft
+
+    if price / sqft < 4000 and price / sqft > 10
+      @set
+        pricePerSqFt: price / sqft
 
   setupDate: ->
     # Dates are 5 hours off (EST) and need to be reset to GMT

@@ -38,6 +38,9 @@ module.exports = class Sales extends Backbone.Collection
     hash
 
   createNeighborhoodDataHash: ->
+    @resTotal = 0
+    @resWithSaleCount = 0
+
     data = {}
     for key in Object.keys(neighborhoodNames)
       data[key] =
@@ -55,6 +58,8 @@ module.exports = class Sales extends Backbone.Collection
       @tallyCounts sale, data, sale.get('ntaCode')
 
     @computeBuildingClassPercent data, 'buildingClass'
+
+    console.log "Total Residential Sales: #{@resTotal}, Total With Price per SqFt #{@resWithSaleCount}"
 
     @formatSalesDataForDisplay data
 
@@ -76,11 +81,13 @@ module.exports = class Sales extends Backbone.Collection
     dateKey = "#{sale.get('quarter')}-#{sale.get('year')}"
     if sale.get('residentialUnits')
       data[key].residentialSaleTally[dateKey]++
-      if sale.get('pricePerSqFt') > 10
+      @resTotal++
+      if sale.get('pricePerSqFt')
         data[key].residentialPrices[dateKey].push Number(sale.get('pricePerSqFt'))
+        @resWithSaleCount++
     else if sale.get('commercialUnits')
       data[key].commercialSaleTally[dateKey]++
-      if sale.get('pricePerSqFt') > 10
+      if sale.get('pricePerSqFt')
         data[key].commercialPrices[dateKey].push Number(sale.get('pricePerSqFt'))
 
     # Tally building class
@@ -106,6 +113,7 @@ module.exports = class Sales extends Backbone.Collection
         data = originalData[ntaID][key]
         flattenedData[key] =
           for itemKey in Object.keys(data)
+            data[itemKey].sort(d3.ascending)
             mean = d3.mean(data[itemKey])
             {
               date: moment(itemKey, 'Q-YYYY').valueOf()
@@ -127,9 +135,9 @@ module.exports = class Sales extends Backbone.Collection
               data[itemKey].sort(d3.ascending)
               {
                 date: moment(itemKey, 'Q-YYYY').valueOf()
-                pct25: d3.quantile(data[itemKey], .25)
-                value: d3.quantile(data[itemKey], .5)
-                pct75: d3.quantile(data[itemKey], .75)
+                pct25: Number(d3.quantile(data[itemKey], .25).toFixed(2))
+                value: Number(d3.mean(data[itemKey]).toFixed(2))
+                pct75: Number(d3.quantile(data[itemKey], .75).toFixed(2))
               }
 
       flattenedData['buildingClass'] = @formatBuildingClassData flattenedData, originalData[ntaID]['buildingClass']

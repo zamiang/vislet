@@ -3,16 +3,14 @@ module.exports =
     flattenedData = @getFlattenedData startingDataset
     @lines = @getLines flattenedData, startingDataset, compareDataset
 
-    svg = d3.select("##{@$el.attr('id')}")
+    @rescaleYAxis @svg
 
-    @rescaleYAxis svg
-
-    svg.selectAll(".sales .line")
+    @svg.selectAll(".sales .line")
       .data(@lines).transition().duration(@speed)
       .ease("linear")
       .attr("d", (d) => @line(d.values))
 
-    @transitionLineLabels svg if @displayLineLabels
+    @transitionLineLabels @svg if @displayLineLabels
 
   transitionLineLabels: (svg) ->
     svg.selectAll(".line-label")

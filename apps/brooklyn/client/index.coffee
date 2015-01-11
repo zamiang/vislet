@@ -29,6 +29,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @hoveredLabel = new Label(visible: true, $el: @$('.hover-neighborhood-name'), selector: '.graph-heading')
     @$back = @$('.brooklyn-svg.back')
     @renderSvgMap brooklynTopoJson
+    @NTAs = Object.keys(salesData)
     @renderLineGraph()
     @renderBuildingClassGraphs()
     @renderSlider()
@@ -59,7 +60,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
   colorMap: (date) =>
     dataset = "residentialPrices"
     label = "Avg Price Per SqFt"
-    data = for NTA in Object.keys(salesData)
+    data = for NTA in @NTAs
       value = 0
       for item in salesData[NTA][dataset]
         if item.date == date
