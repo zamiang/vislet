@@ -153,5 +153,5 @@ module.exports = class Sales extends Backbone.Collection
       flattenedData[dataKey] = []
       for dateKey in dateKeys
         date = moment(dateKey, 'YYYY').valueOf()
-        flattenedData[dataKey].push { date: date, value: Number(data[dateKey][dataKey] / 100) }
+        flattenedData[dataKey].push { date: date, value: Number((data[dateKey][dataKey] / 100).toFixed(4)) }
     flattenedData
