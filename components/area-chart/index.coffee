@@ -39,7 +39,7 @@ module.exports = class AreaChart extends Backbone.View
       .y0((d) => @y(d.y0))
       .y1((d) => @y(d.y0 + d.y))
 
-    svg = d3.select("##{@$el.attr('id')}")
+    svg = @svg = d3.select("##{@$el.attr('id')}")
       .attr("width", @width + @margin.left + @margin.right)
       .attr("height", @height + @margin.top + @margin.bottom)
       .append("g")
@@ -95,9 +95,7 @@ module.exports = class AreaChart extends Backbone.View
     flattenedData = @getFlattenedData startingDataset
     @lines = @getLines flattenedData
 
-    svg = d3.select("##{@$el.attr('id')}")
-
-    buildingTypes = svg
+    buildingTypes = @svg
       .selectAll('.building-type .area')
       .data(@lines)
       .transition().duration(@speed)
