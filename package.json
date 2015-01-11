@@ -18,6 +18,7 @@
         "backbone-super-sync": "*",
         "marked": "*",
         "coffee-script": "*",
+        "newrelic": "*",
         "bucket-assets": "*",
         "moment": "*",
         "node-env-file": "*"
