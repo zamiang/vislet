@@ -7,3 +7,21 @@
     fill: none
     stroke: $dark-gray
     shape-rendering: crispEdges
+
+  .handle
+    transition: fill 0.2s
+    fill: $dark-gray
+    cursor: pointer
+    &:hover
+      fill: $gray    
+
+  .tick
+    text
+      display: none
+    line
+      stroke: $gray
+    &:nth-child(4n + 1)
+      text
+        display: block
+      line
+        stroke: $dark-gray

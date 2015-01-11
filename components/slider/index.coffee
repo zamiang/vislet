@@ -51,7 +51,7 @@ module.exports = class Slider extends Backbone.View
       .attr("class", "slider")
       .call(@brush)
 
-    slider.selectAll(".extent,.resize").remove()
+    slider.selectAll(".extent,.resize,.background").remove()
 
     @handle = slider.append("circle")
       .attr("class", "handle")
@@ -83,6 +83,7 @@ module.exports = class Slider extends Backbone.View
     @xAxis = d3.svg.axis()
       .scale(@x)
       .orient("bottom")
+      .ticks(50)
 
     svg.append("g")
       .attr("class", "x axis")
