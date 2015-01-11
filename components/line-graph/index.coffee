@@ -35,7 +35,7 @@ module.exports = class LineGraph extends Backbone.View
     for key in @keys
       if key.indexOf('-mean') > -1
         flattenedData[key] = @data['ALL'][key]
-      else
+      else if @data[startingDataset]
         flattenedData[key] = @data[startingDataset][key]
     flattenedData
 

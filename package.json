@@ -21,7 +21,6 @@
     "devDependencies": {
         "superagent": "*",
         "nice-json2csv": "*",
-        "jquery": "*",
         "d3": "*",
         "topojson": "*",
         "point-in-polygon": "*",
