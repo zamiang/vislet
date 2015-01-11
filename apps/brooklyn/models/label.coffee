@@ -9,7 +9,7 @@ module.exports = class Label extends Backbone.Model
     @onVisibleChange()
 
   onTextChange: ->
-    @$text.text(@get('text'))
+    @$text.html(@get('text'))
 
   onVisibleChange: ->
     if @get('visible')

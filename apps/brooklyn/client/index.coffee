@@ -1,6 +1,7 @@
 Backbone = require "backbone"
 $ = require 'jquery'
 Backbone.$ = $
+_ = require 'underscore'
 moment = require 'moment'
 brooklynTopoJson = require('../data/brooklyn.json')
 svgMapView = require('../../../components/svg-map/index.coffee')
@@ -16,7 +17,6 @@ Slider = require('../../../components/slider/index.coffee')
 module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   startingDataset: 'BK60'
-  lineGraphs: []
   dateFormat: "Q, YYYY"
   speed: 200
   isCholoropleth: true
@@ -25,10 +25,12 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     'click .back' : 'colorMapClick'
 
   initialize: ->
-    @selectedLabel = new Label(visible: true, $el: @$('.selected-neighborhood-name'), selector: '.graph-heading')
-    @hoveredLabel = new Label(visible: true, $el: @$('.hover-neighborhood-name'), selector: '.graph-heading')
+    @$selectedLabel = @$('.selected-neighborhood-name .graph-heading')
+    @$hoveredLabel = @$('.hover-neighborhood-name .graph-heading')
+
     @$back = @$('.brooklyn-svg.back')
     @NTAs = Object.keys(salesData)
+    @formatNeighborhoodNames()
     @mapColorHash = @getMapColorHash()
     @renderSvgMap brooklynTopoJson
     @renderLineGraph()
@@ -87,14 +89,9 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   handleGraphHover: (currentNTA, hoverNTA) =>
     return if @isCholoropleth
+    @lineGraph.animateNewArea(currentNTA, hoverNTA)
 
-    neighborhoodName = neighborhoodNames[hoverNTA]
-    for lineGraph in @lineGraphs
-      lineGraph.animateNewArea(currentNTA, hoverNTA)
-
-    @hoveredLabel.set
-      visible: true
-      text: @formatNeighborhoodName(neighborhoodName)
+    @$hoveredLabel.html neighborhoodNames[hoverNTA]
 
   renderBuildingClassGraphs: ->
     width = 490
@@ -134,7 +131,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     width = 490
     height = 230
 
-    @lineGraphs.push new LineGraph
+    @lineGraph = new LineGraph
       width: width
       height: height
       data: salesData
@@ -178,6 +175,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       displayTrend: true
 
   renderSvgMap: (topojson) ->
+    throttledGraphHover = _.throttle @handleGraphHover, 300
     @svgMap = new svgMapView
       el: $('#brooklyn-svg')
       topojson: topojson
@@ -191,17 +189,20 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       translateX: 37
       translateY: 0
       colorKeyWidth: 610
-      customMouseEnter: @handleGraphHover
+      customMouseEnter: throttledGraphHover
       customClickSelectedArea: (=> @colorMapClick())
 
   formatNeighborhoodName: (name) -> name?.split('-').join(', ')
+  formatNeighborhoodNames: ->
+    for NTA in Object.keys(neighborhoodNames)
+      neighborhoodNames[NTA] = @formatNeighborhoodName neighborhoodNames[NTA]
+
   handleNeighborhoodClick: (id) ->
     neighbornoodName = neighborhoodNames[id]
-    for lineGraph in @lineGraphs
-      lineGraph.animateNewArea(id)
+    @lineGraph.animateNewArea(id)
     @stackedGraph.animateNewArea(id)
 
-    @selectedLabel.set text: @formatNeighborhoodName(neighbornoodName)
+    @$selectedLabel.html neighbornoodName
 
     @$back.fadeIn @speed
     @slider.$el.fadeOut(@speed)
