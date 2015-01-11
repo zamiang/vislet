@@ -18,6 +18,7 @@
         "backbone-super-sync": "*",
         "marked": "*",
         "coffee-script": "*",
+        "bucket-assets": "*",
         "moment": "*",
         "node-env-file": "*"
     },
@@ -32,7 +33,6 @@
         "nib": "*",
         "jadeify": "*",
         "browserify-dev-middleware": "*",
-        "bucket-assets": "*",
         "should": "*",
         "mocha": "*",
         "sinon": "*",
