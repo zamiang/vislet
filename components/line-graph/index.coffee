@@ -3,11 +3,13 @@ _ = require 'underscore'
 Backbone = require "backbone"
 Tooltips = require '../svg-tooltips/index.coffee'
 Transition = require './transition.coffee'
+Trend = require './trend.coffee'
 Key = require './key.coffee'
 
 module.exports = class LineGraph extends Backbone.View
   _.extend @prototype, Tooltips
   _.extend @prototype, Transition
+  _.extend @prototype, Trend
   _.extend @prototype, Key
 
   speed: 500
@@ -19,10 +21,13 @@ module.exports = class LineGraph extends Backbone.View
 
   defaults:
     interpolate: 'cardinal'
+    displayTrend: false
+    displayKey: false
+    displayLineLabels: false
 
   initialize: (options) ->
     { @data, @width, @height, @keys, @startingDataset, @interpolate, @handleHover, @yAxisFormat
-      @label, @filterDataset, @displayLineLabels, @displayKey } = _.defaults(options, @defaults)
+      @label, @filterDataset, @displayLineLabels, @displayKey, @displayTrend } = _.defaults(options, @defaults)
     @render()
 
   getFlattenedData: (startingDataset) ->
@@ -62,8 +67,8 @@ module.exports = class LineGraph extends Backbone.View
       d3.max(@lines, (c) -> d3.max(c.values, (v) -> v.value ))
     ])
 
-    @drawAxis svg
     @drawLines @line, @color, svg
+    @drawAxis svg
     @drawKey() if @displayKey
     @appendTooltips @color, svg, @lines
     @drawLineLabels(@color) if @displayLineLabels
@@ -132,6 +137,8 @@ module.exports = class LineGraph extends Backbone.View
       .data(@lines)
       .enter().append("g")
       .attr("class", "sales")
+
+    @drawTrend(@svgLines) if @displayTrend
 
     paths = @svgLines.append("path")
       .attr("class", 'line')

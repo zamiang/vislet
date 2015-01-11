@@ -45,8 +45,8 @@ rise in the number of Elevator Condos being sold, nothing in these
 graphs explains that spike. I'm going to take a look at the raw sales
 data to look at what actually happened here.
 
-<div class="svg-container">
-<svg id="williamsburg-sales" class="svg-line-graph" />
+<div class="svg-container third-width">
+<svg id="williamsburg-sales" class="svg-line-graph third-width" />
 </div>
 
 There is certainly a lot more to look at with Williamsburg - such as

@@ -15,10 +15,7 @@ module.exports = class Sales extends Backbone.Collection
   validResidentialBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "28"]
 
   salesDataKeys: [
-    'residentialSaleTally'
-    'residentialSaleWithPriceTally'
-    'residentialPriceTally'
-    'residentialPriceAverage'
+    'residentialPrices'
     # 'commercialSaleTally'
     # 'commercialSaleWithPriceTally'
     # 'commercialPriceTally'
@@ -45,14 +42,9 @@ module.exports = class Sales extends Backbone.Collection
     for key in Object.keys(neighborhoodNames)
       data[key] =
         residentialSaleTally: @createQuarterlyHash()
-        residentialSaleWithPriceTally: @createQuarterlyHash()
-        residentialPriceTally: @createQuarterlyHash()
         residentialPrices: @createQuarterlyHash(true)
-        residentialPriceAverage: @createQuarterlyHash()
         commercialSaleTally: @createQuarterlyHash()
-        commercialSaleWithPriceTally: @createQuarterlyHash()
-        commercialPriceTally: @createQuarterlyHash()
-        commercialPriceAverage: @createQuarterlyHash()
+        commercialPrices: @createQuarterlyHash(true)
         buildingClass: @createYearlyBuildingClassHash()
     data
 
@@ -63,19 +55,6 @@ module.exports = class Sales extends Backbone.Collection
       @tallyCounts sale, data, sale.get('ntaCode')
 
     @computeBuildingClassPercent data, 'buildingClass'
-
-    @computePriceAverage(
-      {
-        totalKey: 'commercialPriceTally'
-        countKey: 'commercialSaleWithPriceTally'
-        dataKey: 'commercialPriceAverage'
-      }, data)
-    @computePriceAverage(
-      {
-        totalKey: 'residentialPriceTally'
-        countKey: 'residentialSaleWithPriceTally'
-        dataKey: 'residentialPriceAverage'
-      }, data)
 
     @formatSalesDataForDisplay data
 
@@ -92,28 +71,17 @@ module.exports = class Sales extends Backbone.Collection
             value = (buildingClasses[buildingClass] / total * 100).toFixed(2)
             buildingClasses[buildingClass] = if value > 1 then value else 0
 
-  computePriceAverage: (options, data) ->
-    for key in Object.keys(neighborhoodNames)
-      for date in Object.keys(data[key][options.dataKey])
-        value = if data[key][options.countKey][date] > 0 then data[key][options.totalKey][date] / data[key][options.countKey][date] else 0
-        data[key][options.dataKey][date] = value
-        delete data[key][options.countKey][date]
-        delete data[key][options.totalKey][date]
-
   tallyCounts: (sale, data, key) ->
     return unless data[key]
     dateKey = "#{sale.get('quarter')}-#{sale.get('year')}"
     if sale.get('residentialUnits')
       data[key].residentialSaleTally[dateKey]++
       if sale.get('pricePerSqFt') > 10
-        data[key].residentialPriceTally[dateKey] += Number(sale.get('pricePerSqFt'))
-        data[key].residentialSaleWithPriceTally[dateKey]++
         data[key].residentialPrices[dateKey].push Number(sale.get('pricePerSqFt'))
     else if sale.get('commercialUnits')
       data[key].commercialSaleTally[dateKey]++
       if sale.get('pricePerSqFt') > 10
-        data[key].commercialPriceTally[dateKey] += Number(sale.get('pricePerSqFt'))
-        data[key].commercialSaleWithPriceTally[dateKey]++
+        data[key].commercialPrices[dateKey].push Number(sale.get('pricePerSqFt'))
 
     # Tally building class
     if sale.get('buildingClass')?.length > 0
@@ -126,7 +94,8 @@ module.exports = class Sales extends Backbone.Collection
       data = originalData[ntaID][key]
       for itemKey in Object.keys(data)
         totals[itemKey] ||= []
-        totals[itemKey].push data[itemKey]
+        for item in data[itemKey]
+          totals[itemKey].push item
     totals
 
   formatSalesDataForDisplay: (originalData) ->
@@ -137,9 +106,10 @@ module.exports = class Sales extends Backbone.Collection
         data = originalData[ntaID][key]
         flattenedData[key] =
           for itemKey in Object.keys(data)
+            mean = d3.mean(data[itemKey])
             {
               date: moment(itemKey, 'Q-YYYY').valueOf()
-              value: Number(data[itemKey].toFixed(2))
+              value: if mean then Number(mean.toFixed(2)) else 0
             }
 
         if ntaID == 'ALL'
@@ -150,17 +120,17 @@ module.exports = class Sales extends Backbone.Collection
                 date: moment(totalKey, 'Q-YYYY').valueOf()
                 value: Number(d3.mean(totals[totalKey]).toFixed(2))
               }
-      if ntaID == 'BK73'
-        data = originalData[ntaID]['residentialPrices']
-        flattenedData["williamsburgTrend"] =
-          for itemKey in Object.keys(data)
-            data[itemKey].sort(d3.ascending)
-            {
-              date: moment(itemKey, 'Q-YYYY').valueOf()
-              pct25: d3.quantile(data[itemKey], .25)
-              pct50: d3.quantile(data[itemKey], .5)
-              pct75: d3.quantile(data[itemKey], .75)
-            }
+
+        if ntaID == 'BK73'
+          flattenedData["williamsburgTrend"] =
+            for itemKey in Object.keys(data)
+              data[itemKey].sort(d3.ascending)
+              {
+                date: moment(itemKey, 'Q-YYYY').valueOf()
+                pct25: d3.quantile(data[itemKey], .25)
+                value: d3.quantile(data[itemKey], .5)
+                pct75: d3.quantile(data[itemKey], .75)
+              }
 
       flattenedData['buildingClass'] = @formatBuildingClassData flattenedData, originalData[ntaID]['buildingClass']
       formattedData[ntaID] = flattenedData

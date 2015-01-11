@@ -37,7 +37,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     width = 502
     height = 38
     data =
-      for item in salesData['ALL']['residentialPriceAverage']
+      for item in salesData['ALL']['residentialPrices']
         item.date
 
     @slider = new Slider
@@ -57,7 +57,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @$(".#{$target.attr('data-class')}").show()
 
   colorMap: (date) =>
-    dataset = "residentialPriceAverage"
+    dataset = "residentialPrices"
     label = "Avg Price Per SqFt"
     data = for NTA in Object.keys(salesData)
       value = 0
@@ -133,18 +133,19 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       height: height
       data: salesData
       startingDataset: @startingDataset
-      keys: ['residentialPriceAverage', 'residentialPriceAverage-mean']
+      keys: ['residentialPrices', 'residentialPrices-mean']
       el: $('#brooklyn-residential-price-tally')
       label: 'Avg Price Per SqFt'
       yAxisFormat: (x) -> "$#{x}"
       handleHover: @handleHover
 
+    # Clinton-hill vs Canarsie
     recoveryGraph = new LineGraph
       width: 620
       height: height
       data: salesData
       startingDataset: 'BK69'
-      keys: ['residentialPriceAverage', 'residentialPriceAverage-mean']
+      keys: ['residentialPrices', 'residentialPrices-mean']
       el: $('#clinton-price')
       label: 'Avg Price Per SqFt'
       yAxisFormat: (x) -> "$#{x}"
@@ -156,6 +157,18 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
         else
           'Borough Average'
     recoveryGraph.animateNewArea('BK69', 'BK50')
+
+    # Williamsburg graph
+    new LineGraph
+      width: 620
+      height: height
+      data: salesData
+      startingDataset: 'BK73'
+      keys: ['williamsburgTrend']
+      el: $('#williamsburg-sales')
+      label: 'Avg Price Per SqFt'
+      yAxisFormat: (x) -> "$#{x}"
+      displayTrend: true
 
   renderSvgMap: (topojson) ->
     @svgMap = new svgMapView
