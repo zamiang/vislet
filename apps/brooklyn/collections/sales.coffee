@@ -25,19 +25,19 @@ module.exports = class Sales extends Backbone.Collection
     # 'commercialPriceAverage'
   ]
 
-  createQuarterlyHash: ->
+  createQuarterlyHash: (isArray) ->
     hash = {}
     for year in @years
       for quarter in @quarters
-        hash["#{quarter}-#{year}"] = 0
+        hash["#{quarter}-#{year}"] = if isArray then [] else 0
     hash
 
-  createYearlyBuildingClassHash: ->
+  createYearlyBuildingClassHash: (value=0) ->
     hash = {}
     for year in @years
      hash[year] = {}
      for buildingClass in Object.keys(buildingClasses)
-       hash[year][buildingClass] = 0
+       hash[year][buildingClass] = value
     hash
 
   createNeighborhoodDataHash: ->
@@ -47,6 +47,7 @@ module.exports = class Sales extends Backbone.Collection
         residentialSaleTally: @createQuarterlyHash()
         residentialSaleWithPriceTally: @createQuarterlyHash()
         residentialPriceTally: @createQuarterlyHash()
+        residentialPrices: @createQuarterlyHash(true)
         residentialPriceAverage: @createQuarterlyHash()
         commercialSaleTally: @createQuarterlyHash()
         commercialSaleWithPriceTally: @createQuarterlyHash()
@@ -104,12 +105,13 @@ module.exports = class Sales extends Backbone.Collection
     dateKey = "#{sale.get('quarter')}-#{sale.get('year')}"
     if sale.get('residentialUnits')
       data[key].residentialSaleTally[dateKey]++
-      if sale.get('pricePerSqFt') > 0
+      if sale.get('pricePerSqFt') > 10
         data[key].residentialPriceTally[dateKey] += Number(sale.get('pricePerSqFt'))
         data[key].residentialSaleWithPriceTally[dateKey]++
+        data[key].residentialPrices[dateKey].push Number(sale.get('pricePerSqFt'))
     else if sale.get('commercialUnits')
       data[key].commercialSaleTally[dateKey]++
-      if sale.get('pricePerSqFt') > 0
+      if sale.get('pricePerSqFt') > 10
         data[key].commercialPriceTally[dateKey] += Number(sale.get('pricePerSqFt'))
         data[key].commercialSaleWithPriceTally[dateKey]++
 
@@ -148,6 +150,17 @@ module.exports = class Sales extends Backbone.Collection
                 date: moment(totalKey, 'Q-YYYY').valueOf()
                 value: Number(d3.mean(totals[totalKey]).toFixed(2))
               }
+      if ntaID == 'BK73'
+        data = originalData[ntaID]['residentialPrices']
+        flattenedData["williamsburgTrend"] =
+          for itemKey in Object.keys(data)
+            data[itemKey].sort(d3.ascending)
+            {
+              date: moment(itemKey, 'Q-YYYY').valueOf()
+              pct25: d3.quantile(data[itemKey], .25)
+              pct50: d3.quantile(data[itemKey], .5)
+              pct75: d3.quantile(data[itemKey], .75)
+            }
 
       flattenedData['buildingClass'] = @formatBuildingClassData flattenedData, originalData[ntaID]['buildingClass']
       formattedData[ntaID] = flattenedData

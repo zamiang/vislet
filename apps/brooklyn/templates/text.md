@@ -8,7 +8,10 @@ following Fort Green and so on. What I found was just how incredibly
 different each and every neighborhood in Brooklyn is. They just aren't
 comparable - but contrastable.
 
-## Brownstones vs Lofts
+Here are three 'data vignetts' that should help with how to interpret
+and use the visualization above.
+
+## 1. Brownstones vs Lofts
 
 Visually, Bushwick and Brooklyn Heights could not be more
 different. Brooklyn Heights is historically the wealthiest
@@ -28,7 +31,28 @@ The building class data is some of the most difficult to compare so
 this serves as a good example for getting started looking at those
 graphs.
 
-## 2008 Recovery
+
+## 2. The Williamsburg spike
+
+If you are looking for an interesting real estate graph, Williamsburg
+is probably one of the first places people look. It has truly
+transformed over the past decade from one of the most affordable
+places in Brooklyn (~$150 per sqft) to one of the most expensive
+(~$550). But when you look at the graph, you don't see a nice gradual
+climb. You see a slow climb that slightly beats the Borough average
+until 2012 where there is a huge spike. While it does coincide with a
+rise in the number of Elevator Condos being sold, nothing in these
+graphs explains that spike. I'm going to take a look at the raw sales
+data to look at what actually happened here.
+
+<div class="svg-container">
+<svg id="williamsburg-sales" class="svg-line-graph" />
+</div>
+
+There is certainly a lot more to look at with Williamsburg - such as
+the % of commercial sales - but this is a good start.
+
+## 3. 2008 Recovery
 
 One trend you will notice throughout the data is the impact
 of the 2008 financial crisis on Brooklyn. While some neighborhoods
@@ -54,22 +78,6 @@ around 55% of ALL sales. While neither neighborhood has visually
 changed all much from 2008 until now where each was about $300
 persqft, they have had very different paths since. Clinton Hill is now
 nearing $600 while Canarsie is still below peak at around $250.
-
-## The Williamsburg spike
-
-If you are looking for an interesting real estate graph - Williamsburg
-is probably one of the first places people look. It has truly
-transformed over the past decade from one of the most affordable
-places in Brooklyn (~$150 per sqft) to one of the most expensive
-(~$550). But when you look at the graph, you don't see a nice gradual
-climb. You see a slow climb that slightly beats the Borough average--
-until 2012 where there is a huge spike. While it does coincide with a
-rise in the number of Elevator Condos being sold, nothing in these
-graphs explain that spike. I'm going to take a look at the raw sales
-data to look at what actually happened here.
-
-There is certainly a lot more to look at with Williamsburg - such as
-the % of commercial sales - but this is a good start.
 
 # Where the data comes from
 
