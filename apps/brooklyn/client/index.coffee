@@ -80,7 +80,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
   colorMapClick: ->
     @colorMap(@slider.getValue())
     @$back.fadeOut @speed
-    @slider.$el.fadeIn(200)
+    @slider.$el.fadeIn(@speed)
+    @svgMap.$colorKey.fadeIn(@speed)
     @isCholoropleth = true
     false
 
@@ -161,6 +162,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
           neighborhoodNames['BK50']
         else
           'Borough Average'
+
     recoveryGraph.animateNewArea('BK69', 'BK50')
 
     # Williamsburg graph
@@ -202,7 +204,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @selectedLabel.set text: @formatNeighborhoodName(neighbornoodName)
 
     @$back.fadeIn @speed
-    @slider.$el.fadeOut(200)
+    @slider.$el.fadeOut(@speed)
+    @svgMap.$colorKey.fadeOut(@speed)
     @isCholoropleth = false
 
 module.exports.init = ->

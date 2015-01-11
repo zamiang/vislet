@@ -8,7 +8,6 @@ module.exports =
 
     @$(".tract").attr('class', 'tract')
     @$(".tract[data-id='#{item.id}']").attr('class', 'tract selected')
-    @hideColorKey()
     @updateMapTitle(@title)
 
     if @zoomOnClick
