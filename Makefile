@@ -33,7 +33,6 @@ assets:
 		gzip -f public/$(file).min.css; \
 	)
 
-
 # TODO: Put this in a foreach and iterate through all js and css files
 verify:
 	if [ $(shell wc -c < public/assets/chicago.min.css.gz) -gt $(MIN_FILE_SIZE) ] ; then echo ; echo "Chicago CSS exists" ; else echo ; echo "Chicago CSS asset compilation failed" ; exit 1 ; fi
