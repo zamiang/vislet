@@ -50,8 +50,4 @@ module.exports =
       label: label
 
     @$colorKey.html template(params)
-    @showColorKey()
     @drawnColorKey = true
-
-  showColorKey: -> @$colorKey.fadeIn(100)
-  hideColorKey: -> @$colorKey.fadeOut(100)

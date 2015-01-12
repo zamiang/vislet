@@ -15,12 +15,18 @@
     line-height: 1
     height: 12px
     max-width: 87%
+    width: calc(100% - 21px)
     text-overflow: ellipsis
   .key-circle
     width: 16px
     height: 16px
     border-radius: 8px
     margin-right: 5px
+  @media screen and (max-width: 500px)
+    height: 167px
+    .graph-key
+      height: 42px
+      overflow: hidden
 
 .linear-graph-key
   font-size: 12px

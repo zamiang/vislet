@@ -27,10 +27,8 @@ module.exports = class SvgMap extends Backbone.View
     reverseColorKey: true
 
   initialize: (options) ->
-    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea, @reverseColorKey
+    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea, @reverseColorKey, @width, @height,
       @colorKeyWidth, @customMouseEnter, @$colorKey, @title, @scale, @translateX, @translateY } = _.defaults(options, @defaults)
-    @width = @$el.width()
-    @height = @$el.height()
     @render()
 
   render: ->

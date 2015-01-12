@@ -186,38 +186,15 @@ hr
   franklin-gothic()
   text-transform: uppercase
 
+#mobile
+  display: none
+    
+@media screen and (max-width: 500px)
+  #mobile
+    display: block
 
-.tabs
-  position: relative
-  border-bottom: 1px solid #f2f2f2
-  line-height: 150%
-  height: 30px
-  .tab
-    border: 1px solid #ddd
-    border-bottom: 1px solid #E4E4E4
-    display: inline-block
-    franklin-gothic()
-    letter-spacing: 1px
-    text-align: center
-    text-transform: uppercase
-    font-size: 12px
-    padding: 1px 10px 0px 10px
-    background-color: #f3f3f3
-    color: #ccc
-    cursor: pointer
-    margin-bottom: -1px
-    height: 28px
-    &.active
-      border: 1px solid #f2f2f2
-      border-bottom: 1px solid white
-      background-color: white
-      color: #333
-      margin-bottom: -1px
-    &:first-child
-      margin-left: 14px
-    &:last-child
-      .active
-        border-left: 0px solid
-
-
-  
+  #main-layout-container        
+    width: 340px
+    margin-top: 20px
+  .responsive-layout-container
+    margin 0px 20px

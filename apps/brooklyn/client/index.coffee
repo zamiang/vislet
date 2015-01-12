@@ -19,6 +19,11 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
   dateFormat: "Q, YYYY"
   speed: 200
   isCholoropleth: true
+
+  # TODO Refactor
+  mobileWidth: 270
+  getWidth: (width) -> if @isMobile then @mobileWidth else width
+
   events:
     'click .tab' : 'tabClick'
     'click .back' : 'colorMapClick'
@@ -28,6 +33,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @$hoveredLabel = @$('.hover-neighborhood-name .graph-heading')
 
     @$back = @$('.brooklyn-svg.back')
+    @isMobile = @$el.width() < 500
     @NTAs = Object.keys(salesData)
     @formatNeighborhoodNames()
     @mapColorHash = @getMapColorHash()
@@ -37,7 +43,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @renderSlider()
 
   renderSlider: ->
-    width = 502
     height = 38
     data =
       for item in salesData['ALL']['residentialPrices']
@@ -45,7 +50,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
     @slider = new Slider
       el: $('#brooklyn-date-slider')
-      width: width
+      width: if @isMobile then 340 else 502
       height: height
       data: data
       animateStart: true
@@ -82,7 +87,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @colorMap(@slider.getValue())
     @$back.fadeOut @speed
     @slider.$el.fadeIn(@speed)
-    @svgMap.$colorKey.fadeIn(@speed)
+    @svgMap.$colorKey.fadeIn(@speed) unless @isMobile
     @isCholoropleth = true
     false
 
@@ -93,7 +98,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @$hoveredLabel.html neighborhoodNames[hoverNTA]
 
   renderBuildingClassGraphs: ->
-    width = 490
+    width = @getWidth(490)
+    blogPostWidth = @getWidth(460)
     height = 230
 
     @stackedGraph = new StackedGraph
@@ -109,7 +115,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     # For blog post
     new StackedGraph
       el: $('#bushwick-building-class')
-      width: 460
+      width: blogPostWidth
       height: 300
       data: salesData
       startingDataset: 'BK77'
@@ -119,7 +125,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
     new StackedGraph
       el: $('#heights-building-class')
-      width: 460
+      width: blogPostWidth
       height: 300
       data: salesData
       startingDataset: 'BK09'
@@ -128,7 +134,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
     new StackedGraph
       el: $('#williamsburg-building-class')
-      width: 460
+      width: blogPostWidth
       height: 300
       data: salesData
       startingDataset: 'BK73'
@@ -137,7 +143,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
     new StackedGraph
       el: $('#greenpoint-building-class')
-      width: 460
+      width: blogPostWidth
       height: 300
       data: salesData
       startingDataset: 'BK76'
@@ -146,7 +152,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       displayKey: (id) -> buildingClasses[id]
 
   renderLineGraph: ->
-    width = 490
+    width = @getWidth(490)
+    blogPostWidth = @getWidth(620)
     height = 230
 
     @lineGraph = new LineGraph
@@ -162,7 +169,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
     # Clinton-hill vs Canarsie
     recoveryGraph = new LineGraph
-      width: 620
+      width: blogPostWidth
       height: height
       data: salesData
       startingDataset: 'BK69'
@@ -197,6 +204,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       colorKeyWidth: 610
       customMouseEnter: throttledGraphHover
       customClickSelectedArea: (=> @colorMapClick())
+      height: if @isMobile then 400 else 600
+      width: if @isMobile then 340 else 500
 
   formatNeighborhoodName: (name) -> name?.split('-').join(', ')
   formatNeighborhoodNames: ->
