@@ -4,8 +4,9 @@
   column-gap: 10px
   column-fill: auto
   height: 120px
+  max-width: 520px
   .graph-key
-    height: 29px
+    max-height: 29px
   .key-circle, .key-text
     display: inline-block
     vertical-align: top
@@ -13,7 +14,6 @@
     margin-top: 3px
     text-transform: uppercase
     line-height: 1
-    height: 12px
     max-width: 87%
     width: calc(100% - 21px)
     text-overflow: ellipsis
@@ -24,8 +24,9 @@
     margin-right: 5px
   @media screen and (max-width: 500px)
     height: 167px
+    max-width: 300px
     .graph-key
-      height: 42px
+      max-height: 42px
       overflow: hidden
 
 .linear-graph-key
