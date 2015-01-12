@@ -9,8 +9,12 @@ append locals
 block body
   #home
     header
-      .heading.faux-underline-large Visualizations of city data
+      .heading.faux-underline-large Vislet
       .sub-heading Small interactive visualzations to help us understand the cities we live in.
-
+    .border
     .projects
-      a.project
+      a.project( href="/brooklyn" )
+        .project-title.heading.faux-underline-large Brooklyn Residential Sales 2003-2014
+        .brooklyn-sales-image
+
+    include ../../../components/layout/footer/bio.jade      
