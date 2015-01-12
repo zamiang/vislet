@@ -69,9 +69,8 @@ module.exports = class SvgMap extends Backbone.View
 
   addMapTitle: (g, label) ->
     @label = g.append("text")
-      .attr("x", @width - 20)
-      .attr("y", 30)
-      .style("text-anchor", "end")
+      .attr("x", 10)
+      .attr("y", 20)
       .attr('class', 'label-text')
       .text(label)
 

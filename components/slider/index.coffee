@@ -56,7 +56,7 @@ module.exports = class Slider extends Backbone.View
     @handle = slider.append("circle")
       .attr("class", "handle")
       .attr("transform", "translate(0,#{@height / 2})")
-      .attr("r", 9)
+      .attr("r", 10)
 
     @transition(slider) if @animateStart
 

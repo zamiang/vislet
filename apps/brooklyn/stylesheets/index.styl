@@ -26,6 +26,18 @@
     margin-bottom: 1px
     margin-left: 14px
     height: 80px
+    > div:first-child
+      height: 41px
+      .graph-heading
+        font-size: 20px
+        white-space: nowrap
+        text-overflow: ellipsis
+        width: 92%
+        overflow: hidden
+      .circle-key
+        height: 30px
+        width: 30px
+
     .circle-key, .graph-heading
       display: inline-block
       vertical-align: top
@@ -49,6 +61,9 @@
       margin-left: 10px
       margin-top: -1px
       font-size: 14px
+      &:first-child
+        font-size: 20px
+
 
 .brooklyn-svg-key
   transform: rotate(90deg)
@@ -62,6 +77,8 @@
     max-width: 548px
   .svg-building-class
     width: 548px
+  .stacked-area-chart
+    height: 350px
 
 .commercial-sales
   display: none
@@ -75,7 +92,7 @@
     width: 700px
 
 .sales-group
-  margin-top: 10px
+  margin-top: 20px
 
 .svg-slider
   margin-top: -13px

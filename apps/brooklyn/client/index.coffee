@@ -110,7 +110,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     new StackedGraph
       el: $('#bushwick-building-class')
       width: 460
-      height: height
+      height: 300
       data: salesData
       startingDataset: 'BK77'
       keys: ['buildingClass']
@@ -120,7 +120,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     new StackedGraph
       el: $('#heights-building-class')
       width: 460
-      height: height
+      height: 300
       data: salesData
       startingDataset: 'BK09'
       keys: ['buildingClass']
