@@ -12,7 +12,8 @@ module.exports = class Sales extends Backbone.Collection
   quarters: [1..4]
   years: [2003..2014]
 
-  validResidentialBuildingClasses: ["01", "02", "03", "07", "09", "10", "13", "15", "28"]
+  validResidentialBuildingClasses: ["01", "02", "03", "04", "07", "08", "09", "10", "12", "13", "15", "28"]
+  # exclude "16", "23", "17"
 
   salesDataKeys: [
     'residentialPrices'
@@ -82,7 +83,7 @@ module.exports = class Sales extends Backbone.Collection
     if sale.get('residentialUnits')
       data[key].residentialSaleTally[dateKey]++
       @resTotal++
-      if sale.get('pricePerSqFt')
+      if sale.get('pricePerSqFt') and sale.get('buildingClass').substring(0,2) in @validResidentialBuildingClasses
         data[key].residentialPrices[dateKey].push Number(sale.get('pricePerSqFt'))
         @resWithSaleCount++
     else if sale.get('commercialUnits')
