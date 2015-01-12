@@ -26,14 +26,14 @@ While, I would love to chart a neighborhood's 'number of mentions in the NYTimes
 
 ## 3. A Whole New Neighborhood
 
-If you are looking for an interesting real estate graph, Williamsburg and the surrounding neighborhoods are probably one of the first places to look. The area has transformed over the past decade from one of the most affordable places in Brooklyn (~$150 per sqft) to one of the most expensive (~$625). Once occupied by 'The Three H's' (Hassids, Hispanics and Hipsters), it is becomming an affluent family neighborhood slash shopping area. Lets look at how the types of buildings being sold in this area has changed.
+If you are looking for an interesting real estate graph, Williamsburg and the surrounding neighborhoods are probably one of the first places to look. The area has transformed over the past decade from one of the most affordable places in Brooklyn (~$150 per SqFt) to one of the most expensive (~$625). Once occupied by 'The Three H's' (Hassids, Hispanics and Hipsters), it is becoming an affluent family neighborhood slash shopping area. Lets look at how the types of buildings being sold in this area have changed.
 
 <div class="svg-container">
 <svg id="williamsburg-building-class" class="stacked-area-chart svg-building-class" />
 <svg id="greenpoint-building-class" class="stacked-area-chart svg-building-class" />
 </div>
 
-At first glance, these property type graphs tell the story of developers coming in and building lots of condos. From 2004-2012 there is a strong increase in condo sales and a strong decrease in Family Homes. Interestingly, even that begins to give way in 2013 when residential sales begin to take a smaller percentage of total sales, down to 70% from ~90%. This may show a neighborhood becoming a desireable place to live and then shops and restarunts being created to capitalize on the greater density and wealth.
+At first glance, these property type graphs tell the story of developers coming in and building lots of condos. From 2004-2012 there is a strong increase in condo sales and a strong decrease in Family Homes. Interestingly, even that begins to give way in 2013 when residential sales begin to take a smaller percentage of total sales, down to 70% from ~90%. This may show a neighborhood becoming a desirable place to live and then shops and restaurants being created to capitalize on the greater density and wealth.
 
 # Where the data comes from
 
