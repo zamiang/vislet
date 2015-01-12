@@ -148,7 +148,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       data: salesData
       startingDataset: 'BK76'
       keys: ['buildingClass']
-      label: 'Greenpoint Heights Building Class as % of sales'
+      label: 'Greenpoint Building Class as % of sales'
       displayKey: (id) -> buildingClasses[id]
 
   renderLineGraph: ->
