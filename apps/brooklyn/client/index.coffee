@@ -126,6 +126,25 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       keys: ['buildingClass']
       label: 'Brooklyn Heights Building Class as % of sales'
 
+    new StackedGraph
+      el: $('#williamsburg-building-class')
+      width: 460
+      height: 300
+      data: salesData
+      startingDataset: 'BK73'
+      keys: ['buildingClass']
+      label: 'Wiliamsburg Building Class as % of sales'
+
+    new StackedGraph
+      el: $('#greenpoint-building-class')
+      width: 460
+      height: 300
+      data: salesData
+      startingDataset: 'BK76'
+      keys: ['buildingClass']
+      label: 'Greenpoint Heights Building Class as % of sales'
+      displayKey: (id) -> buildingClasses[id]
+
   renderLineGraph: ->
     width = 490
     height = 230
@@ -160,18 +179,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
           'Borough Average'
 
     recoveryGraph.animateNewArea('BK69', 'BK50')
-
-    # Williamsburg graph
-    new LineGraph
-      width: 620
-      height: height
-      data: salesData
-      startingDataset: 'BK73'
-      keys: ['williamsburgTrend']
-      el: $('#williamsburg-sales')
-      label: 'Avg Price Per SqFt'
-      yAxisFormat: (x) -> "$#{x}"
-      displayTrend: true
 
   renderSvgMap: (topojson) ->
     throttledGraphHover = _.throttle @handleGraphHover, 300

@@ -12,15 +12,12 @@ module.exports = class Sales extends Backbone.Collection
   quarters: [1..4]
   years: [2003..2014]
 
+  # excludes "16", "17", "23" since they are very uncommon in Brooklyn
   validResidentialBuildingClasses: ["01", "02", "03", "04", "07", "08", "09", "10", "12", "13", "15", "28"]
-  # exclude "16", "23", "17"
 
   salesDataKeys: [
     'residentialPrices'
-    # 'commercialSaleTally'
-    # 'commercialSaleWithPriceTally'
-    # 'commercialPriceTally'
-    # 'commercialPriceAverage'
+    # 'commercialPrices'
   ]
 
   createQuarterlyHash: (isArray) ->
@@ -149,7 +146,7 @@ module.exports = class Sales extends Backbone.Collection
   formatBuildingClassData: (flattenedData, data) ->
     flattenedData = {}
     dateKeys = Object.keys(data)
-    dataKeys = @validResidentialBuildingClasses # Object.keys(data[dateKeys[0]])
+    dataKeys = @validResidentialBuildingClasses
     for dataKey in dataKeys
       flattenedData[dataKey] = []
       for dateKey in dateKeys
