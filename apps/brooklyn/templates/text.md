@@ -4,7 +4,7 @@ The graphs above are based on the NYC Department of Finance data [here](http://w
 
 ## 1. A Whole New Neighborhood
 
-If you are looking for an interesting real estate graph, Williamsburg and the surrounding neighborhoods are probably one of the first places to look. The area has transformed over the past decade from one of the most affordable places in Brooklyn (~$150 per SqFt) to one of the most expensive (~$625). Once occupied by 'The Three H's' (Hassids, Hispanics and Hipsters), it is becoming an affluent family neighborhood slash shopping area. Lets look at how the types of buildings being sold in Williamsburg and Greenpoint have changed.
+If you are looking for an interesting real estate graph, Williamsburg and the surrounding neighborhoods are probably one of the first places to look. The area has transformed over the past decade from one of the most affordable places in Brooklyn (~$150 per SqFt) to one of the most expensive (~$625). In 2003 it was occupied by 'The Three H's' (Hassids, Hispanics and Hipsters) while today it is becoming an affluent family neighborhood slash shopping area. Lets look at how the types of buildings being sold in Williamsburg and Greenpoint have changed.
 
 <div class="svg-container">
 <svg id="williamsburg-building-class" class="stacked-area-chart svg-building-class" />
