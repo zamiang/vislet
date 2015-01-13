@@ -40,3 +40,7 @@ The raw sales data is on the department of Finance website [here](http://www.nyc
 
 If you would like to download the dataset used for the visualizations
 above. It can be found [here](https://s3.amazonaws.com/vislet-production/data/brooklyn-sales.json). I have also written up how I generated the data on my blog [here](http://www.zamiang.com/posts/post/2015/01/15/apartment-sales/).
+
+## Thanks
+
+Many thanks to the awesome [Christina Xu](https://twitter.com/xuhulk) who, in helping conceptualize the both the text and visualization above, left this sentence untouched.
