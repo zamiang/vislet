@@ -56,7 +56,6 @@ module.exports = class MapView extends Backbone.View
   # Allows for easy referencing of map values for coloring the map
   getMapColorHash: ->
     mapColorHash = {}
-    console.log @dataset
     for NTA in @NTAs
       unless NTA == 'ALL'
         for item in salesData[NTA][@dataset]
