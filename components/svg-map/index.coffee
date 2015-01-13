@@ -27,7 +27,7 @@ module.exports = class SvgMap extends Backbone.View
     reverseColorKey: true
 
   initialize: (options) ->
-    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea, @reverseColorKey, @width, @height,
+    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea, @reverseColorKey, @width, @height, @formatHoverText,
       @colorKeyWidth, @customMouseEnter, @$colorKey, @title, @scale, @translateX, @translateY } = _.defaults(options, @defaults)
     @render()
 
@@ -63,6 +63,7 @@ module.exports = class SvgMap extends Backbone.View
     svg.on 'mouseleave', => @mouseleave()
 
     @drawLabels(g, neighborhoods, path) if @shouldLabel
+    @addHoverText(g) if @formatHoverText
     @addMapTitle g, @label
 
   addMapTitle: (g, label) ->
@@ -71,6 +72,12 @@ module.exports = class SvgMap extends Backbone.View
       .attr("y", 20)
       .attr('class', 'label-text')
       .text(label)
+
+  addHoverText: (g) ->
+    @hoverText = g.append("text")
+      .attr("x", 10)
+      .attr("y", 40)
+      .attr('class', 'hover-text')
 
   updateMapTitle: (label) -> @label.text(label)
 

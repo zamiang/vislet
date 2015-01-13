@@ -40,7 +40,7 @@ module.exports =
         Number(value.toFixed(0)).toLocaleString()
       else
         num = value / 1000000
-        "#{Number(num.toFixed(3)).toLocaleString()}m"
+        "#{Number(num.toFixed(2)).toLocaleString()}m"
 
     params =
       classes: classes

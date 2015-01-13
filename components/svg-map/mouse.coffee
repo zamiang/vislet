@@ -33,6 +33,8 @@ module.exports =
   mouseover: (item) ->
     return if item.id == @activeId
     @customMouseEnter?(@activeId, item.id)
+    @hoverText?.text @formatHoverText(item)
 
   mouseleave: ->
+    @hoverText?.text ''
     @customMouseLeave?(@activeId)

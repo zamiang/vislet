@@ -11,6 +11,7 @@ module.exports = class Slider extends Backbone.View
       right: 15
       bottom: 0
     speed: 500
+    height: 38
 
   initialize: (options) ->
     { @data, @width, @height, @margin, @handleSelect, @speed, @startValue, @animateStart } = _.defaults(options, @defaults)
