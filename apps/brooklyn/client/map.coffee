@@ -127,4 +127,5 @@ module.exports = class MapView extends Backbone.View
       @$back.fadeIn @speed
       @slider.$el.fadeOut(@speed)
       @svgMap.$colorKey.fadeOut(@speed)
+      @svgMap.hoverText.text ''
       @isCholoropleth = false
