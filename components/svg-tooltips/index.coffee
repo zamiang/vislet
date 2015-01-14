@@ -65,6 +65,7 @@ module.exports =
 
     # TODO
     # Refactor this
+    index = 0
     for line in @lines
       i = bisectDate(line.values, new Date(x0))
       d0 = line.values[i - 1]
@@ -80,6 +81,9 @@ module.exports =
         tooltipSvg
           .attr("transform", "translate(#{@x(d.date)},#{@y(value)})")
           .style('display', 'block')
-        tooltipSvg.select('.tooltip-label').text(text)
+        tooltipText = tooltipSvg.select('.tooltip-label').text(text)
+        transform = if index % 2 then 'translate(-50, 5)' else 'translate(8, 5)'
+        index++
+        tooltipText.attr 'transform', transform
       else
         tooltipSvg.style('display', 'none')
