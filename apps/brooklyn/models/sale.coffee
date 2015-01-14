@@ -47,6 +47,12 @@ module.exports = class Sale extends Backbone.Model
         sqft: sqft
 
       if sqft > maxSqFt or sqft < minSqFt or price < minPrice
+        # Probably transfer of owership or residential land sale
+        # console.log "Excluded:", price, sqft, @get('landSqFt'), @get('ntacode')
+        return
+
+      if price / sqft < 30
+        # Not sure what is going on here
         # console.log "Excluded:", price, sqft, @get('landSqFt'), @get('ntacode')
         return
 
