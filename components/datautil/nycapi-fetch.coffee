@@ -1,5 +1,5 @@
 fs = require('fs')
-request = require('superagent')
+# request = require('superagent')
 sales = require('../../missing-bbl.json')
 { NYC_API_ID, NYC_API_KEY } = require('../../config.coffee')
 

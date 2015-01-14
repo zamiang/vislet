@@ -33,7 +33,9 @@ module.exports = class Sale extends Backbone.Model
     price = Number(@get('price').replace('$', '').replace(',', '').replace(',', '').replace(',', ''))
     sqft = Number(@get('grossSqFt').replace(',', '').replace(',', ''))
 
-    if price / sqft < 4000 and price / sqft > 10
+    if sqft > 0 && price > 0
+      if sqft > 4000 or sqft < 300
+        return console.log("Excluded:", price, sqft, @get('landSqFt'), @get('ntaCode')) if price/sqft > 4000 # and price / sqft > 10
       @set
         pricePerSqFt: price / sqft
 
