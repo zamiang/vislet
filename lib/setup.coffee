@@ -16,7 +16,7 @@ module.exports = (app) ->
     CSS_EXT: if "production" is NODE_ENV then ".min.css" else ".css"
 
   # Override Backbone to use server-side sync
-  Backbone.sync = require 'backbone-super-sync'
+  # Backbone.sync = require 'backbone-super-sync'
 
   # Mount sharify
   app.use sharify

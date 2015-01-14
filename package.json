@@ -15,16 +15,15 @@
         "backbone": "*",
         "underscore": "*",
         "underscore.string": "*",
-        "backbone-super-sync": "*",
         "marked": "*",
         "coffee-script": "*",
+        "superagent": "*",
         "newrelic": "*",
         "bucket-assets": "*",
         "moment": "*",
         "node-env-file": "*"
     },
     "devDependencies": {
-        "superagent": "*",
         "nice-json2csv": "*",
         "d3": "*",
         "topojson": "*",
