@@ -8,8 +8,7 @@ append locals
 
 block body
   #brooklyn
-    a( href="/" ) VISLET - Small interactive visualizations to help us understand the cities we live in
-
+    include ../../../components/layout/header/intro.jade
     header
       .heading.faux-underline-large Brooklyn Residential Sales 2003-2014
       .sub-heading Click a neighborhood to see graphs for that area. Hover an area to compare residential sales.
@@ -35,7 +34,7 @@ block body
         svg#brooklyn-residential-building-class.stacked-area-chart.svg-building-class
      .markdown-text( itemtype="http://schema.org/BlogPosting" )
         time( datetime="2014-01-12T03:24:00" itemprop="datePublished" ) January 12, 2015
-        h1( itemprop="name headline" ) A look at the NYC Department of Finance Property Sales Data
+        h1( itemprop="name headline" ) A look at the NYC Department of Finance Residential Property Sales Data
         div( itemprop="articleBody" )
           include:md text.md
         include ../../../components/layout/footer/bio.jade

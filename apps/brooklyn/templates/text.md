@@ -1,6 +1,6 @@
 Why look at the Brooklyn property sales data? Well, I've lived in Brooklyn for about 5 years and want to better understand the wave of gentrification currently washing over Brooklyn. I expected to see was Bushwick trailing Williamsburg, Clinton Hill following Fort Green and so on. What I found was just how unique each neighborhood is in Brooklyn. While their differences are obvious from walking around, it is incredible that the differences come across in residential property sales data.
 
-The graphs above are based on the NYC Department of Finance [rolling ales data](http://www.nyc.gov/html/dof/html/property/rolling_sales_data.shtml). Below are three 'data vignettes' that demonstrate how to use the visualization above to explore this awesome dataset.
+The graphs above are based on the NYC Department of Finance [rolling sales data](http://www.nyc.gov/html/dof/html/property/rolling_sales_data.shtml). Below are three 'data vignettes' that demonstrate how to use the visualization above to explore this awesome dataset.
 
 ## 1. A Whole New Neighborhood
 

@@ -82,8 +82,10 @@ module.exports =
           .attr("transform", "translate(#{@x(d.date)},#{@y(value)})")
           .style('display', 'block')
         tooltipText = tooltipSvg.select('.tooltip-label').text(text)
-        transform = if index % 2 then 'translate(-50, 5)' else 'translate(8, 5)'
-        index++
+
+        # Alternate sides
+        transform = if index % 2 then "translate(#{-8 - tooltipText[0][0].getBBox().width}, 4)" else 'translate(8, 4)'
         tooltipText.attr 'transform', transform
+        index++
       else
         tooltipSvg.style('display', 'none')
