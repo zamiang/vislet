@@ -38,4 +38,4 @@ above, it is [here](https://s3.amazonaws.com/vislet-production/data/brooklyn-sal
 
 ## Thanks
 
-Many thanks to the awesome [Christina Xu](https://twitter.com/xuhulk) who, in helping conceptualize the both the text and visualization above, left this sentence untouched.
+Many thanks to the awesome [Christina Xu](https://twitter.com/xuhulk) who gave helpful feedback on both the text and visualization above, and remains my bitter rival in Gang Beasts.
