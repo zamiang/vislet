@@ -56,25 +56,6 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
     # For blog post
     new StackedGraph
-      el: $('#bushwick-building-class')
-      width: blogPostWidth
-      height: 300
-      data: salesData
-      startingDataset: 'BK77'
-      keys: ['buildingClass']
-      label: 'Bushwick Building Class as % of sales'
-      displayKey: (id) -> buildingClasses[id]
-
-    new StackedGraph
-      el: $('#heights-building-class')
-      width: blogPostWidth
-      height: 300
-      data: salesData
-      startingDataset: 'BK09'
-      keys: ['buildingClass']
-      label: 'Brooklyn Heights Building Class as % of sales'
-
-    new StackedGraph
       el: $('#williamsburg-building-class')
       width: blogPostWidth
       height: 300

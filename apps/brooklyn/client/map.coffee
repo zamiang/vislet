@@ -91,14 +91,6 @@ module.exports = class MapView extends Backbone.View
       key: 'nycneighborhoods'
       ignoredId: 'BK99'
       customOnClick: (id) => @handleNeighborhoodClick(id)
-      formatHoverText: (hoveredItem) =>
-        return unless @isCholoropleth and @mapColorHash
-        value = 0
-        for item in @mapColorHash[@slider.getValue()]
-          if item.id == hoveredItem.id
-            value = item.value
-        if value > 0
-          "$#{value.toLocaleString()}: #{neighborhoodNames[hoveredItem.id]}"
       drawLabels: false
       zoomOnClick: false
       $colorKey: $('.brooklyn-svg-key')
@@ -110,6 +102,16 @@ module.exports = class MapView extends Backbone.View
       customClickSelectedArea: (=> @colorMapClick())
       height: if @isMobile then 400 else 600
       width: if @isMobile then 340 else 500
+      formatHoverText: @formatMapHoverText
+
+  formatMapHoverText: (hoveredItem) =>
+    return unless @isCholoropleth and @mapColorHash
+    value = 0
+    for item in @mapColorHash[@slider.getValue()]
+      if item.id == hoveredItem.id
+        value = item.value
+    if value > 0
+      "$#{value.toLocaleString()}: #{neighborhoodNames[hoveredItem.id]}"
 
   handleNeighborhoodClick: (id) ->
     @trigger 'click', { id: id }
@@ -121,6 +123,8 @@ module.exports = class MapView extends Backbone.View
       @$back.fadeOut @speed
       @slider.$el.fadeIn(@speed)
       @svgMap.$colorKey.fadeIn(@speed) unless @isMobile
+      @$selectedLabel.text 'SELECTED NEIGHBORHOOD'
+      @$hoveredLabel.text 'HOVERED NEIGHBORHOOD'
       @isCholoropleth = true
     else
       @$back.fadeIn @speed
