@@ -2,7 +2,12 @@ fs = require('fs')
 data = require './data/brooklyn-sales.json'
 SalesCollection = require './collections/sales.coffee'
 
-sales = new SalesCollection(data)
+console.log data.features.length
+salesData =
+  for item in data.features
+    item.properties
+
+sales = new SalesCollection salesData
 
 fs.writeFile "./apps/brooklyn/data/brooklyn-sales-display-data.json", JSON.stringify(sales.getSalesData()), (err) ->
   if (err)

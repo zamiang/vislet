@@ -33,24 +33,28 @@ module.exports = class Sale extends Backbone.Model
 
     @setupDate()
     @setupPricePerSqFt()
-    console.log @
 
   setupPricePerSqFt: ->
-    price = Number(@get('price').replace('$', '').replace(',', '').replace(',', '').replace(',', ''))
-    sqft = Number(@get('grossSqFt').replace(',', '').replace(',', ''))
-    minSqFt = 300
-    maxSqFt = 10000
+    if @get('price') && @get('grossSqFt')
+      price = Number(String(@get('price')).replace('$', '').replace(',', '').replace(',', '').replace(',', ''))
+      sqft = Number(String(@get('grossSqFt')).replace(',', '').replace(',', ''))
+      minSqFt = 300
+      maxSqFt = 10000
+      minPrice = 10000
 
-    if sqft > 0 && price > 0
-      if sqft > maxSqFt or sqft < minSqFt
+      @set
+        price: price
+        sqft: sqft
+
+      if sqft > maxSqFt or sqft < minSqFt or price < minPrice
+        # console.log "Excluded:", price, sqft, @get('landSqFt'), @get('ntacode')
         return
-      if price / sqft < 100
-        console.log "Excluded:", price, sqft, @get('landSqFt'), @get('ntacode')
+
       @set
         pricePerSqFt: price / sqft
 
   setupDate: ->
-    date = moment(@get('date'))
+    date = moment(Math.floor(@get('date'))).add(5, 'hours')
     @set
       quarter: date.quarter()
       month: date.months()
