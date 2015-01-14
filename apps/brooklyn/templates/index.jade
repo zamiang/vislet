@@ -8,9 +8,11 @@ append locals
 
 block body
   #brooklyn
+    a( href="/" ) VISLET - Small interactive visualizations to help us understand the cities we live in
+
     header
       .heading.faux-underline-large Brooklyn Residential Sales 2003-2014
-      .sub-heading Click a neighborhood to see graphs for that area. Hover an area to compare.
+      .sub-heading Click a neighborhood to see graphs for that area. Hover an area to compare residential sales.
     .map-svg-container
       svg#brooklyn-svg.svg-map
         include ../../../components/svg-map/defs.jade
