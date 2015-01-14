@@ -1,3 +1,5 @@
+_ = require 'underscore'
+
 module.exports =
 
   onClick: (item, path, g) ->
@@ -32,9 +34,14 @@ module.exports =
 
   mouseover: (item) ->
     return if item.id == @activeId
-    @customMouseEnter?(@activeId, item.id)
-    @hoverText?.text @formatHoverText(item)
+    @hoveredId = item.id
+    _.delay (hoveredItem) =>
+      return unless hoveredItem.id == @hoveredId and hoveredItem.id != @activeId
+      @customMouseEnter?(@activeId, hoveredItem.id)
+      @hoverText?.text @formatHoverText(item)
+    , 500, item
 
   mouseleave: ->
+    @hoveredId = false
     @hoverText?.text ''
     @customMouseLeave?(@activeId)
