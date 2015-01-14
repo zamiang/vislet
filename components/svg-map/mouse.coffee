@@ -3,7 +3,10 @@ _ = require 'underscore'
 module.exports =
 
   onClick: (item, path, g) ->
-    return @customClickSelectedArea?() if item.id == @activeId
+    if item.id == @activeId
+      @activeId = false
+      @customClickSelectedArea?()
+      return
 
     @activeId = item.id
     @customOnClick item.id
