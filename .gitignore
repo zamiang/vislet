@@ -16,3 +16,4 @@ node_modules
 public/assets
 dump.rdb
 apps/brooklyn/data/brooklyn-sales.json
+apps/brooklyn/data/raw-brooklyn-sales.json

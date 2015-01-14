@@ -53,10 +53,10 @@ module.exports = class Sales extends Backbone.Collection
     data = @createNeighborhoodDataHash()
     for sale in @models
       @tallyCounts sale, data, 'ALL'
-      @tallyCounts sale, data, sale.get('ntaCode')
+      @tallyCounts sale, data, sale.get('ntacode')
 
     @computeBuildingClassPercent data, 'buildingClass'
-
+]
     console.log "Total Residential Sales: #{@resTotal}, Total With Price per SqFt #{@resWithSaleCount}"
 
     @formatSalesDataForDisplay data
@@ -77,7 +77,7 @@ module.exports = class Sales extends Backbone.Collection
   tallyCounts: (sale, data, key) ->
     return unless data[key]
     dateKey = "#{sale.get('quarter')}-#{sale.get('year')}"
-    if sale.get('residentialUnits')
+    if sale.get('residentia') > 0 and sale.get('commercial') < 1
       data[key].residentialSaleTally[dateKey]++
       @resTotal++
       if sale.get('pricePerSqFt') and sale.get('buildingClass').substring(0,2) in @validResidentialBuildingClasses

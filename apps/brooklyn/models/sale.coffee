@@ -1,5 +1,7 @@
 Backbone = require 'backbone'
 moment = require 'moment'
+_ = require 'underscore'
+_s = require 'underscore.string'
 
 # {
 # "buildingClass":"01  ONE FAMILY DWELLINGS",
@@ -26,22 +28,29 @@ moment = require 'moment'
 module.exports = class Sale extends Backbone.Model
 
   initialize: ->
+    @set
+      'buildingClass': _s.trim(@get('buildingCl'))
+
     @setupDate()
     @setupPricePerSqFt()
+    console.log @
 
   setupPricePerSqFt: ->
     price = Number(@get('price').replace('$', '').replace(',', '').replace(',', '').replace(',', ''))
     sqft = Number(@get('grossSqFt').replace(',', '').replace(',', ''))
+    minSqFt = 300
+    maxSqFt = 10000
 
     if sqft > 0 && price > 0
-      if sqft > 4000 or sqft < 300
-        return console.log("Excluded:", price, sqft, @get('landSqFt'), @get('ntaCode')) if price/sqft > 4000 # and price / sqft > 10
+      if sqft > maxSqFt or sqft < minSqFt
+        return
+      if price / sqft < 100
+        console.log "Excluded:", price, sqft, @get('landSqFt'), @get('ntacode')
       @set
         pricePerSqFt: price / sqft
 
   setupDate: ->
-    # Dates are 5 hours off (EST) and need to be reset to GMT
-    date = moment(@get('date')).add(5, 'hours')
+    date = moment(@get('date'))
     @set
       quarter: date.quarter()
       month: date.months()
