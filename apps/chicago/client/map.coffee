@@ -2,10 +2,8 @@ Backbone = require "backbone"
 Backbone.$ = $
 _ = require 'underscore'
 moment = require 'moment'
-brooklynTopoJson = require('../data/brooklyn.json')
+chicagoTopoJson = require('../data/neighborhoods.json')
 svgMapView = require('../../../components/svg-map/index.coffee')
-neighborhoodNames = require('../data/nyc-neighborhood-names.json')
-salesData = require('../data/brooklyn-sales-display-data.json')
 Slider = require('../../../components/slider/index.coffee')
 
 # Manages communication between the map, slider and graphs
@@ -16,25 +14,20 @@ module.exports = class MapView extends Backbone.View
   isCholoropleth: true
   dataset: "residentialPrices"
 
-  formatNeighborhoodName: (name) -> name?.split('-').join(', ')
-  formatNeighborhoodNames: ->
-    for NTA in Object.keys(neighborhoodNames)
-      neighborhoodNames[NTA] = @formatNeighborhoodName neighborhoodNames[NTA]
-
   events:
     'click .back' : 'colorMapClick'
 
   initialize: (options) ->
     @$selectedLabel = @$('.selected-neighborhood-name .graph-heading')
     @$hoveredLabel = @$('.hover-neighborhood-name .graph-heading')
-    @$back = @$('.brooklyn-svg.back')
-
-    @NTAs = Object.keys(salesData)
+    @$back = @$('.chicago-svg.back')
     @isMobile = options.isMobile
-    @formatNeighborhoodNames()
-    @mapColorHash = @getMapColorHash()
-    @renderSvgMap brooklynTopoJson
-    @renderSlider()
+
+    # @NTAs = Object.keys(salesData)
+    # @mapColorHash = @getMapColorHash()
+    @renderSvgMap chicagoTopoJson
+
+    # @renderSlider()
 
   renderSlider: ->
     data =
@@ -42,7 +35,7 @@ module.exports = class MapView extends Backbone.View
         item.date
 
     @slider = new Slider
-      el: $('#brooklyn-date-slider')
+      el: $('#chicago-date-slider')
       width: if @isMobile then 340 else 502
       data: data
       animateStart: true
@@ -74,23 +67,23 @@ module.exports = class MapView extends Backbone.View
 
   handleGraphHover: (currentNTA, hoverNTA) =>
     return if @isCholoropleth
-    @$hoveredLabel.html neighborhoodNames[hoverNTA]
+    @$hoveredLabel.html hoverNTA
 
     @trigger 'hover', { currentNTA: currentNTA, hoverNTA: hoverNTA }
 
   renderSvgMap: (topojson) ->
     throttledGraphHover = _.throttle @handleGraphHover, 300
     @svgMap = new svgMapView
-      el: $('#brooklyn-svg')
+      el: $('#chicago-svg')
       topojson: topojson
-      key: 'nycneighborhoods'
-      ignoredId: 'BK99'
+      key: 'neighborhoods'
+      ignoredId: 'Park'
       customOnClick: (id) => @handleNeighborhoodClick(id)
       drawLabels: false
       zoomOnClick: false
-      $colorKey: $('.brooklyn-svg-key')
-      scale: 1.05
-      translateX: 37
+      $colorKey: $('.chicago-svg-key')
+      scale: 0.95
+      translateX: 0
       translateY: 0
       colorKeyWidth: 610
       customMouseEnter: throttledGraphHover
@@ -106,11 +99,11 @@ module.exports = class MapView extends Backbone.View
       if item.id == hoveredItem.id
         value = item.value
     if value > 0
-      "$#{value.toLocaleString()}: #{neighborhoodNames[hoveredItem.id]}"
+      "$#{value.toLocaleString()}: #{hoveredItem.id}"
 
   handleNeighborhoodClick: (id) ->
     @trigger 'click', { id: id }
-    @$selectedLabel.html neighborhoodNames[id]
+    @$selectedLabel.html id
     @updateUI false
 
   updateUI: (visible) ->

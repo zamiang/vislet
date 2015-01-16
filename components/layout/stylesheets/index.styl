@@ -146,13 +146,6 @@ hr
   margin-top: 100px
   margin-bottom: 100px
 
-.responsive-layout-container
-  margin 0px 55px
-  @media screen and (min-width: 1440px)
-    margin 0px 150px
-  @media screen and (min-width: 1660px)
-    margin 0px 200px
-
 .faux-underline-large
   &
     display: inline-block
@@ -178,7 +171,7 @@ hr
   text-align: center
   letter-spacing: 2px
   color: #333
-  margin-bottom: 28px
+  margin-bottom: 16px
   line-height: 148%
   font-weight: normal
 
@@ -204,5 +197,101 @@ hr
   #main-layout-container        
     width: 340px
     margin-top: 20px
-  .responsive-layout-container
-    margin 0px 20px
+
+html.wf-active body a
+  &.back
+    franklin-gothic()
+    text-transform: uppercase
+    font-size: 17px
+    position: absolute
+    top: 9px
+    right: 22px
+    color: #333
+    display: none
+
+.markdown-text
+  font-size: 15px
+  margin-top: 30px
+  h1, h2, p
+    max-width: 548px
+  h1
+    text-align: left
+    margin-top: 20px
+    margin-bottom: 6px
+    line-height: 136%
+  h2
+    margin-bottom: 5px
+    margin-top: 25px
+  time
+    margin-bottom: -23px
+    display: block
+  .svg-building-class
+    width: 548px
+  .stacked-area-chart
+    height: 350px
+
+.graph-heading-container
+  margin-bottom: 1px
+  margin-left: 14px
+  height: 80px
+  > div:first-child
+    height: 41px
+    .graph-heading
+      font-size: 20px
+      white-space: nowrap
+      text-overflow: ellipsis
+      width: calc(100% - 41px)
+      overflow: hidden
+    .circle-key
+      height: 30px
+      width: 30px
+
+  .circle-key, .graph-heading
+    display: inline-block
+    vertical-align: top
+  .circle-key
+    width: 20px
+    height: 20px
+    border-radius: 100%
+    &.blue
+      background: $blue
+    &.red
+      background: $red
+    &.gray
+      background: $gray
+
+  .graph-heading
+    width: 90%
+    franklin-gothic()
+    line-height: 150%
+    letter-spacing: 1px
+    text-transform: uppercase
+    margin-left: 10px
+    margin-top: -1px
+    font-size: 14px
+    &:first-child
+      font-size: 20px
+
+.map-app
+  min-height 100%
+  width: 1054px
+  margin: 0px auto
+  header
+    .sub-heading
+      text-align: left
+      width: 100%
+  .svg-graphs
+    vertical-align: top
+    display: inline-block
+    width: 541px
+    margin-left: 13px
+  .map-svg-container
+    display: inline-block
+    max-width: 500px
+    position: relative
+  .svg-container
+    width: 100%
+    &.third-width
+      width: 700px
+
+      

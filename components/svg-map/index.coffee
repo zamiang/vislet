@@ -44,7 +44,7 @@ module.exports = class SvgMap extends Backbone.View
     projection.scale(1).translate([0, 0])
 
     bounds = path.bounds(neighborhoods)
-    scale = 1.05 / Math.max((bounds[1][0] - bounds[0][0]) / @width, (bounds[1][1] - bounds[0][1]) / @height)
+    scale = @scale / Math.max((bounds[1][0] - bounds[0][0]) / @width, (bounds[1][1] - bounds[0][1]) / @height)
     translate = [((@width - scale * (bounds[1][0] + bounds[0][0])) / 2) + @translateX, ((@height - scale * (bounds[1][1] + bounds[0][1])) / 2) + @translateY]
 
     projection.scale(scale).translate(translate)

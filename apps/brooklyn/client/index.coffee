@@ -1,16 +1,13 @@
 Backbone = require "backbone"
 Backbone.$ = $
-_ = require 'underscore'
 moment = require 'moment'
 brooklynTopoJson = require('../data/brooklyn.json')
-svgMapView = require('../../../components/svg-map/index.coffee')
 LineGraph = require('../../../components/line-graph/index.coffee')
 PercentGraph = require('../../../components/line-graph/percent-graph.coffee')
 StackedGraph = require('../../../components/area-chart/index.coffee')
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
 salesData = require('../data/brooklyn-sales-display-data.json')
 buildingClasses = require('../data/building-class.json')
-Label = require('../models/label.coffee')
 Slider = require('../../../components/slider/index.coffee')
 MapView = require('./map.coffee')
 
