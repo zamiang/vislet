@@ -142,7 +142,6 @@ module.exports = class Sales extends Backbone.Collection
       formattedData[ntaID] = flattenedData
     formattedData
 
-  parseYear: d3.time.format("%Y").parse
   formatBuildingClassData: (flattenedData, data) ->
     flattenedData = {}
     dateKeys = Object.keys(data)
