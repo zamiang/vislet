@@ -1,18 +1,18 @@
 Backbone = require "backbone"
-Backbone.$ = $
 _ = require 'underscore'
 moment = require 'moment'
 chicagoTopoJson = require('../data/neighborhoods.json')
+crimeData = require '../data/chicago-crimes-display-data.json'
 svgMapView = require('../../../components/svg-map/index.coffee')
 Slider = require('../../../components/slider/index.coffee')
 
 # Manages communication between the map, slider and graphs
 module.exports = class MapView extends Backbone.View
 
-  dateFormat: "Q, YYYY"
+  dateFormat: "MMM, YYYY"
   speed: 200
   isCholoropleth: true
-  dataset: "residentialPrices"
+  dataset: "crimeTally"
 
   events:
     'click .back' : 'colorMapClick'
@@ -23,15 +23,15 @@ module.exports = class MapView extends Backbone.View
     @$back = @$('.chicago-svg.back')
     @isMobile = options.isMobile
 
-    # @NTAs = Object.keys(salesData)
-    # @mapColorHash = @getMapColorHash()
+    @NTAs = Object.keys(crimeData)
+    @mapColorHash = @getMapColorHash()
     @renderSvgMap chicagoTopoJson
 
-    # @renderSlider()
+    @renderSlider()
 
   renderSlider: ->
     data =
-      for item in salesData['ALL']['residentialPrices']
+      for item in crimeData[@NTAs[0]][@dataset]
         item.date
 
     @slider = new Slider
@@ -45,20 +45,19 @@ module.exports = class MapView extends Backbone.View
   getMapColorHash: ->
     mapColorHash = {}
     for NTA in @NTAs
-      unless NTA == 'ALL'
-        for item in salesData[NTA][@dataset]
-          mapColorHash[item.date] ||= []
-          mapColorHash[item.date].push
-            id: NTA
-            value: item.value
+      for item in crimeData[NTA][@dataset]
+        mapColorHash[item.date] ||= []
+        mapColorHash[item.date].push
+          id: NTA
+          value: item.value
     mapColorHash
 
   colorMap: (date) =>
-    label = "Avg Price Per SqFt"
+    label = "Number of Crimes"
     @date = date
     data = @mapColorHash[date]
-    @svgMap.colorMap data, 0, 1000, label
-    @svgMap.updateMapTitle "Q#{moment(date).format(@dateFormat)} #{label}"
+    @svgMap.colorMap data, 0, 500, label
+    @svgMap.updateMapTitle "#{moment(date).format(@dateFormat)} #{label}"
 
   colorMapClick: ->
     @colorMap(@slider.getValue())

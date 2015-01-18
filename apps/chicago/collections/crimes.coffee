@@ -59,13 +59,16 @@ module.exports = class Crimes extends Backbone.Collection
         for crimeType in Object.keys(crimeTypes)
           total += crimeTypes[crimeType]
 
+        for crimeType in Object.keys(crimeTypes)
+          value = 0
           if crimeTypes[crimeType] > 0
             value = (crimeTypes[crimeType] / total * 100).toFixed(2)
-            crimeTypes[crimeType] = if value > 1 then value else 0
+          crimeTypes[crimeType] = if value > 1 then value else 0
 
   tallyCounts: (crime, data, key) ->
     return unless data[key]
-    return if crime.get('year') > 2014
+    if crime.get('year') > 2014
+      return
 
     dateKey = "#{crime.get('month')}-#{crime.get('year')}"
 
@@ -93,13 +96,12 @@ module.exports = class Crimes extends Backbone.Collection
       for key in @crimesDataKeys
         data = originalData[ntaID][key]
         flattenedData[key] =
-          for itemKey in Object.keys(data)
+          for dateKey in Object.keys(data)
             {
-              date: moment(itemKey, 'M-YYYY').valueOf()
-              value: data[itemKey]
+              date: moment(dateKey, 'M-YYYY').valueOf()
+              value: data[dateKey]
             }
 
-      # console.log originalData[ntaID].crimeType
       flattenedData.crimeType = @formatCrimeTypeData originalData[ntaID].crimeType
       formattedData[ntaID] = flattenedData
     formattedData
