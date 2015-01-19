@@ -23,8 +23,12 @@
   width: 600px
   vertical-align: top
   display: inline-block
+  @media screen and (max-width: 500px)
+    width: 340px
   &.third-width
     width: 700px
+    @media screen and (max-width: 500px)
+      width: 340px
 
 #brooklyn-residential-building-class
   margin-top: 10px
@@ -35,3 +39,6 @@
 .svg-slider
   margin-top: -13px
   margin-left: -14px
+
+.map-app .svg-container
+  width: 105%
