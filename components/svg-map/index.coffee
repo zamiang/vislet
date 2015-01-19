@@ -25,17 +25,17 @@ module.exports = class SvgMap extends Backbone.View
     translateX: 0
     translateY: 0
     reverseColorKey: true
+    rotate: [74 + 700 / 60, -38 - 50 / 60]
 
   initialize: (options) ->
-    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea, @reverseColorKey, @width, @height, @formatHoverText,
+    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea, @reverseColorKey, @width, @height, @formatHoverText, @rotate
       @colorKeyWidth, @customMouseEnter, @$colorKey, @title, @scale, @translateX, @translateY } = _.defaults(options, @defaults)
     @render()
 
   render: ->
     neighborhoods = topojson.feature(@topojson, @topojson.objects[@key])
 
-    projection = d3.geo.transverseMercator()
-      .rotate([74 + 700 / 60, -38 - 50 / 60])
+    projection = d3.geo.transverseMercator().rotate @rotate
 
     path = d3.geo.path().projection(projection)
 

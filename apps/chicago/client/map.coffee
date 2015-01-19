@@ -90,8 +90,8 @@ module.exports = class MapView extends Backbone.View
       drawLabels: false
       zoomOnClick: false
       $colorKey: $('.chicago-svg-key')
-      scale: 0.95
-      translateX: 0
+      scale: 0.93
+      translateX: 3
       translateY: 0
       colorKeyWidth: 610
       customMouseEnter: throttledGraphHover
@@ -99,6 +99,7 @@ module.exports = class MapView extends Backbone.View
       height: if @isMobile then 400 else 600
       width: if @isMobile then 340 else 500
       formatHoverText: @formatMapHoverText
+      rotate: [74 + 800 / 60, -38 - 50 / 60]
 
   formatMapHoverText: (hoveredItem) =>
     return unless @isCholoropleth and @mapColorHash
