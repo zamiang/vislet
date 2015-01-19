@@ -1,16 +1,24 @@
 d3 = require 'd3'
 moment = require 'moment'
-Backbone = require 'backbone'
-Crime = require '../models/crime.coffee'
 crimeTypes = require '../data/crime-types.json'
 neighborhoodNames = require '../data/neighborhood-names.json'
 
-module.exports = class Crimes extends Backbone.Collection
-
-  model: Crime
+module.exports =
 
   months: [1..12]
   years: [2001..2014]
+
+  validCrimeTypes: [
+    "ASS",
+    "NAR",
+    "BAT",
+    "THE",
+    "HOM",
+    "ROB",
+    "BUR",
+    "SEOF",
+    "CRSEAS"
+  ]
 
   crimesDataKeys: [
     'crimeTally'
@@ -28,7 +36,7 @@ module.exports = class Crimes extends Backbone.Collection
     hash = {}
     for year in @years
       hash[year] = {}
-      for crimeType in Object.keys(crimeTypes)
+      for crimeType in @crimeTypes
         hash[year][crimeType] = value
     hash
 
@@ -36,30 +44,45 @@ module.exports = class Crimes extends Backbone.Collection
     @resTotal = 0
 
     data = {}
-    for key in Object.keys(neighborhoodNames)
+    for key in @neighborhoodNames
       data[key] =
         crimeTally: @createMonthyHash()
         crimeType: @createYearlyCrimeTypeHash()
     data
 
-  getCrimesData: ->
+  formatNeighborhoodNames: ->
+    names = {}
+    for name in Object.keys(neighborhoodNames)
+      names[neighborhoodNames[name]] = name
+    names
+
+  formatCrimeTypes: ->
+    names = {}
+    for name in Object.keys(crimeTypes)
+      names[crimeTypes[name]] = name
+    names
+
+  getCrimesData: (models) ->
+    @neighborhoodNames = Object.keys @formatNeighborhoodNames()
+    @crimeTypes = Object.keys @formatCrimeTypes()
+
     data = @createDataHash()
-    for crime in @models
-      @tallyCounts crime, data, crime.get('nta')
+    for crime in models
+      @tallyCounts crime, data, crime.nta
 
     @computeCrimeTypePercent data, 'crimeType'
 
     @formatCrimesDataForDisplay data
 
   computeCrimeTypePercent: (data, dataKey) ->
-    for key in Object.keys(neighborhoodNames)
+    for key in @neighborhoodNames
       for date in Object.keys(data[key][dataKey])
         crimeTypes = data[key][dataKey][date]
         total = 0
-        for crimeType in Object.keys(crimeTypes)
+        for crimeType in @crimeTypes
           total += crimeTypes[crimeType]
 
-        for crimeType in Object.keys(crimeTypes)
+        for crimeType in @crimeTypes
           value = 0
           if crimeTypes[crimeType] > 0
             value = (crimeTypes[crimeType] / total * 100).toFixed(2)
@@ -67,16 +90,16 @@ module.exports = class Crimes extends Backbone.Collection
 
   tallyCounts: (crime, data, key) ->
     return unless data[key]
-    if crime.get('year') > 2014
+    if crime.year > 2014
       return
 
-    dateKey = "#{crime.get('month')}-#{crime.get('year')}"
+    dateKey = "#{crime.month}-#{crime.year}"
 
     data[key].crimeTally[dateKey]++
     @resTotal++
 
-    if crime.get('crimeType')?.length > 0
-      data[key].crimeType["#{crime.get('year')}"][crime.get('crimeType')]++
+    if crime.crimeType?.length > 0
+      data[key].crimeType[crime.year][crime.crimeType]++
 
   getCrimesTotals: (originalData, key) ->
     # Compute averages
@@ -108,7 +131,7 @@ module.exports = class Crimes extends Backbone.Collection
 
   formatCrimeTypeData: (data) ->
     flattenedData = {}
-    for crimeType in Object.keys(crimeTypes)
+    for crimeType in @validCrimeTypes
       flattenedData[crimeType] = []
       for dateKey in Object.keys(data)
         date = moment(dateKey, 'YYYY').valueOf()

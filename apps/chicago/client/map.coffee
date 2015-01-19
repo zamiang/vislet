@@ -5,6 +5,7 @@ chicagoTopoJson = require('../data/neighborhoods.json')
 crimeData = require '../data/chicago-crimes-display-data.json'
 svgMapView = require('../../../components/svg-map/index.coffee')
 Slider = require('../../../components/slider/index.coffee')
+neighborhoodNames = require('../data/neighborhood-names.json')
 
 # Manages communication between the map, slider and graphs
 module.exports = class MapView extends Backbone.View
@@ -13,6 +14,12 @@ module.exports = class MapView extends Backbone.View
   speed: 200
   isCholoropleth: true
   dataset: "crimeTally"
+
+  formatNeighborhoodNames: ->
+    names = {}
+    for name in Object.keys(neighborhoodNames)
+      names[neighborhoodNames[name]] = name
+    names
 
   events:
     'click .back' : 'colorMapClick'
@@ -23,7 +30,9 @@ module.exports = class MapView extends Backbone.View
     @$back = @$('.chicago-svg.back')
     @isMobile = options.isMobile
 
+    @neighborhoodNames = @formatNeighborhoodNames()
     @NTAs = Object.keys(crimeData)
+
     @mapColorHash = @getMapColorHash()
     @renderSvgMap chicagoTopoJson
 
@@ -48,7 +57,7 @@ module.exports = class MapView extends Backbone.View
       for item in crimeData[NTA][@dataset]
         mapColorHash[item.date] ||= []
         mapColorHash[item.date].push
-          id: NTA
+          id: @neighborhoodNames[NTA]
           value: item.value
     mapColorHash
 

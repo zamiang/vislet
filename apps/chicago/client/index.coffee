@@ -6,15 +6,23 @@ LineGraph = require('../../../components/line-graph/index.coffee')
 StackedGraph = require('../../../components/area-chart/index.coffee')
 MapView = require('./map.coffee')
 crimeData = require '../data/chicago-crimes-display-data.json'
+crimeTypes = require '../data/crime-types.json'
 
 module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
   mobileWidth: 270
   getWidth: (width) -> if @isMobile then @mobileWidth else width
-  startingDataset: 'Englewood'
+  startingDataset: 'Eng' #'Englewood'
+
+  formatCrimeTypes: ->
+    names = {}
+    for name in Object.keys(crimeTypes)
+      names[crimeTypes[name]] = name
+    names
 
   initialize: ->
     @isMobile = @$el.width() < 500
+    @crimeTypes = @formatCrimeTypes()
     @renderMap()
     @renderStackedGraph()
     @renderLineGraph()
@@ -43,7 +51,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       startingDataset: @startingDataset
       keys: ['crimeType']
       label: 'Type of Crimes as % of total'
-      displayKey: (id) -> id
+      displayKey: (id) => @crimeTypes[id]
 
   renderLineGraph: ->
     width = @getWidth(490)
