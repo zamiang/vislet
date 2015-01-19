@@ -50,8 +50,6 @@ module.exports = class AreaChart extends Backbone.View
 
     flattenedData = @getFlattenedData @startingDataset
 
-
-    console.log @colorSet
     @color = @colorSet()
     @color.domain Object.keys(flattenedData).sort()
     @stack = d3.layout.stack().values((d) -> d.values )
