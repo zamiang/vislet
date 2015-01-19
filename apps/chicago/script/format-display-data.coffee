@@ -17,7 +17,7 @@ module.exports =
     "ROB",
     "BUR",
     "SEOF",
-    "CRSEAS"
+    "CRDA"
   ]
 
   crimesDataKeys: [
@@ -101,15 +101,14 @@ module.exports =
     if crime.crimeType?.length > 0
       data[key].crimeType[crime.year][crime.crimeType]++
 
-  getCrimesTotals: (originalData, key) ->
+  getCrimeTotals: (originalData, key) ->
     # Compute averages
     totals = {}
     for ntaID in Object.keys(originalData)
       data = originalData[ntaID][key]
       for itemKey in Object.keys(data)
         totals[itemKey] ||= []
-        for item in data[itemKey]
-          totals[itemKey].push item
+        totals[itemKey].push data[itemKey]
     totals
 
   formatCrimesDataForDisplay: (originalData) ->
@@ -124,6 +123,16 @@ module.exports =
               date: moment(dateKey, 'M-YYYY').valueOf()
               value: data[dateKey]
             }
+
+        if ntaID == 'ALL'
+          totals = @getCrimeTotals(originalData, key)
+          console.log key
+          flattenedData["#{key}-mean"] =
+            for totalKey in Object.keys(totals)
+              {
+                date: moment(totalKey, 'M-YYYY').valueOf()
+                value: Number(d3.mean(totals[totalKey]).toFixed(2))
+              }
 
       flattenedData.crimeType = @formatCrimeTypeData originalData[ntaID].crimeType
       formattedData[ntaID] = flattenedData

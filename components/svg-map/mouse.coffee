@@ -12,7 +12,7 @@ module.exports =
     @customOnClick item.id
 
     @$(".tract").attr('class', 'tract')
-    @$(".tract[data-id='#{item.id}']").attr('class', 'tract selected')
+    @$(".tract[data-id=\"#{item.id}\"]").attr('class', 'tract selected')
     @updateMapTitle(@title)
 
     if @zoomOnClick

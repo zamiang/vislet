@@ -20,9 +20,10 @@ module.exports = class AreaChart extends Backbone.View
     displayKey: false
     interpolate: 'cardinal'
     speed: 500
+    colorSet: d3.scale.category20c
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @label, @speed
+    { @data, @width, @height, @keys, @startingDataset, @label, @speed, @colorSet,
       @displayKey, @filterDataset, @interpolate } = _.defaults(options, @defaults)
     @render()
 
@@ -49,7 +50,9 @@ module.exports = class AreaChart extends Backbone.View
 
     flattenedData = @getFlattenedData @startingDataset
 
-    @color = d3.scale.category20c()
+
+    console.log @colorSet
+    @color = @colorSet()
     @color.domain Object.keys(flattenedData).sort()
     @stack = d3.layout.stack().values((d) -> d.values )
 

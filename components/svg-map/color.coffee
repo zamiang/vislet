@@ -17,8 +17,7 @@ module.exports =
       else
         'tract'
 
-    @svg.selectAll(".tract")
-      .attr('class', selectColor)
+    @svg.selectAll(".tract").attr('class', selectColor)
 
     # Only draw once
     unless @drawnColorKey

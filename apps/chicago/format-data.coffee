@@ -1,7 +1,7 @@
 fs = require('fs')
 moment = require('moment')
 crimesData = []
-preProcess = true
+preProcess = false
 formatDisplayData = require './script/format-display-data.coffee'
 getInitials = require './script/get-initials.coffee'
 
@@ -18,9 +18,8 @@ lr.on 'line', (line) ->
     date = moment(json['Date'], 'MM/DD/YYYY hh:mm:SS A')
 
     crimesData.push {
-      crimeType: getInitials(json['Primary Ty'])
-      nta: getInitials(json['PRI_NEIGH'])
-      # quarter: date.quarter()
+      crimeType: getInitials(json['Primary Ty'], 2)
+      nta: getInitials(json['PRI_NEIGH'], 3)
       month: date.months() + 1
       year: date.year()
     }

@@ -65,7 +65,7 @@ module.exports = class MapView extends Backbone.View
     label = "Number of Crimes"
     @date = date
     data = @mapColorHash[date]
-    @svgMap.colorMap data, 0, 500, label
+    @svgMap.colorMap data, 0, 1000, label
     @svgMap.updateMapTitle "#{moment(date).format(@dateFormat)} #{label}"
 
   colorMapClick: ->
@@ -77,7 +77,7 @@ module.exports = class MapView extends Backbone.View
     return if @isCholoropleth
     @$hoveredLabel.html hoverNTA
 
-    @trigger 'hover', { currentNTA: currentNTA, hoverNTA: hoverNTA }
+    @trigger 'hover', { currentNTA: neighborhoodNames[currentNTA], hoverNTA: neighborhoodNames[hoverNTA] }
 
   renderSvgMap: (topojson) ->
     throttledGraphHover = _.throttle @handleGraphHover, 300
@@ -107,10 +107,10 @@ module.exports = class MapView extends Backbone.View
       if item.id == hoveredItem.id
         value = item.value
     if value > 0
-      "$#{value.toLocaleString()}: #{hoveredItem.id}"
+      "#{value.toLocaleString()}: #{hoveredItem.id}"
 
   handleNeighborhoodClick: (id) ->
-    @trigger 'click', { id: id }
+    @trigger 'click', { id: neighborhoodNames[id] }
     @$selectedLabel.html id
     @updateUI false
 

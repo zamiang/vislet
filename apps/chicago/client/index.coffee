@@ -1,3 +1,4 @@
+d3 = require 'd3'
 Backbone = require "backbone"
 Backbone.$ = $
 _ = require 'underscore'
@@ -12,7 +13,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
   mobileWidth: 270
   getWidth: (width) -> if @isMobile then @mobileWidth else width
-  startingDataset: 'Eng' #'Englewood'
+  startingDataset: 'MorPar' #'Englewood'
 
   formatCrimeTypes: ->
     names = {}
@@ -63,13 +64,10 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       height: height
       data: crimeData
       startingDataset: @startingDataset
-      keys: ['crimeTally']
+      keys: ['crimeTally', 'crimeTally-mean']
       el: $('#chicago-crime-tally')
-      label: 'Number of Crimess'
-      yAxisFormat: (x) -> "$#{x}"
+      label: 'Number of Crimes'
       handleHover: @handleHover
-
-    # recoveryGraph.animateNewArea('BK69', 'BK50')
 
 module.exports.init = ->
   new ChicagoView
