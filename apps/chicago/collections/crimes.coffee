@@ -45,7 +45,7 @@ module.exports = class Crimes extends Backbone.Collection
   getCrimesData: ->
     data = @createDataHash()
     for crime in @models
-      @tallyCounts crime, data, crime.get('PRI_NEIGH')
+      @tallyCounts crime, data, crime.get('nta')
 
     @computeCrimeTypePercent data, 'crimeType'
 
@@ -75,8 +75,8 @@ module.exports = class Crimes extends Backbone.Collection
     data[key].crimeTally[dateKey]++
     @resTotal++
 
-    if crime.get('Primary Ty')?.length > 0
-      data[key].crimeType["#{crime.get('year')}"][crime.get('Primary Ty')]++
+    if crime.get('crimeType')?.length > 0
+      data[key].crimeType["#{crime.get('year')}"][crime.get('crimeType')]++
 
   getCrimesTotals: (originalData, key) ->
     # Compute averages

@@ -7,7 +7,7 @@ module.exports = class Crime extends Backbone.Model
     @setupDate()
 
   setupDate: ->
-    date = moment(@get('Date'), 'MM/DD/YYYY hh:mm:SS A')
+    date = moment(@get('date'), 'MM/DD/YYYY hh:mm:SS A')
     @set
       quarter: date.quarter()
       month: date.months() + 1

@@ -27,7 +27,7 @@
         "nice-json2csv": "*",
         "d3": "*",
         "topojson": "*",
-        "point-in-polygon": "*",
+        "line-by-line": "*",
         "browserify": "*",
         "stylus": "*",
         "nib": "*",
