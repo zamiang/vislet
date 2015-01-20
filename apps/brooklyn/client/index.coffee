@@ -35,6 +35,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     mapview.on 'click', (params) =>
       @lineGraph.animateNewArea(params.id)
       @stackedGraph.animateNewArea(params.id)
+      @stackedGraph.changeLabel "Building Class as % of sales in #{neighborhoodNames[params.id]}"
 
   renderBuildingClassGraphs: ->
     width = @getWidth(490)

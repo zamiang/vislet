@@ -131,3 +131,6 @@ module.exports = class AreaChart extends Backbone.View
       .style("text-anchor", "start")
       .attr('class', 'label-text')
       .text(label)
+
+  changeLabel: (text) ->
+    @svg.selectAll('.label-text').text text
