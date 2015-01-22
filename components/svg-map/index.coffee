@@ -4,6 +4,7 @@ topojson = require 'topojson'
 Backbone = require "backbone"
 Color = require './color.coffee'
 Mouse = require './mouse.coffee'
+hoverintent = require 'hoverintent'
 { uniqueId } = require 'underscore'
 
 module.exports = class SvgMap extends Backbone.View
@@ -57,14 +58,26 @@ module.exports = class SvgMap extends Backbone.View
       .attr("data-id", (d) -> d.id )
       .attr("d", path)
       .on("click", (d) => if d.id != @ignoredId then @onClick(d, path, g) )
-      .on("mouseover", (d) => if d.id != @ignoredId then @mouseover(d) )
       .append("title")
 
-    svg.on 'mouseleave', => @mouseleave()
-
+    @setupMouseEvents()
     @drawLabels(g, neighborhoods, path) if @shouldLabel
     @addHoverText(g) if @formatHoverText
     @addMapTitle g, @label
+
+  setupMouseEvents: ->
+    @svg.on 'mouseleave', => @mouseleave()
+
+    hover = (item) => @mouseover(item)
+    options =
+      sensitivity: 5
+
+    for $item in @$('.tract')
+      hoverintent(
+        $item
+        -> hover(d3.select(@).data()[0])
+        ->
+      ).options(options)
 
   addMapTitle: (g, label) ->
     @label = g.append("text")

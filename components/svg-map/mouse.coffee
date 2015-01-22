@@ -37,12 +37,8 @@ module.exports =
 
   mouseover: (item) ->
     return if item.id == @activeId
-    @hoveredId = item.id
-    _.delay (hoveredItem) =>
-      return unless hoveredItem.id == @hoveredId and hoveredItem.id != @activeId
-      @customMouseEnter?(@activeId, hoveredItem.id)
-      @hoverText?.text @formatHoverText(item)
-    , 500, item
+    @customMouseEnter?(@activeId, item.id)
+    @hoverText?.text @formatHoverText(item)
 
   mouseleave: ->
     @hoveredId = false

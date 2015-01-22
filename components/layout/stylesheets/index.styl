@@ -216,6 +216,24 @@ html.wf-active body a
   .stacked-area-chart
     height: 350px
 
+.svg-graphs-content
+  transition: opacity 0.3s
+  opacity: 0.1
+
+.graph-help-text
+  top: 415px
+  width: 376px
+  padding: 0px 100px
+  text-align: center
+  position: absolute
+  transition: opacity 0.3s
+
+.svg-graphs.active
+  .graph-help-text
+    opacity: 0
+  .svg-graphs-content
+    opacity: 1
+
 .graph-heading-container
   margin-bottom: 1px
   margin-left: 14px

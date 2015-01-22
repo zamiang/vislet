@@ -28,6 +28,7 @@ module.exports = class MapView extends Backbone.View
     @$selectedLabel = @$('.selected-neighborhood-name .graph-heading')
     @$hoveredLabel = @$('.hover-neighborhood-name .graph-heading')
     @$back = @$('.brooklyn-svg.back')
+    @$graphContent = @$('.svg-graphs')
 
     @NTAs = Object.keys(salesData)
     @isMobile = options.isMobile
@@ -120,10 +121,12 @@ module.exports = class MapView extends Backbone.View
       @svgMap.$colorKey.fadeIn(@speed) unless @isMobile
       @$selectedLabel.text 'SELECTED NEIGHBORHOOD'
       @$hoveredLabel.text 'HOVERED NEIGHBORHOOD'
+      @$graphContent.removeClass 'active'
       @isCholoropleth = true
     else
       @$back.fadeIn @speed
       @slider.$el.fadeOut(@speed)
       @svgMap.$colorKey.fadeOut(@speed)
       @svgMap.hoverText.text ''
+      @$graphContent.addClass 'active'
       @isCholoropleth = false
