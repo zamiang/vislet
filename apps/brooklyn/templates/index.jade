@@ -10,7 +10,8 @@ block body
   #brooklyn.map-app
     include ../../../components/layout/header/intro.jade
     header
-      .heading.faux-underline-large Brooklyn Residential Sales 2003-2014
+      .heading Brooklyn Residential Sales 2003-2014
+      .border
     .map-svg-container
       svg#brooklyn-svg.svg-map
         include ../../../components/svg-map/defs.jade
@@ -18,7 +19,8 @@ block body
       a.brooklyn-svg.back.faux-underline-large( href="#" ) Back to overview
       svg#brooklyn-date-slider.svg-slider( width='500px' )
     .svg-graphs
-      .graph-help-text Click a neighborhood to see graphs for that area. Hover over an area to compare residential sales.
+      .graph-help-text
+        | Click on a neighborhood like "Willamsburg" to see how the housing market has changed since 2003.
       .svg-graphs-content
         .graph-heading-container
           .selected-neighborhood-name
@@ -35,7 +37,7 @@ block body
           svg#brooklyn-residential-building-class.stacked-area-chart.svg-building-class
      .markdown-text( itemtype="http://schema.org/BlogPosting" )
         time( datetime="2014-01-12T03:24:00" itemprop="datePublished" ) January 12, 2015
-        h1( itemprop="name headline" ) A look at the NYC Department of Finance Residential Property Sales Data
+        h1( itemprop="name headline" ) How Residential Property Sales can help us better understand changes in Brooklyn
         div( itemprop="articleBody" )
           include:md text.md
         include ../../../components/layout/footer/bio.jade
