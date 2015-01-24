@@ -55,7 +55,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       rotate: [74 + 800 / 60, -38 - 50 / 60]
       data: crimeData
       topoJSON: topoJSON
-      neighborhoodNames: neighborhoods # neighborhoodNames
+      neighborhoodNames: neighborhoods
 
     mapview.on 'hover', (params) =>
       @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)

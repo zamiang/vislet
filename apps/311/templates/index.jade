@@ -1,0 +1,43 @@
+extends ../../../components/layout/templates/index
+
+block head
+  include meta
+
+append locals
+  - assetPackage = 'three'
+
+block body
+  #three.map-app
+    include ../../../components/layout/header/intro.jade
+    header
+      .heading 311 Calls from 2010-2014
+      .border
+    .map-svg-container
+      svg#three-svg.svg-map
+        include ../../../components/svg-map/defs.jade
+      .three-svg-key
+      a.three-svg.back.faux-underline-large( href="#" ) Back to overview
+      svg#three-date-slider.svg-slider( width='500px' )
+    .svg-graphs
+      .graph-help-text
+        | Click on a neighborhood like "Willamsburg" to see X changed since 2010.
+      .svg-graphs-content
+        .graph-heading-container
+          .selected-neighborhood-name
+            .circle-key.blue
+            .graph-heading Selected Neighborhood
+          .hover-neighborhood-name
+            .circle-key.red
+            .graph-heading Hovered Neighborhood
+          .avg-neighborhood-name
+            .circle-key.gray
+            .graph-heading Borough Average
+        .residential-sales.sales-group
+          svg#three-residential-price-tally.svg-line-graph
+          svg#three-residential-building-class.stacked-area-chart.svg-building-class
+     .markdown-text( itemtype="http://schema.org/BlogPosting" )
+        time( datetime="2014-01-12T03:24:00" itemprop="datePublished" ) January 22, 2015
+        h1( itemprop="name headline" ) How 311 Data can help us X the Ys
+        div( itemprop="articleBody" )
+          include:md text.md
+        include ../../../components/layout/footer/bio.jade

@@ -19,7 +19,7 @@ module.exports = class SvgMap extends Backbone.View
 
   defaults:
     zoomOnClick: true
-    ignoredId: null
+    ignoredIds: null
     title: ''
     speed: 500
     scale: 0.95
@@ -29,7 +29,7 @@ module.exports = class SvgMap extends Backbone.View
     rotate: [74 + 700 / 60, -38 - 50 / 60]
 
   initialize: (options) ->
-    { @zoomOnClick, @key, @topojson, @ignoredId, @customOnClick, @customMouseLeave, @customClickSelectedArea, @reverseColorKey, @width, @height, @formatHoverText, @rotate
+    { @zoomOnClick, @key, @topojson, @ignoredIds, @customOnClick, @customMouseLeave, @customClickSelectedArea, @reverseColorKey, @width, @height, @formatHoverText, @rotate
       @colorKeyWidth, @customMouseEnter, @$colorKey, @title, @scale, @translateX, @translateY } = _.defaults(options, @defaults)
     @render()
 
@@ -54,7 +54,7 @@ module.exports = class SvgMap extends Backbone.View
     g.selectAll("path")
       .data(neighborhoods.features)
       .enter().append("path")
-      .attr("class", (d) => if d.id == @ignoredId then 'park' else 'tract' )
+      .attr("class", @getShapeClass)
       .attr("data-id", (d) -> d.id )
       .attr("d", path)
       .on("click", (d) => if d.id != @ignoredId then @onClick(d, path, g) )
@@ -64,6 +64,14 @@ module.exports = class SvgMap extends Backbone.View
     @drawLabels(g, neighborhoods, path) if @shouldLabel
     @addHoverText(g) if @formatHoverText
     @addMapTitle g, @label
+
+  getShapeClass: (d) =>
+    cls = 'tract'
+    if @ignoredIds
+      for id in @ignoredIds
+        if d.id.indexOf(id) > -1
+          cls = 'park'
+    cls
 
   setupMouseEvents: ->
     @svg.on 'mouseleave', => @mouseleave()

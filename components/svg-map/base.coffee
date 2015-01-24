@@ -40,7 +40,7 @@ module.exports = class MapViewBase extends Backbone.View
     @$graphContent = @$('.svg-graphs')
 
   initialize: (options) ->
-    { @rotate, @$colorKey, @mapLabel, @scale, @translateX, @translateY, @speed, @isCholoropleth, @dateFormat, @$map, @data, @topoJSON, @neighborhoodNames, @dataset, @isDollar, @valueFormat, @ignoredId } = _.defaults(options, @defaults)
+    { @rotate, @$colorKey, @mapLabel, @scale, @translateX, @translateY, @speed, @isCholoropleth, @dateFormat, @$map, @data, @topoJSON, @neighborhoodNames, @dataset, @isDollar, @valueFormat, @ignoredIds } = _.defaults(options, @defaults)
 
     @cacheSelectors()
 
@@ -72,7 +72,7 @@ module.exports = class MapViewBase extends Backbone.View
         for item in data[NTA][@dataset]
           mapColorHash[item.date] ||= []
           mapColorHash[item.date].push
-            id: NTA #@formattedNeighborhoodNames[NTA]
+            id: NTA
             value: item.value
     mapColorHash
 
@@ -100,7 +100,7 @@ module.exports = class MapViewBase extends Backbone.View
       el: @$map
       topojson: topojson
       key: 'neighborhoods'
-      ignoredId: @ignoredId
+      ignoredIds: @ignoredIds
       customOnClick: (id) => @handleNeighborhoodClick(id)
       drawLabels: false
       zoomOnClick: false

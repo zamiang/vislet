@@ -1,12 +1,13 @@
 .svg-map
   font-size: 12px
-  .tract:hover
-    fill: $red
-    transition fill 0.1s
-
-  .tract.selected
-    fill: hsla(207, 44%, 50%, 0.9)
-    stroke: rgb(70, 130, 180)
+  .tract
+    cursor: pointer
+    &:hover
+      fill: $red
+      transition fill 0.1s
+    &.selected
+      fill: hsla(207, 44%, 50%, 0.9)
+      stroke: rgb(70, 130, 180)
 
   .subunit-label
     fill: #777
