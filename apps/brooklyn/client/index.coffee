@@ -1,15 +1,15 @@
 Backbone = require "backbone"
 Backbone.$ = $
 moment = require 'moment'
-brooklynTopoJson = require('../data/brooklyn.json')
 LineGraph = require('../../../components/line-graph/index.coffee')
 PercentGraph = require('../../../components/line-graph/percent-graph.coffee')
 StackedGraph = require('../../../components/area-chart/index.coffee')
+MapViewBase = require('../../../components/svg-map/base.coffee')
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
 salesData = require('../data/brooklyn-sales-display-data.json')
 buildingClasses = require('../data/building-class.json')
 Slider = require('../../../components/slider/index.coffee')
-MapView = require('./map.coffee')
+topoJSON = require('../data/brooklyn.json')
 
 module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
@@ -26,9 +26,28 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     @renderBuildingClassGraphs()
 
   renderMap: ->
-    mapview = new MapView
+    formatNeighborhoodName = (name) -> name?.split('-').join(', ')
+
+    for NTA in Object.keys(neighborhoodNames)
+      neighborhoodNames[NTA] = formatNeighborhoodName neighborhoodNames[NTA]
+
+    mapview = new MapViewBase
       el: @$el
       isMobile: @isMobile
+      mapLabel: "Avg Price per SQFT"
+      dateFormat: "Q, YYYY"
+      valueFormat: "$"
+      dataset: "residentialPrices"
+      translateX: 37
+      translateY: 0
+      scale: 1.07
+      $colorKey: $('.brooklyn-svg-key')
+      $map: $('#brooklyn-svg')
+      data: salesData
+      topoJSON: topoJSON
+      neighborhoodNames: neighborhoodNames
+      ignoredId: 'BK99'
+      rotate: [74 + 700 / 60, -38 - 50 / 60]
 
     mapview.on 'hover', (params) =>
       @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)

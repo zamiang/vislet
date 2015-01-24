@@ -21,6 +21,7 @@ module.exports = class MapViewBase extends Backbone.View
     topoJSON: []
     neighborhoodNames: []
     data: []
+    ignoredId: 'Park'
     valueFormat: ""
 
   formatNeighborhoodNames: (neighborhoodNames) ->
@@ -39,11 +40,10 @@ module.exports = class MapViewBase extends Backbone.View
     @$graphContent = @$('.svg-graphs')
 
   initialize: (options) ->
-    { @rotate, @$colorKey, @mapLabel, @scale, @translateX, @translateY, @speed, @isCholoropleth, @dateFormat, @$map, @data, @topoJSON, @neighborhoodNames, @dataset, @isDollar, @valueFormat } = _.defaults(options, @defaults)
+    { @rotate, @$colorKey, @mapLabel, @scale, @translateX, @translateY, @speed, @isCholoropleth, @dateFormat, @$map, @data, @topoJSON, @neighborhoodNames, @dataset, @isDollar, @valueFormat, @ignoredId } = _.defaults(options, @defaults)
 
     @cacheSelectors()
 
-    @formattedNeighborhoodNames = @formatNeighborhoodNames @neighborhoodNames
     @isMobile = options.isMobile
     @NTAs = Object.keys @data
 
@@ -68,11 +68,12 @@ module.exports = class MapViewBase extends Backbone.View
   getMapColorHash: (data) ->
     mapColorHash = {}
     for NTA in @NTAs
-      for item in data[NTA][@dataset]
-        mapColorHash[item.date] ||= []
-        mapColorHash[item.date].push
-          id: @formattedNeighborhoodNames[NTA]
-          value: item.value
+      unless NTA == 'ALL'
+        for item in data[NTA][@dataset]
+          mapColorHash[item.date] ||= []
+          mapColorHash[item.date].push
+            id: NTA #@formattedNeighborhoodNames[NTA]
+            value: item.value
     mapColorHash
 
   colorMap: (date) =>
@@ -89,9 +90,9 @@ module.exports = class MapViewBase extends Backbone.View
 
   handleGraphHover: (currentNTA, hoverNTA) =>
     return if @isCholoropleth
-    @$hoveredLabel.html hoverNTA
+    @$hoveredLabel.html @neighborhoodNames[hoverNTA]
 
-    @trigger 'hover', { currentNTA: @neighborhoodNames[currentNTA], hoverNTA: @neighborhoodNames[hoverNTA] }
+    @trigger 'hover', { currentNTA: currentNTA, hoverNTA: hoverNTA }
 
   renderSvgMap: (topojson) ->
     throttledGraphHover = _.throttle @handleGraphHover, 300
@@ -99,7 +100,7 @@ module.exports = class MapViewBase extends Backbone.View
       el: @$map
       topojson: topojson
       key: 'neighborhoods'
-      ignoredId: 'Park'
+      ignoredId: @ignoredId
       customOnClick: (id) => @handleNeighborhoodClick(id)
       drawLabels: false
       zoomOnClick: false
@@ -117,16 +118,18 @@ module.exports = class MapViewBase extends Backbone.View
 
   formatMapHoverText: (hoveredItem) =>
     return unless @isCholoropleth and @mapColorHash
+    return unless @mapColorHash[@slider.getValue()]
     value = 0
+
     for item in @mapColorHash[@slider.getValue()]
       if item.id == hoveredItem.id
         value = item.value
     if value > 0
-      "#{@valueFormat}#{value.toLocaleString()}: #{hoveredItem.id}"
+      "#{@valueFormat}#{value.toLocaleString()}: #{@neighborhoodNames[hoveredItem.id]}"
 
   handleNeighborhoodClick: (id) ->
-    @trigger 'click', { id: @neighborhoodNames[id] }
-    @$selectedLabel.html id
+    @trigger 'click', { id: id }
+    @$selectedLabel.html @neighborhoodNames[id]
     @updateUI false
 
   updateUI: (visible) ->
