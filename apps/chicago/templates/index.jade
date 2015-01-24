@@ -10,8 +10,8 @@ block body
   #chicago.map-app
     include ../../../components/layout/header/intro.jade
     header
-      .heading.faux-underline-large Chicago Crime 2001-2014
-      .sub-heading Click a neighborhood to see graphs for that area. Hover over an area to compare crime.
+      .heading Chicago Crime 2001-2014
+      .border
     .map-svg-container
       svg#chicago-svg.svg-map
         include ../../../components/svg-map/defs.jade
@@ -19,19 +19,21 @@ block body
       a.chicago-svg.back.faux-underline-large( href="#" ) Back to overview
       svg#chicago-date-slider.svg-slider( width='500px' )
     .svg-graphs
-      .graph-heading-container
-        .selected-neighborhood-name
-          .circle-key.blue
-          .graph-heading Selected Neighborhood
-        .hover-neighborhood-name
-          .circle-key.red
-          .graph-heading Hovered Neighborhood
-        .avg-neighborhood-name
-          .circle-key.gray
-          .graph-heading City Average
-      .crime-group
-        svg#chicago-crime-tally.svg-line-graph
-        svg#chicago-crime-type.stacked-area-chart.svg-building-class
+      .graph-help-text Click a neighborhood to see graphs for that area. Hover over an area to compare crime.
+      .svg-graphs-content
+        .graph-heading-container
+          .selected-neighborhood-name
+            .circle-key.blue
+            .graph-heading Selected Neighborhood
+          .hover-neighborhood-name
+            .circle-key.red
+            .graph-heading Hovered Neighborhood
+          .avg-neighborhood-name
+            .circle-key.gray
+            .graph-heading City Average
+        .crime-group
+          svg#chicago-crime-tally.svg-line-graph
+          svg#chicago-crime-type.stacked-area-chart.svg-building-class
      .markdown-text( itemtype="http://schema.org/BlogPosting" )
         time( datetime="2014-01-12T03:24:00" itemprop="datePublished" ) January 18, 2015
         h1( itemprop="name headline" ) A look at the Chicago Crime Data

@@ -2,10 +2,10 @@ Backbone = require "backbone"
 Backbone.$ = $
 _ = require 'underscore'
 moment = require 'moment'
-brooklynTopoJson = require('../data/brooklyn.json')
+topoJSON = require('../data/brooklyn.json')
 svgMapView = require('../../../components/svg-map/index.coffee')
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
-salesData = require('../data/brooklyn-sales-display-data.json')
+data = require('../data/brooklyn-sales-display-data.json')
 Slider = require('../../../components/slider/index.coffee')
 
 # Manages communication between the map, slider and graphs
@@ -18,8 +18,10 @@ module.exports = class MapView extends Backbone.View
 
   formatNeighborhoodName: (name) -> name?.split('-').join(', ')
   formatNeighborhoodNames: ->
+    names = {}
     for NTA in Object.keys(neighborhoodNames)
-      neighborhoodNames[NTA] = @formatNeighborhoodName neighborhoodNames[NTA]
+      names[NTA] = @formatNeighborhoodName neighborhoodNames[NTA]
+    names
 
   events:
     'click .back' : 'colorMapClick'
@@ -27,23 +29,25 @@ module.exports = class MapView extends Backbone.View
   initialize: (options) ->
     @$selectedLabel = @$('.selected-neighborhood-name .graph-heading')
     @$hoveredLabel = @$('.hover-neighborhood-name .graph-heading')
-    @$back = @$('.brooklyn-svg.back')
+    @$back = @$('.back')
     @$graphContent = @$('.svg-graphs')
 
-    @NTAs = Object.keys(salesData)
+    @NTAs = Object.keys(data)
     @isMobile = options.isMobile
-    @formatNeighborhoodNames()
+    @neighborhoodNames = @formatNeighborhoodNames()
+
     @mapColorHash = @getMapColorHash()
-    @renderSvgMap brooklynTopoJson
+    @renderSvgMap topoJSON
+
     @renderSlider()
 
   renderSlider: ->
     data =
-      for item in salesData['ALL']['residentialPrices']
+      for item in data['ALL'][@dataset]
         item.date
 
     @slider = new Slider
-      el: $('#brooklyn-date-slider')
+      el: $('.date-slider')
       width: if @isMobile then 340 else 502
       data: data
       animateStart: true
@@ -54,7 +58,7 @@ module.exports = class MapView extends Backbone.View
     mapColorHash = {}
     for NTA in @NTAs
       unless NTA == 'ALL'
-        for item in salesData[NTA][@dataset]
+        for item in data[NTA][@dataset]
           mapColorHash[item.date] ||= []
           mapColorHash[item.date].push
             id: NTA

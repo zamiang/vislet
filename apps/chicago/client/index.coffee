@@ -2,12 +2,15 @@ d3 = require 'd3'
 Backbone = require "backbone"
 Backbone.$ = $
 _ = require 'underscore'
+
 svgMapView = require('../../../components/svg-map/index.coffee')
 LineGraph = require('../../../components/line-graph/index.coffee')
 StackedGraph = require('../../../components/area-chart/index.coffee')
-MapView = require('./map.coffee')
+MapViewBase = require('../../../components/svg-map/base.coffee')
 crimeData = require '../data/chicago-crimes-display-data.json'
 crimeTypes = require '../data/crime-types.json'
+topoJSON = require('../data/neighborhoods.json')
+neighborhoodNames = require('../data/neighborhood-names.json')
 
 module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
@@ -29,9 +32,20 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     @renderLineGraph()
 
   renderMap: ->
-    mapview = new MapView
+    mapview = new MapViewBase
       el: @$el
       isMobile: @isMobile
+      dateFormat: "MMM, YYYY"
+      dataset: "crimeTally"
+      scale: 0.93
+      translateX: 3
+      translateY: 0
+      $colorKey: $('.chicago-svg-key')
+      $map: $('#chicago-svg')
+      rotate: [74 + 800 / 60, -38 - 50 / 60]
+      data: crimeData
+      topoJSON: topoJSON
+      neighborhoodNames: neighborhoodNames
 
     mapview.on 'hover', (params) =>
       @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
