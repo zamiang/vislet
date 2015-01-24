@@ -14,7 +14,7 @@
         "sharify": "*",
         "backbone": "*",
         "underscore": "*",
-        "underscore.string": "*",
+        "underscore.string": "~2.4.0",
         "marked": "*",
         "coffee-script": "*",
         "superagent": "*",
