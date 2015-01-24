@@ -18,11 +18,13 @@
         "marked": "*",
         "coffee-script": "*",
         "superagent": "*",
+        "lodash-node": "*",
         "bucket-assets": "*",
         "moment": "*",
         "node-env-file": "*"
     },
     "devDependencies": {
+        "hoverintent": "*",
         "nice-json2csv": "*",
         "d3": "*",
         "topojson": "*",
