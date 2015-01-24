@@ -18,7 +18,6 @@
         "marked": "*",
         "coffee-script": "*",
         "superagent": "*",
-        "newrelic": "*",
         "bucket-assets": "*",
         "moment": "*",
         "node-env-file": "*"

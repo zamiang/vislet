@@ -5,7 +5,6 @@
 #
 { PORT, NODE_ENV } = require "./config"
 
-require('newrelic')
 express = require "express"
 setup = require "./lib/setup"
 
