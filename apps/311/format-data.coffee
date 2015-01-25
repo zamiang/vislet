@@ -17,12 +17,13 @@ lr.on 'line', (line) ->
     json = JSON.parse(line.replace('} },', "} }")).properties
     date = moment(json['Created Da'], 'MM/DD/YYYY hh:mm:SS A')
 
-    threeData.push {
-      complaintType: getInitials(json['Complaint'], 3)
-      nta: json.ntacode
-      month: date.months() + 1
-      year: date.year()
-    }
+    if date.year() > 2009 && date.year() < 2015
+      threeData.push {
+        complaintType: getInitials(json['Complaint'], 3)
+        nta: json.ntacode
+        month: date.months() + 1
+        year: date.year()
+      }
 
 lr.on 'end', ->
   # All lines are read, file is closed now.
