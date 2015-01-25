@@ -34,7 +34,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     mapview = new MapViewBase
       el: @$el
       isMobile: @isMobile
-      mapLabel: "Avg Price per SQFT"
+      mapLabel: "311 Reports"
       dateFormat: "Q, YYYY"
       dataset: "complaintTally"
       translateX: -120
@@ -53,7 +53,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     mapview.on 'click', (params) =>
       @lineGraph.animateNewArea(params.id)
       @stackedGraph.animateNewArea(params.id)
-      @stackedGraph.changeLabel "Building Class as % of sales in #{neighborhoodNames[params.id]}"
+      @stackedGraph.changeLabel "Complaint type as % of complaints in #{neighborhoodNames[params.id]}"
 
   renderStackedGraphs: ->
     width = @getWidth(490)

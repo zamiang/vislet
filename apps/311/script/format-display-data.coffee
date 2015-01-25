@@ -135,6 +135,11 @@ module.exports =
 
   formatComplaintTypeData: (data) ->
     flattenedData = {}
+
+    types = []
+    for type in Object.keys(complaintTypes)
+      types.push complaintTypes[type]
+
     for complaintType in @validComplaintTypes
       flattenedData[complaintType] = []
       for dateKey in Object.keys(data)

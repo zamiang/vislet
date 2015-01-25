@@ -18,7 +18,7 @@ lr.on 'line', (line) ->
     date = moment(json['Created Da'], 'MM/DD/YYYY hh:mm:SS A')
 
     threeData.push {
-      complaint: getInitials(json['Complaint'], 3)
+      complaintType: getInitials(json['Complaint'], 3)
       nta: json.ntacode
       month: date.months() + 1
       year: date.year()
@@ -32,7 +32,7 @@ lr.on 'end', ->
     ## Complaint types
     complaints = {}
     for item in threeData
-      complaints[item['complaint']] = getInitials(item['complaint'], 3)
+      complaints[item['complaintType']] = getInitials(item['complaintType'], 3)
 
     console.log complaints
 
