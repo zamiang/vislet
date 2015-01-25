@@ -6,8 +6,7 @@ PercentGraph = require('../../../components/line-graph/percent-graph.coffee')
 StackedGraph = require('../../../components/area-chart/index.coffee')
 MapViewBase = require('../../../components/svg-map/base.coffee')
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
-# threeData = require('../data/three-sales-display-data.json')
-# buildingClasses = require('../data/building-class.json')
+threeData = require('../data/three-sales-display-data.json')
 Slider = require('../../../components/slider/index.coffee')
 topoJSON = require('../data/nyc.json')
 
@@ -22,8 +21,8 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
   initialize: ->
     @isMobile = @$el.width() < 500
     @renderMap()
-    # @renderLineGraph()
-    # @renderBuildingClassGraphs()
+    @renderLineGraph()
+    @renderBuildingClassGraphs()
 
   renderMap: ->
     formatNeighborhoodName = (name) -> name?.split('-').join(', ')
@@ -43,7 +42,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       scale: 1.67
       $colorKey: $('.three-svg-key')
       $map: $('#three-svg')
-      # data: threeData
+      data: threeData
       topoJSON: topoJSON
       neighborhoodNames: neighborhoodNames
       ignoredIds: ['99', '98']
@@ -56,7 +55,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       @stackedGraph.animateNewArea(params.id)
       @stackedGraph.changeLabel "Building Class as % of sales in #{neighborhoodNames[params.id]}"
 
-  renderBuildingClassGraphs: ->
+  renderStackedGraphs: ->
     width = @getWidth(490)
     blogPostWidth = @getWidth(460)
     height = 230
@@ -68,7 +67,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       data: salesData
       startingDataset: @startingDataset
       keys: ['buildingClass']
-      label: 'Building Class as % of sales'
+      label: ' as % of sales'
       displayKey: (id) -> buildingClasses[id]
 
   renderLineGraph: ->
