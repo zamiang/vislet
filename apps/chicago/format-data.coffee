@@ -3,7 +3,7 @@ moment = require('moment')
 crimesData = []
 preProcess = false
 formatDisplayData = require './script/format-display-data.coffee'
-getInitials = require './script/get-initials.coffee'
+getInitials = require '../../components/datautil/get-initials.coffee'
 
 LineByLineReader = require('line-by-line')
 lr = new LineByLineReader('./data/chicago-crimes.json')

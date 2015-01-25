@@ -6,9 +6,10 @@ PercentGraph = require('../../../components/line-graph/percent-graph.coffee')
 StackedGraph = require('../../../components/area-chart/index.coffee')
 MapViewBase = require('../../../components/svg-map/base.coffee')
 neighborhoodNames = require('../data/nyc-neighborhood-names.json')
-threeData = require('../data/three-sales-display-data.json')
+threeData = require('../data/display-data.json')
 Slider = require('../../../components/slider/index.coffee')
 topoJSON = require('../data/nyc.json')
+complaintTypes = require('../data/complaint-types.json')
 
 module.exports.ThreeView = class ThreeView extends Backbone.View
 
@@ -22,7 +23,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     @isMobile = @$el.width() < 500
     @renderMap()
     @renderLineGraph()
-    @renderBuildingClassGraphs()
+    @renderStackedGraphs()
 
   renderMap: ->
     formatNeighborhoodName = (name) -> name?.split('-').join(', ')
@@ -35,8 +36,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       isMobile: @isMobile
       mapLabel: "Avg Price per SQFT"
       dateFormat: "Q, YYYY"
-      valueFormat: "$"
-      dataset: "residentialPrices"
+      dataset: "complaintTally"
       translateX: -120
       translateY: 60
       scale: 1.67
@@ -60,15 +60,19 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     blogPostWidth = @getWidth(460)
     height = 230
 
+    types = {}
+    for type in Object.keys(complaintTypes)
+      types[complaintTypes[type]] = type
+
     @stackedGraph = new StackedGraph
-      el: $('#three-residential-building-class')
+      el: $('#three-complaint-type')
       width: width
       height: height
-      data: salesData
+      data: threeData
       startingDataset: @startingDataset
-      keys: ['buildingClass']
-      label: ' as % of sales'
-      displayKey: (id) -> buildingClasses[id]
+      keys: ['complaintType']
+      label: ' as % of 311 complaints'
+      displayKey: (id) -> types[id]
 
   renderLineGraph: ->
     width = @getWidth(490)
@@ -78,12 +82,11 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     @lineGraph = new LineGraph
       width: width
       height: height
-      data: salesData
+      data: threeData
       startingDataset: @startingDataset
-      keys: ['residentialPrices', 'residentialPrices-mean']
-      el: $('#three-residential-price-tally')
-      label: 'Avg Price Per SqFt'
-      yAxisFormat: (x) -> "$#{x}"
+      keys: ['complaintTally', 'complaintTally-mean']
+      el: $('#three-complaint-tally')
+      label: 'Avg Number of 311 complaints'
       handleHover: @handleHover
 
 module.exports.init = ->
