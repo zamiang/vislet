@@ -35,7 +35,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       el: @$el
       isMobile: @isMobile
       mapLabel: "311 Reports"
-      dateFormat: "Q, YYYY"
+      dateFormat: "MMMM, YYYY"
       dataset: "complaintTally"
       translateX: -120
       translateY: 60

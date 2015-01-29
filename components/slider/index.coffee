@@ -84,7 +84,7 @@ module.exports = class Slider extends Backbone.View
     @xAxis = d3.svg.axis()
       .scale(@x)
       .orient("bottom")
-      .ticks(50)
+      .ticks(d3.time.quarters)
 
     svg.append("g")
       .attr("class", "x axis")

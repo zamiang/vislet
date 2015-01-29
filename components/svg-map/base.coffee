@@ -40,7 +40,9 @@ module.exports = class MapViewBase extends Backbone.View
     @$graphContent = @$('.svg-graphs')
 
   initialize: (options) ->
-    { @rotate, @$colorKey, @mapLabel, @scale, @translateX, @translateY, @speed, @isCholoropleth, @dateFormat, @$map, @data, @topoJSON, @neighborhoodNames, @dataset, @isDollar, @valueFormat, @ignoredIds } = _.defaults(options, @defaults)
+    { @rotate, @$colorKey, @mapLabel, @scale, @translateX, @translateY, @speed,
+      @isCholoropleth, @dateFormat, @$map, @data, @topoJSON, @neighborhoodNames,
+      @dataset, @isDollar, @valueFormat, @ignoredIds } = _.defaults(options, @defaults)
 
     @cacheSelectors()
 
@@ -63,6 +65,7 @@ module.exports = class MapViewBase extends Backbone.View
       data: data
       animateStart: true
       handleSelect: (date) => @colorMap(new Date(date).valueOf())
+      numberTicks: @numberTicks
 
   # Allows for easy referencing of map values for coloring the map
   getMapColorHash: (data) ->

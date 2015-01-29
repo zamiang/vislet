@@ -107,6 +107,7 @@ module.exports = class AreaChart extends Backbone.View
     xAxis = d3.svg.axis()
       .scale(@x)
       .orient("bottom")
+      .ticks(d3.time.years)
 
     yAxis = d3.svg.axis()
       .scale(@y)
