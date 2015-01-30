@@ -27,8 +27,13 @@ module.exports = class Slider extends Backbone.View
       .append("g")
       .attr("transform", "translate(#{@margin.left},#{@margin.top})")
 
-    @drawKey svg
+    @drawKey svg, @getNumberTicks()
     @setupSlider svg
+
+  # 4 ticks per year
+  getNumberTicks: ->
+    ticksPerYear = 4
+    (new Date().getFullYear(@data[@data.length - 1]) - new Date(@data[0]).getFullYear()) * ticksPerYear
 
   bisectDate: d3.bisector((d) -> d).right
   setupSlider: (svg) ->
@@ -80,11 +85,11 @@ module.exports = class Slider extends Backbone.View
           , speed * i
         )(index)
 
-  drawKey: (svg) ->
+  drawKey: (svg, ticks) ->
     @xAxis = d3.svg.axis()
       .scale(@x)
       .orient("bottom")
-      .ticks(d3.time.quarters)
+      .ticks ticks
 
     svg.append("g")
       .attr("class", "x axis")
