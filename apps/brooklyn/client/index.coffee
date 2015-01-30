@@ -35,7 +35,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       el: @$el
       isMobile: @isMobile
       mapLabel: "Avg Price per SQFT"
-      dateFormat: "Q, YYYY"
+      dateFormat: "[Quarter] Q, YYYY"
       valueFormat: "$"
       dataset: "residentialPrices"
       translateX: 37

@@ -104,7 +104,7 @@ module.exports = class SvgMap extends Backbone.View
 
   drawLabels: (svg, neighborhoods, path) ->
     svg.selectAll(".subunit-label")
-      .data(neighborhoods.features.filter((d) -> return (d.id / 10000 | 0) % 100 != 99 ))
+      .data(neighborhoods.features.filter((d) -> (d.id / 10000 | 0) % 100 != 99 ))
       .enter().append("text")
       .attr("class", (d) -> "subunit-label #{d.id}" )
       .attr("transform", (d) -> "translate(#{path.centroid(d)})" )

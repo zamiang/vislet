@@ -34,8 +34,8 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     mapview = new MapViewBase
       el: @$el
       isMobile: @isMobile
-      mapLabel: "311 Reports"
-      dateFormat: "MMMM, YYYY"
+      mapLabel: ""
+      dateFormat: "[Number of 311 Reports per 100 residents in] MMMM, YYYY"
       dataset: "complaintTally"
       translateX: -120
       translateY: 60
@@ -47,6 +47,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       neighborhoodNames: neighborhoodNames
       ignoredIds: ['99', '98']
       rotate: [74 + 700 / 60, -38 - 50 / 60]
+      mapColorMax: 9
 
     mapview.on 'hover', (params) =>
       @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
@@ -86,7 +87,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       startingDataset: @startingDataset
       keys: ['complaintTally', 'complaintTally-mean']
       el: $('#three-complaint-tally')
-      label: 'Avg Number of 311 complaints'
+      label: 'Avg Number of 311 complaints per 100 residents'
       handleHover: @handleHover
 
 module.exports.init = ->

@@ -1,25 +1,32 @@
 d3 = require 'd3'
+_ = require 'underscore'
 moment = require 'moment'
 complaintTypes = require '../data/complaint-types.json'
 neighborhoodNames = require '../data/nyc-neighborhood-names.json'
+population = require '../data/population.json'
 
 module.exports =
 
   months: [1..12]
+  hours: [1..24]
   years: [2010..2014]
 
   validComplaintTypes: [
-    "HEAT",
-    "CONS",
-    "BAT",
-    "PubAss",
-    "Drin",
-    "ROB",
-    "GENE",
-    "SAFE",
-    "Nois",
-    "Rode",
-    "Traf"
+    "heat",
+    "heawat"
+    "cons",
+    "gencon",
+    "graf",
+    "strcon",
+    "lospro",
+    "safe",
+    "nois",
+    "strligcon",
+    "taxcom",
+    "sewe",
+    "blodri",
+    "dircon",
+    "sancon"
   ]
 
   complaintsDataKeys: [
@@ -107,17 +114,39 @@ module.exports =
         totals[itemKey].push data[itemKey]
     totals
 
+  formatDecimal: (number) ->
+    Number(number).toFixed(2)
+
+  averageByPopulation: (data, nta) ->
+    if nta == 'ALL'
+      pops = for name in @neighborhoodNames
+        if population[name]
+          population[name][1]
+        else
+          0
+
+      popTotal = _.reduce(pops, ((memo, num) -> memo + num), 0)
+      dataTotal = _.reduce(data, ((memo, num) -> memo + num), 0)
+
+      @formatDecimal dataTotal / (popTotal / 100)
+    else
+      if data < 1 or population[nta][1] < 1
+        return 0
+      else
+        @formatDecimal(data / (population[nta][1] / 100))
+
   formatComplaintsDataForDisplay: (originalData) ->
     formattedData = {}
     for ntaID in Object.keys(originalData)
       flattenedData = {}
       for key in @complaintsDataKeys
         data = originalData[ntaID][key]
+
         flattenedData[key] =
           for dateKey in Object.keys(data)
             {
               date: moment(dateKey, 'M-YYYY').valueOf()
-              value: data[dateKey]
+              value: @averageByPopulation data[dateKey], ntaID
             }
 
         if ntaID == 'ALL'
@@ -126,7 +155,7 @@ module.exports =
             for totalKey in Object.keys(totals)
               {
                 date: moment(totalKey, 'M-YYYY').valueOf()
-                value: Number(d3.mean(totals[totalKey]).toFixed(2))
+                value: @averageByPopulation totals[totalKey], ntaID
               }
 
       flattenedData.complaintType = @formatComplaintTypeData originalData[ntaID].complaintType

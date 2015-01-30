@@ -19,7 +19,8 @@ lr.on 'line', (line) ->
 
     if date.year() > 2009 && date.year() < 2015
       threeData.push {
-        complaintType: getInitials(json['Complaint'], 3)
+        complaintType: getInitials(json['Complaint'], 3).toLowerCase()
+        complaint: json['Complaint']
         nta: json.ntacode
         month: date.months() + 1
         year: date.year()
@@ -33,7 +34,7 @@ lr.on 'end', ->
     ## Complaint types
     complaints = {}
     for item in threeData
-      complaints[item['complaintType']] = getInitials(item['complaintType'], 3)
+      complaints[item['complaint']] = getInitials(item['complaint'], 3).toLowerCase()
 
     console.log complaints
 

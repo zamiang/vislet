@@ -23,6 +23,7 @@ module.exports = class MapViewBase extends Backbone.View
     data: []
     ignoredId: 'Park'
     valueFormat: ""
+    mapColorMax: 1000
 
   formatNeighborhoodNames: (neighborhoodNames) ->
     names = {}
@@ -41,7 +42,7 @@ module.exports = class MapViewBase extends Backbone.View
 
   initialize: (options) ->
     { @rotate, @$colorKey, @mapLabel, @scale, @translateX, @translateY, @speed,
-      @isCholoropleth, @dateFormat, @$map, @data, @topoJSON, @neighborhoodNames,
+      @isCholoropleth, @dateFormat, @$map, @data, @topoJSON, @neighborhoodNames, @mapColorMax,
       @dataset, @isDollar, @valueFormat, @ignoredIds } = _.defaults(options, @defaults)
 
     @cacheSelectors()
@@ -83,7 +84,7 @@ module.exports = class MapViewBase extends Backbone.View
     label = @mapLabel
     @date = date
     data = @mapColorHash[date]
-    @svgMap.colorMap data, 0, 1000, label
+    @svgMap.colorMap data, 0, @mapColorMax, label
     @svgMap.updateMapTitle "#{moment(date).format(@dateFormat)} #{label}"
 
   colorMapClick: ->
