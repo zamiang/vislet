@@ -12,21 +12,22 @@ module.exports =
   years: [2010..2014]
 
   validComplaintTypes: [
-    "heat",
-    "heawat"
-    "cons",
-    "gencon",
-    "graf",
-    "strcon",
-    "lospro",
-    "safe",
-    "nois",
-    "strligcon",
-    "taxcom",
-    "sewe",
-    "blodri",
-    "dircon",
+    "illpar"
+    "watsys"
+    "blodri"
+    "derveh"
+    "sewe"
+    "strligcon"
+    "gencon"
+    "deatre"
     "sancon"
+    "heat"
+    "dircon"
+    "miscol"
+    "buil"
+    "concom"
+    "roocon"
+    "nois"
   ]
 
   complaintsDataKeys: [
@@ -164,10 +165,6 @@ module.exports =
 
   formatComplaintTypeData: (data) ->
     flattenedData = {}
-
-    types = []
-    for type in Object.keys(complaintTypes)
-      types.push complaintTypes[type]
 
     for complaintType in @validComplaintTypes
       flattenedData[complaintType] = []

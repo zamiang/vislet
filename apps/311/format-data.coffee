@@ -18,8 +18,25 @@ lr.on 'line', (line) ->
     date = moment(json['Created Da'], 'MM/DD/YYYY hh:mm:SS A')
 
     if date.year() > 2009 && date.year() < 2015
+      initials = getInitials(json['Complaint'], 3).toLowerCase()
+
+      # Merge heat/hot water with heat since the term changed in 2014
+      if initials == 'heawat'
+        initials = 'heat'
+
+      # Merge damaged and dead tree and overgrown tree
+      if initials == 'damtre' or initials == 'ovetre'
+        initials = 'deatre'
+
+      if initials == 'miscol(almat'
+        initials = 'miscol'
+
+      # Merge street light condition and traffic signal condition
+      if initials == 'trasigcon'
+        initials = 'strligcon'
+
       threeData.push {
-        complaintType: getInitials(json['Complaint'], 3).toLowerCase()
+        complaintType: initials
         complaint: json['Complaint']
         nta: json.ntacode
         month: date.months() + 1

@@ -19,13 +19,13 @@ module.exports =
       .transition().duration(@speed)
       .attr("transform", (d) => "translate(#{@x(d.value.date)}, #{@y(d.value.value)})")
 
-  # Only rescale the YAxis if a change threshold is met
-  # This reduces the confusing shifting of the y axis on hover to ensure the shifting is meaninful
-  rescaleYAxis: (svg, threshhold = 50) ->
-    max = d3.min(@lines, (c) -> d3.min(c.values, (v) -> v.value ))
-    min = d3.max(@lines, (c) -> d3.max(c.values, (v) -> v.value ))
+  rescaleYAxis: (svg) ->
+    max = Number(d3.min(@lines, (c) -> d3.min(c.values, (v) -> v.value )))
+    min = Number(d3.max(@lines, (c) -> d3.max(c.values, (v) -> v.value )))
 
-    return if Math.abs(max - @maxY) < threshhold and Math.abs(min - @minY) < threshhold
+    # Only rescale the YAxis if a change threshold is met
+    # This reduces the confusing shifting of the y axis on hover to ensure the shifting is meaninful
+    return if @maxY * 1.3 > max and @maxY * 0.7 < max and @minY * 1.3 > min and @minY * 0.7 < min
 
     @y.domain([max, min])
     svg.select(".y-axis")
