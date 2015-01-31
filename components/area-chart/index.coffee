@@ -74,7 +74,10 @@ module.exports = class AreaChart extends Backbone.View
         name: name,
         values: Object.keys(data[name]).map((key) ->
           d = data[name][key]
-          { date: Number(d.date), y: d.value }
+          {
+            date: Number(d.date)
+            y: d.value
+          }
         )
       }
     ))
@@ -101,6 +104,15 @@ module.exports = class AreaChart extends Backbone.View
     flattenedData = @getFlattenedData startingDataset
     @lines = @getLines flattenedData
 
+    if @computeYDomain
+      @y.domain([
+        0,
+        d3.sum((@lines.map((c) -> d3.max(c.values, (v) -> v.y ))))
+      ])
+      @svg.select(".y-axis")
+        .transition().duration(@speed).ease("sin-in-out")
+        .call(@yAxis)
+
     buildingTypes = @svg
       .selectAll('.building-type .area')
       .data(@lines)
@@ -109,12 +121,11 @@ module.exports = class AreaChart extends Backbone.View
       .attr("d", (d) => @area(d.values) )
 
   drawLineLabels: (svg) ->
-    xAxis = d3.svg.axis()
+    @xAxis = d3.svg.axis()
       .scale(@x)
       .orient("bottom")
-      #.ticks(d3.time.hours)
 
-    yAxis = d3.svg.axis()
+    @yAxis = d3.svg.axis()
       .scale(@y)
       .orient("left")
       .tickFormat(@yAxisFormat)
@@ -122,11 +133,11 @@ module.exports = class AreaChart extends Backbone.View
     svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0,#{@height})")
-      .call(xAxis)
+      .call(@xAxis)
 
     svg.append("g")
       .attr("class", "y axis y-axis")
-      .call(yAxis)
+      .call(@yAxis)
 
     @addLabel(svg, @label) if @label
 

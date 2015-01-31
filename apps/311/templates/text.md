@@ -36,6 +36,17 @@ noise' and 'noise'. So they have been merged. Other complaints seem
 like errors. For example, 'street light condition' complaints have
 been merged into 'traffic signal condition' complaints.
 
+There are still other issues with the data. About 90% of calls to 311
+for 'heat' were recorded at exactly midnight. I don't know if that is
+just the universal time to complain about your heat, but it has forced
+me to exclude the heat information from the stacked graphs.
+
+## Using streetlights to tell when it is lunch time
+
+For some reason, people don't report streetlights at 1pm. Probably because they are at lunch!
+
+Interestingly, Queens seems to have an earlier lunch time than Brooklyn. There are almost no streetlight complaints in upper manhattan and the Bronx but many in lower manhattan.
+
 ## The three chinatowns
 
 

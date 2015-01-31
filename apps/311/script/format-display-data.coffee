@@ -189,6 +189,5 @@ module.exports =
     for complaintType in @validComplaintTypes
       flattenedData[complaintType] = []
       for dateKey in Object.keys(data)
-        # date = moment(dateKey, 'H').valueOf()
-        flattenedData[complaintType].push { date: dateKey, value: data[dateKey][complaintType] }
+        flattenedData[complaintType].push { date: moment(new Date()).hours(dateKey).valueOf(), value: data[dateKey][complaintType] }
     flattenedData
