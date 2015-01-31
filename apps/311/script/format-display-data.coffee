@@ -28,6 +28,22 @@ module.exports =
     "concom"
     "roocon"
     "nois"
+    "bromunmet"
+    # taxcom
+    # nois
+    # firsafdir-f58
+    # concom
+    # strcon
+    # noi-com
+    # watsys
+    # noi-str
+    # illpar
+    # gencon
+    # heat
+    # eapins-f59
+    # fooest
+    # vend
+    # sewe
   ]
 
   complaintsDataKeys: [

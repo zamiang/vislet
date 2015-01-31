@@ -35,6 +35,10 @@ lr.on 'line', (line) ->
       if initials == 'trasigcon'
         initials = 'strligcon'
 
+      # Merge commercial noise with noise
+      if initials == 'noi-con' or initials == 'noi-str'
+        initials = 'nois'
+
       threeData.push {
         complaintType: initials
         complaint: json['Complaint']

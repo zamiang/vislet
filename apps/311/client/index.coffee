@@ -74,6 +74,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       keys: ['complaintType']
       label: ' as % of 311 complaints'
       displayKey: (id) -> types[id]
+      colorSet: d3.scale.category20c
 
   renderLineGraph: ->
     width = @getWidth(490)
