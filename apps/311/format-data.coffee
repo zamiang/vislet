@@ -41,10 +41,10 @@ lr.on 'line', (line) ->
 
       threeData.push {
         complaintType: initials
-        complaint: json['Complaint']
         nta: json.ntacode
         month: date.months() + 1
         year: date.year()
+        hour: date.hours()
       }
 
 lr.on 'end', ->

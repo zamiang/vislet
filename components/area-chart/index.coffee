@@ -21,14 +21,13 @@ module.exports = class AreaChart extends Backbone.View
     interpolate: 'cardinal'
     speed: 500
     colorSet: d3.scale.category20c
+    yAxisFormat: (x) -> d3.format(".1%")(x).replace(/\.0+%$/, "%")
+    computeYDomain: false
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @label, @speed, @colorSet,
+    { @data, @width, @height, @keys, @startingDataset, @label, @speed, @colorSet, @yAxisFormat, @computeYDomain
       @displayKey, @filterDataset, @interpolate } = _.defaults(options, @defaults)
     @render()
-
-  formatFixedPercent: d3.format(".1%")
-  yAxisFormat: (x) => @formatFixedPercent(x).replace(/\.0+%$/, "%")
 
   render: ->
     @x = d3.time.scale().range([0, @width])
@@ -36,7 +35,7 @@ module.exports = class AreaChart extends Backbone.View
 
     @area = d3.svg.area()
       .interpolate(@interpolate)
-      .x((d) => @x(d.date))
+      .x((d) => @x(Number(d.date)))
       .y0((d) => @y(d.y0))
       .y1((d) => @y(d.y0 + d.y))
 
@@ -56,7 +55,13 @@ module.exports = class AreaChart extends Backbone.View
 
     @lines = @getLines(flattenedData)
 
-    @x.domain(d3.extent(flattenedData[Object.keys(flattenedData)[0]], (d) -> d.date ))
+    if @computeYDomain
+      @y.domain([
+        0,
+        d3.sum((@lines.map((c) -> d3.max(c.values, (v) -> v.y )))) + 100
+      ])
+
+    @x.domain(d3.extent(flattenedData[Object.keys(flattenedData)[0]], (d) -> Number(d.date) ))
 
     @drawLines @lines, svg
     @drawKey() if @displayKey
@@ -69,7 +74,7 @@ module.exports = class AreaChart extends Backbone.View
         name: name,
         values: Object.keys(data[name]).map((key) ->
           d = data[name][key]
-          { date: d.date, y: d.value }
+          { date: Number(d.date), y: d.value }
         )
       }
     ))
@@ -107,7 +112,7 @@ module.exports = class AreaChart extends Backbone.View
     xAxis = d3.svg.axis()
       .scale(@x)
       .orient("bottom")
-      .ticks(d3.time.years)
+      #.ticks(d3.time.hours)
 
     yAxis = d3.svg.axis()
       .scale(@y)
@@ -120,7 +125,7 @@ module.exports = class AreaChart extends Backbone.View
       .call(xAxis)
 
     svg.append("g")
-      .attr("class", "y axis")
+      .attr("class", "y axis y-axis")
       .call(yAxis)
 
     @addLabel(svg, @label) if @label

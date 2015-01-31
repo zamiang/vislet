@@ -8,7 +8,7 @@ population = require '../data/population.json'
 module.exports =
 
   months: [1..12]
-  hours: [1..24]
+  hours: [0..23]
   years: [2010..2014]
 
   validComplaintTypes: [
@@ -18,28 +18,24 @@ module.exports =
     "derveh"
     "sewe"
     "strligcon"
-    "gencon"
+    # "gencon" Recorded daily
     "deatre"
     "sancon"
-    "heat"
+    # "heat" Recorded daily
     "dircon"
     "miscol"
     "buil"
     "concom"
-    "roocon"
+    # "roocon"
     "nois"
     "bromunmet"
-    # taxcom
-    # nois
+    "taxcom"
     # firsafdir-f58
     # concom
     # strcon
-    # noi-com
     # watsys
-    # noi-str
     # illpar
     # gencon
-    # heat
     # eapins-f59
     # fooest
     # vend
@@ -66,6 +62,14 @@ module.exports =
         hash[year][complaintType] = value
     hash
 
+  createHourlyComplaintTypeHash: (value=0) ->
+    hash = {}
+    for hour in @hours
+      hash[hour] = {}
+      for complaintType in @complaintTypes
+        hash[hour][complaintType] = value
+    hash
+
   createDataHash: ->
     @resTotal = 0
 
@@ -73,7 +77,7 @@ module.exports =
     for key in @neighborhoodNames
       data[key] =
         complaintTally: @createMonthyHash()
-        complaintType: @createYearlyComplaintTypeHash()
+        complaintType: @createHourlyComplaintTypeHash()
     data
 
   formatComplaintTypes: ->
@@ -90,7 +94,7 @@ module.exports =
     for complaint in models
       @tallyCounts complaint, data, complaint.nta
 
-    @computeComplaintTypePercent data, 'complaintType'
+    # @computeComplaintTypePercent data, 'complaintType'
 
     @formatComplaintsDataForDisplay data
 
@@ -119,7 +123,7 @@ module.exports =
     @resTotal++
 
     if complaint.complaintType?.length > 0
-      data[key].complaintType[complaint.year][complaint.complaintType]++
+      data[key].complaintType[complaint.hour][complaint.complaintType]++
 
   getComplaintTotals: (originalData, key) ->
     # Compute averages
@@ -132,7 +136,7 @@ module.exports =
     totals
 
   formatDecimal: (number) ->
-    Number(number).toFixed(2)
+    Number(Number(number).toFixed(2))
 
   averageByPopulation: (data, nta) ->
     if nta == 'ALL'
@@ -145,12 +149,12 @@ module.exports =
       popTotal = _.reduce(pops, ((memo, num) -> memo + num), 0)
       dataTotal = _.reduce(data, ((memo, num) -> memo + num), 0)
 
-      @formatDecimal dataTotal / (popTotal / 100)
+      @formatDecimal dataTotal / (popTotal / 1000)
     else
       if data < 1 or population[nta][1] < 1
         return 0
       else
-        @formatDecimal(data / (population[nta][1] / 100))
+        @formatDecimal(data / (population[nta][1] / 1000))
 
   formatComplaintsDataForDisplay: (originalData) ->
     formattedData = {}
@@ -185,6 +189,6 @@ module.exports =
     for complaintType in @validComplaintTypes
       flattenedData[complaintType] = []
       for dateKey in Object.keys(data)
-        date = moment(dateKey, 'YYYY').valueOf()
-        flattenedData[complaintType].push { date: date, value: Number((data[dateKey][complaintType] / 100).toFixed(4)) }
+        # date = moment(dateKey, 'H').valueOf()
+        flattenedData[complaintType].push { date: dateKey, value: data[dateKey][complaintType] }
     flattenedData
