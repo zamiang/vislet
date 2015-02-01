@@ -24,6 +24,34 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     @renderMap()
     @renderLineGraph()
     @renderStackedGraphs()
+    @renderSelectBox()
+
+  renderSelectBox: ->
+    html = "<option value='ALL'>ALL</option>"
+    html +=
+      (for key in Object.keys(threeData["ALL"]["complaintType"])
+        "<option value='#{key}'>#{@types[key]}</option>"
+      ).join ''
+    @$('#three-select')
+      .html(html)
+      .on 'change', => @handleSelectChange()
+
+  handleSelectChange: (event) ->
+    val = @$('#three-select').val()
+    return @mapview.colorMapClick() if val == "ALL"
+
+    data = []
+    for NTA in Object.keys(threeData)
+      unless NTA == "ALL"
+        rawData = threeData[NTA]["complaintType"][val]
+        values =
+          for key in Object.keys(rawData)
+            rawData[key].value
+
+        data.push({ id: NTA, value: d3.sum(values)})
+
+    @mapview.svgMap.colorMap data, 0, 200, 'hello'
+    @mapview.svgMap.updateMapTitle "HELLO"
 
   renderMap: ->
     formatNeighborhoodName = (name) -> name?.split('-').join(', ')
@@ -31,7 +59,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     for NTA in Object.keys(neighborhoodNames)
       neighborhoodNames[NTA] = formatNeighborhoodName neighborhoodNames[NTA]
 
-    mapview = new MapViewBase
+    mapview = @mapview =new MapViewBase
       el: @$el
       isMobile: @isMobile
       mapLabel: ""
@@ -64,6 +92,8 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     types = {}
     for type in Object.keys(complaintTypes)
       types[complaintTypes[type]] = type
+
+    @types = types
 
     @stackedGraph = new StackedGraph
       el: $('#three-complaint-type')
