@@ -13,12 +13,14 @@ block body
       .heading 311 Calls from 2010-2014
       .border
     .map-svg-container
+      .select-container.visible
+        label Filter 311 reports: 
+        select#three-select
       svg#three-svg.svg-map.red-map
         include ../../../components/svg-map/defs.jade
-      .three-svg-key.red-map
+      .three-svg-key.red-map.graph-key-container.visible
       a.three-svg.back.faux-underline-large( href="#" ) Back to overview
       svg#three-date-slider.svg-slider( width='500px' )
-      select#three-select
     .svg-graphs
       .graph-help-text
         | Click on a neighborhood like "Willamsburg" to see what people call 311 about.

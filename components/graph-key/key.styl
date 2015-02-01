@@ -28,10 +28,17 @@
       max-height: 42px
       overflow: hidden
 
+.graph-key-container
+  transition: opacity 0.2s
+  opacity: 0
+  &.visible
+    opacity: 1
+
 .linear-graph-key
   font-size: 12px
   width: 100%
   line-height: 200%
+  transition: opacity 0.2s
   .key-bar
     height: 10px
     width: 10px

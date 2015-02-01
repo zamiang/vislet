@@ -298,6 +298,21 @@ html.wf-active body a
     &.third-width
       width: 700px
 
+.select-container
+  franklin-gothic()
+  position: absolute
+  top: -1px
+  left: 11px
+  transition: opacity 0.2s
+  opacity: 0
+  &.visible
+    opacity: 1
+  label
+    font-size: 14px
+    text-transform: uppercase
+  select
+    width: 150px
+    font-size: 14px
 #mobile
   display: none
     

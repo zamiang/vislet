@@ -39,6 +39,7 @@ module.exports = class MapViewBase extends Backbone.View
     @$hoveredLabel = @$('.hover-neighborhood-name .graph-heading')
     @$back = @$('.back')
     @$graphContent = @$('.svg-graphs')
+    @$select = @$('.select-container')
 
   initialize: (options) ->
     { @rotate, @$colorKey, @mapLabel, @scale, @translateX, @translateY, @speed,
@@ -139,16 +140,18 @@ module.exports = class MapViewBase extends Backbone.View
   updateUI: (visible) ->
     if visible
       @$back.fadeOut @speed
-      @slider.$el.fadeIn(@speed)
-      @svgMap.$colorKey.fadeIn(@speed) unless @isMobile
+      d3.select(@slider.$el[0]).attr('class', 'svg-slider visible') unless @isMobile
+      @svgMap.$colorKey.addClass('visible')
+      @$select.addClass('visible')
       @$selectedLabel.text 'SELECTED NEIGHBORHOOD'
       @$hoveredLabel.text 'HOVERED NEIGHBORHOOD'
       @$graphContent.removeClass 'active'
       @isCholoropleth = true
     else
       @$back.fadeIn @speed
-      @slider.$el.fadeOut(@speed)
-      @svgMap.$colorKey.fadeOut(@speed)
+      d3.select(@slider.$el[0]).attr('class', 'svg-slider')
+      @svgMap.$colorKey.removeClass('visible')
       @svgMap.hoverText.text ''
       @$graphContent.addClass 'active'
+      @$select.removeClass('visible')
       @isCholoropleth = false

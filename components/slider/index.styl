@@ -2,6 +2,10 @@
   font-size: 12px
   fill: $dark-gray
   user-select: none
+  transition: opacity 0.2s
+  opacity: 0
+  &.visible
+    opacity: 1
 
   .axis path, .axis line
     fill: none

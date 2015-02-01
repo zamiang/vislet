@@ -15,9 +15,9 @@ block body
     .map-svg-container
       svg#brooklyn-svg.svg-map
         include ../../../components/svg-map/defs.jade
-      .brooklyn-svg-key
+      .brooklyn-svg-key.graph-key-container.visible
       a.brooklyn-svg.back.faux-underline-large( href="#" ) Back to overview
-      svg#brooklyn-date-slider.svg-slider( width='500px' )
+      svg#brooklyn-date-slider.svg-slider.visible( width='500px' )
     .svg-graphs
       .graph-help-text
         | Click on a neighborhood like "Willamsburg" to see how the housing market has changed since 2003.
