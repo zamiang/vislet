@@ -21,13 +21,13 @@ module.exports =
     # "gencon" Recorded daily
     "deatre"
     "sancon"
-    # "heat" Recorded daily
+    "heat" # Recorded daily
     "dircon"
     "miscol"
     "buil"
     "concom"
     # "roocon"
-    'rode'
+    'rode' # Recorded daily
     "nois"
     "bromunmet"
     "taxcom"
@@ -180,15 +180,18 @@ module.exports =
                 value: @averageByPopulation totals[totalKey], ntaID
               }
 
-      flattenedData.complaintType = @formatComplaintTypeData originalData[ntaID].complaintType
+      flattenedData.complaintType = @formatComplaintTypeData originalData[ntaID].complaintType, ntaID
       formattedData[ntaID] = flattenedData
     formattedData
 
-  formatComplaintTypeData: (data) ->
+  formatComplaintTypeData: (data, ntaID) ->
     flattenedData = {}
 
     for complaintType in @validComplaintTypes
       flattenedData[complaintType] = []
       for dateKey in Object.keys(data)
-        flattenedData[complaintType].push { date: moment(new Date()).hours(dateKey).valueOf(), value: data[dateKey][complaintType] }
+        flattenedData[complaintType].push {
+          date: moment(new Date()).hours(dateKey).valueOf(),
+          value: @averageByPopulation data[dateKey][complaintType], ntaID
+        }
     flattenedData

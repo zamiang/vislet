@@ -54,7 +54,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     mapview.on 'click', (params) =>
       @lineGraph.animateNewArea(params.id)
       @stackedGraph.animateNewArea(params.id)
-      @stackedGraph.changeLabel "311 reports over the course of a day in #{neighborhoodNames[params.id]}"
+      @stackedGraph.changeLabel "Number of 311 reports per 1,000 residents per hour in #{neighborhoodNames[params.id]}"
 
   renderStackedGraphs: ->
     width = @getWidth(490)
@@ -77,6 +77,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       colorSet: d3.scale.category20c
       yAxisFormat: (x) -> x
       computeYDomain: true
+      ignoredIds: ['rode', 'heat']
 
   renderLineGraph: ->
     width = @getWidth(490)
@@ -90,7 +91,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       startingDataset: @startingDataset
       keys: ['complaintTally', 'complaintTally-mean']
       el: $('#three-complaint-tally')
-      label: 'Avg Number of 311 complaints per 1,000 residents'
+      label: 'Number of 311 reports per 1,000 residents per month'
       handleHover: @handleHover
 
 module.exports.init = ->

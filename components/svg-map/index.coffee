@@ -57,7 +57,7 @@ module.exports = class SvgMap extends Backbone.View
       .attr("class", @getShapeClass)
       .attr("data-id", (d) -> d.id )
       .attr("d", path)
-      .on("click", (d) => if d.id != @ignoredId then @onClick(d, path, g) )
+      .on("click", (d) => @onClick(d, path, g) unless @isIgnored(d.id) )
       .append("title")
 
     @setupMouseEvents()
@@ -65,12 +65,16 @@ module.exports = class SvgMap extends Backbone.View
     @addHoverText(g) if @formatHoverText
     @addMapTitle g, @label
 
+  isIgnored: (id) ->
+    for ignoredId in @ignoredIds
+      if id.indexOf(ignoredId) > -1
+        return true
+    false
+
   getShapeClass: (d) =>
     cls = 'tract'
-    if @ignoredIds
-      for id in @ignoredIds
-        if d.id.indexOf(id) > -1
-          cls = 'park'
+    if @isIgnored(d.id)
+      cls = 'park'
     cls
 
   setupMouseEvents: ->

@@ -23,9 +23,11 @@ module.exports = class AreaChart extends Backbone.View
     colorSet: d3.scale.category20c
     yAxisFormat: (x) -> d3.format(".1%")(x).replace(/\.0+%$/, "%")
     computeYDomain: false
+    recomputeYDomain: false
+    ignoredIds: []
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @label, @speed, @colorSet, @yAxisFormat, @computeYDomain
+    { @data, @width, @height, @keys, @startingDataset, @label, @speed, @colorSet, @yAxisFormat, @computeYDomain, @recomputeYDomain, @ignoredIds,
       @displayKey, @filterDataset, @interpolate } = _.defaults(options, @defaults)
     @render()
 
@@ -50,16 +52,12 @@ module.exports = class AreaChart extends Backbone.View
     flattenedData = @getFlattenedData @startingDataset
 
     @color = @colorSet()
-    @color.domain Object.keys(flattenedData).sort()
+    keys = Object.keys(flattenedData).sort().filter (name) => name not in @ignoredIds
+    @color.domain keys
     @stack = d3.layout.stack().values((d) -> d.values )
 
     @lines = @getLines(flattenedData)
-
-    if @computeYDomain
-      @y.domain([
-        0,
-        d3.sum((@lines.map((c) -> d3.max(c.values, (v) -> v.y )))) + 100
-      ])
+    @rescaleYAxis() if @computeYDomain
 
     @x.domain(d3.extent(flattenedData[Object.keys(flattenedData)[0]], (d) -> Number(d.date) ))
 
@@ -69,10 +67,10 @@ module.exports = class AreaChart extends Backbone.View
     @drawLineLabels svg
 
   getLines: (data) ->
-    @stack(@color.domain().map((name) ->
+    @stack(@color.domain().map((name) =>
       {
         name: name,
-        values: Object.keys(data[name]).map((key) ->
+        values: Object.keys(data[name]).map((key) =>
           d = data[name][key]
           {
             date: Number(d.date)
@@ -104,14 +102,7 @@ module.exports = class AreaChart extends Backbone.View
     flattenedData = @getFlattenedData startingDataset
     @lines = @getLines flattenedData
 
-    if @computeYDomain
-      @y.domain([
-        0,
-        d3.sum((@lines.map((c) -> d3.max(c.values, (v) -> v.y ))))
-      ])
-      @svg.select(".y-axis")
-        .transition().duration(@speed).ease("sin-in-out")
-        .call(@yAxis)
+    @rescaleYAxis() if @computeYDomain
 
     buildingTypes = @svg
       .selectAll('.building-type .area')
@@ -119,6 +110,23 @@ module.exports = class AreaChart extends Backbone.View
       .transition().duration(@speed)
       .ease('linear')
       .attr("d", (d) => @area(d.values) )
+
+  rescaleYAxis: ->
+    max = d3.sum((@lines.map((c) -> c.values[11].y )))
+    max = max + (max * 0.3)
+
+    # Only rescale the YAxis if a change threshold is met
+    # This reduces the confusing shifting of the y axis on hover to ensure the shifting is meaninful
+    return if @maxY * 1.3 > max and @maxY * 0.5 < max
+
+    @y.domain([0, max])
+    @svg.select(".y-axis")
+      .transition().duration(@speed).ease("sin-in-out")
+
+    if @yAxis
+      @svg.select(".y-axis").call(@yAxis)
+
+    @maxY = max
 
   drawLineLabels: (svg) ->
     @xAxis = d3.svg.axis()
