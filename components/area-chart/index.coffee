@@ -120,11 +120,11 @@ module.exports = class AreaChart extends Backbone.View
     return if @maxY * 1.3 > max and @maxY * 0.5 < max
 
     @y.domain([0, max])
-    @svg.select(".y-axis")
-      .transition().duration(@speed).ease("sin-in-out")
 
     if @yAxis
-      @svg.select(".y-axis").call(@yAxis)
+      @svg.select(".y-axis")
+      .transition().duration(@speed).ease("sin-in-out")
+      .call(@yAxis)
 
     @maxY = max
 
