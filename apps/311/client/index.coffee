@@ -18,6 +18,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
   # TODO Refactor
   mobileWidth: 270
   getWidth: (width) -> if @isMobile then @mobileWidth else width
+  ignoredIds: ['99', '98']
 
   initialize: ->
     @isMobile = @$el.width() < 500
@@ -38,20 +39,35 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
 
   handleSelectChange: (event) ->
     val = @$('#three-select').val()
-    return @mapview.colorMapClick() if val == "ALL"
+    if val == "ALL"
+      @selectData = false
+      @mapview.colorMapClick()
+      return @mapview.showHideSlider true
 
-    data = []
+    @mapview.showHideSlider false
+
+    @selectData = []
+    @selectHash = {}
     for NTA in Object.keys(threeData)
-      unless NTA == "ALL"
+      unless NTA == "ALL" or @isIgnored(NTA)
         rawData = threeData[NTA]["complaintType"][val]
         values =
           for key in Object.keys(rawData)
             rawData[key].value
 
-        data.push({ id: NTA, value: d3.sum(values)})
+        value = d3.sum(values)
+        @selectHash[NTA] = value
+        @selectData.push({ id: NTA, value: value })
 
-    @mapview.svgMap.colorMap data, 0, 200, 'hello'
-    @mapview.svgMap.updateMapTitle "HELLO"
+    max = d3.max(@selectData, (item) -> item.value)
+    @mapview.svgMap.colorMap @selectData, 0, max
+    @mapview.svgMap.updateMapTitle "#{@types[val]} Reports per 1,000 residents"
+
+  isIgnored: (id) ->
+    for ignoredId in @ignoredIds
+      if id.indexOf(ignoredId) > -1
+        return true
+    false
 
   renderMap: ->
     formatNeighborhoodName = (name) -> name?.split('-').join(', ')
@@ -59,30 +75,35 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     for NTA in Object.keys(neighborhoodNames)
       neighborhoodNames[NTA] = formatNeighborhoodName neighborhoodNames[NTA]
 
-    mapview = @mapview =new MapViewBase
+    mapview = @mapview = new MapViewBase
       el: @$el
       isMobile: @isMobile
-      mapLabel: ""
-      dateFormat: "[Number of 311 Reports per 1,000 residents in] MMMM, YYYY"
+      mapLabel: "311 Reports per 1,000 residents"
+      dateFormat: "MMMM, YYYY"
       dataset: "complaintTally"
-      translateX: -120
-      translateY: 60
-      scale: 1.67
+      scale: 1.3
+      translateX: -50
+      translateY: 20
       $colorKey: $('.three-svg-key')
       $map: $('#three-svg')
+      $select: $('.select-container')
       data: threeData
       topoJSON: topoJSON
       neighborhoodNames: neighborhoodNames
-      ignoredIds: ['99', '98']
-      rotate: [74 + 700 / 60, -38 - 50 / 60]
+      ignoredIds: @ignoredIds
+      rotate: [74 + 700 / 50, -38 - 50 / 60]
       mapColorMax: 50
 
     mapview.on 'hover', (params) =>
-      @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
+      if @mapview.isCholoropleth and @selectData
+        @mapview.updateMapHoverText({id: params.hoverNTA}, @selectHash[params.hoverNTA])
+      else
+        @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
+
     mapview.on 'click', (params) =>
       @lineGraph.animateNewArea(params.id)
       @stackedGraph.animateNewArea(params.id)
-      @stackedGraph.changeLabel "Number of 311 reports per 1,000 residents per hour in #{neighborhoodNames[params.id]}"
+      @stackedGraph.changeLabel "311 reports per 1,000 residents per hour in #{neighborhoodNames[params.id]}"
 
   renderStackedGraphs: ->
     width = @getWidth(490)

@@ -17,6 +17,7 @@ module.exports = class MapViewBase extends Backbone.View
     translateY: 0
     $colorKey: false
     $map: false
+    $select: false
     scale: 0
     topoJSON: []
     neighborhoodNames: []
@@ -39,10 +40,9 @@ module.exports = class MapViewBase extends Backbone.View
     @$hoveredLabel = @$('.hover-neighborhood-name .graph-heading')
     @$back = @$('.back')
     @$graphContent = @$('.svg-graphs')
-    @$select = @$('.select-container')
 
   initialize: (options) ->
-    { @rotate, @$colorKey, @mapLabel, @scale, @translateX, @translateY, @speed,
+    { @rotate, @$colorKey, @mapLabel, @scale, @translateX, @translateY, @speed, @$select
       @isCholoropleth, @dateFormat, @$map, @data, @topoJSON, @neighborhoodNames, @mapColorMax,
       @dataset, @isDollar, @valueFormat, @ignoredIds } = _.defaults(options, @defaults)
 
@@ -86,7 +86,7 @@ module.exports = class MapViewBase extends Backbone.View
     @date = date
     data = @mapColorHash[date]
     @svgMap.colorMap data, 0, @mapColorMax, label
-    @svgMap.updateMapTitle "#{moment(date).format(@dateFormat)} #{label}"
+    @svgMap.updateMapTitle "#{moment(date).format(@dateFormat)} - #{label}"
 
   colorMapClick: ->
     @colorMap(@slider.getValue())
@@ -94,9 +94,7 @@ module.exports = class MapViewBase extends Backbone.View
     false
 
   handleGraphHover: (currentNTA, hoverNTA) =>
-    return if @isCholoropleth
-    @$hoveredLabel.html @neighborhoodNames[hoverNTA]
-
+    @$hoveredLabel.html(@neighborhoodNames[hoverNTA]) unless @isCholoropleth
     @trigger 'hover', { currentNTA: currentNTA, hoverNTA: hoverNTA }
 
   renderSvgMap: (topojson) ->
@@ -121,35 +119,47 @@ module.exports = class MapViewBase extends Backbone.View
       formatHoverText: @formatMapHoverText
       rotate: @rotate
 
-  formatMapHoverText: (hoveredItem) =>
-    return unless @isCholoropleth and @mapColorHash
-    return unless @mapColorHash[@slider.getValue()]
-    value = 0
+  formatMapHoverText: (hoveredItem, value=0) =>
+    return unless @isCholoropleth
 
-    for item in @mapColorHash[@slider.getValue()]
-      if item.id == hoveredItem.id
-        value = item.value
+    unless value
+      return unless @mapColorHash
+      return unless @mapColorHash[@slider.getValue()]
+
+      for item in @mapColorHash[@slider.getValue()]
+        if item.id == hoveredItem.id
+          value = item.value
     if value > 0
       "#{@valueFormat}#{value.toLocaleString()}: #{@neighborhoodNames[hoveredItem.id]}"
+
+  updateMapHoverText: (item, value) ->
+    text = @formatMapHoverText item, value
+    @svgMap.hoverText.text text
 
   handleNeighborhoodClick: (id) ->
     @trigger 'click', { id: id }
     @$selectedLabel.html @neighborhoodNames[id]
     @updateUI false
 
+  showHideSlider: (visible=true) ->
+    if visible
+      d3.select(@slider.$el[0]).attr('class', 'svg-slider visible') unless @isMobile
+    else
+      d3.select(@slider.$el[0]).attr('class', 'svg-slider')
+
   updateUI: (visible) ->
     if visible
       @$back.fadeOut @speed
-      d3.select(@slider.$el[0]).attr('class', 'svg-slider visible') unless @isMobile
+      @showHideSlider true
       @svgMap.$colorKey.addClass('visible')
-      @$select.addClass('visible')
+      @$select.addClass('visible').find('select').val('ALL')
       @$selectedLabel.text 'SELECTED NEIGHBORHOOD'
       @$hoveredLabel.text 'HOVERED NEIGHBORHOOD'
       @$graphContent.removeClass 'active'
       @isCholoropleth = true
     else
       @$back.fadeIn @speed
-      d3.select(@slider.$el[0]).attr('class', 'svg-slider')
+      @showHideSlider false
       @svgMap.$colorKey.removeClass('visible')
       @svgMap.hoverText.text ''
       @$graphContent.addClass 'active'

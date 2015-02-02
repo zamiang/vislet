@@ -10,7 +10,7 @@ block body
   #three.map-app
     include ../../../components/layout/header/intro.jade
     header
-      .heading 311 Calls from 2010-2014
+      .heading 311 Calls in NYC from 2010-2014
       .border
     .map-svg-container
       .select-container.visible
@@ -20,10 +20,10 @@ block body
         include ../../../components/svg-map/defs.jade
       .three-svg-key.red-map.graph-key-container.visible
       a.three-svg.back.faux-underline-large( href="#" ) Back to overview
-      svg#three-date-slider.svg-slider( width='500px' )
+      svg#three-date-slider.svg-slider.visible( width='500px' )
     .svg-graphs
       .graph-help-text
-        | Click on a neighborhood like "Willamsburg" to see what people call 311 about.
+        | Click on a neighborhood like "Willamsburg" to see why hipsters call 311.
       .svg-graphs-content
         .graph-heading-container
           .selected-neighborhood-name
@@ -40,7 +40,7 @@ block body
           svg#three-complaint-type.stacked-area-chart.svg-building-class
      .markdown-text( itemtype="http://schema.org/BlogPosting" )
         time( datetime="2014-01-12T03:24:00" itemprop="datePublished" ) January 22, 2015
-        h1( itemprop="name headline" ) How 311 Data can help us understand where we live
+        h1( itemprop="name headline" ) How 311 Data can help us understand NYC
         div( itemprop="articleBody" )
           include:md text.md
         include ../../../components/layout/footer/bio.jade
