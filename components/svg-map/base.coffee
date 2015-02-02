@@ -152,16 +152,16 @@ module.exports = class MapViewBase extends Backbone.View
       @$back.fadeOut @speed
       @showHideSlider true
       @svgMap.$colorKey.addClass('visible')
-      @$select.addClass('visible').find('select').val('ALL')
       @$selectedLabel.text 'SELECTED NEIGHBORHOOD'
       @$hoveredLabel.text 'HOVERED NEIGHBORHOOD'
       @$graphContent.removeClass 'active'
       @isCholoropleth = true
+      @$select.addClass('visible').find('select').val('ALL') if @$select
     else
       @$back.fadeIn @speed
       @showHideSlider false
       @svgMap.$colorKey.removeClass('visible')
       @svgMap.hoverText.text ''
       @$graphContent.addClass 'active'
-      @$select.removeClass('visible')
       @isCholoropleth = false
+      @$select.removeClass('visible') if @$select

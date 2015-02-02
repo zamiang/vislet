@@ -31,7 +31,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
     for NTA in Object.keys(neighborhoodNames)
       neighborhoodNames[NTA] = formatNeighborhoodName neighborhoodNames[NTA]
 
-    mapview = new MapViewBase
+    @mapview = new MapViewBase
       el: @$el
       isMobile: @isMobile
       mapLabel: "Avg Price per SQFT"
@@ -49,9 +49,10 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       ignoredIds: ['99', '98']
       rotate: [74 + 700 / 60, -38 - 50 / 60]
 
-    mapview.on 'hover', (params) =>
-      @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
-    mapview.on 'click', (params) =>
+    @mapview.on 'hover', (params) =>
+      if @mapview.isCholoropleth
+        @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
+    @mapview.on 'click', (params) =>
       @lineGraph.animateNewArea(params.id)
       @stackedGraph.animateNewArea(params.id)
       @stackedGraph.changeLabel "Building Class as % of sales in #{neighborhoodNames[params.id]}"
