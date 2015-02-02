@@ -6,6 +6,7 @@ module.exports =
   # @param {Array} Array of objects { id: 123, value: 0.5 }
   colorMap: (data, min, max, label) ->
     hash = {}
+
     quantize = @getColorClass min, max
 
     for item in data
@@ -20,8 +21,9 @@ module.exports =
     @svg.selectAll(".tract").attr('class', selectColor)
 
     # Only draw once
-    unless @drawnColorKey
+    if max != @colorMax
       @drawColorKey(quantize.range(), quantize.quantiles(), label)
+      @colorMax = max
 
   # Input must be sorted in ascending order
   getColorClass: (min, max) ->

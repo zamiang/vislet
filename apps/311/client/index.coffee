@@ -19,6 +19,8 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
   mobileWidth: 270
   getWidth: (width) -> if @isMobile then @mobileWidth else width
   ignoredIds: ['99', '98']
+  mapLabel: "311 Reports per 1,000 residents"
+  mapColorMax: 50
 
   initialize: ->
     @isMobile = @$el.width() < 500
@@ -41,8 +43,9 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     val = @$('#three-select').val()
     if val == "ALL"
       @selectData = false
-      @mapview.colorMapClick()
-      return @mapview.showHideSlider true
+      @mapview.showHideSlider true
+      @mapview.colorMap @mapview.slider.getValue(), 0, @mapColorMax, @mapLabel
+      return
 
     @mapview.showHideSlider false
 
@@ -60,7 +63,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
         @selectData.push({ id: NTA, value: value })
 
     max = d3.max(@selectData, (item) -> item.value)
-    @mapview.svgMap.colorMap @selectData, 0, max
+    @mapview.svgMap.colorMap @selectData, 0, max, @mapLabel, true
     @mapview.svgMap.updateMapTitle "#{@types[val]} Reports per 1,000 residents"
 
   isIgnored: (id) ->
@@ -78,7 +81,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     mapview = @mapview = new MapViewBase
       el: @$el
       isMobile: @isMobile
-      mapLabel: "311 Reports per 1,000 residents"
+      mapLabel: @mapLabel
       dateFormat: "MMMM, YYYY"
       dataset: "complaintTally"
       scale: 1.3
@@ -92,7 +95,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       neighborhoodNames: neighborhoodNames
       ignoredIds: @ignoredIds
       rotate: [74 + 700 / 50, -38 - 50 / 60]
-      mapColorMax: 50
+      mapColorMax: @mapColorMax
 
     mapview.on 'hover', (params) =>
       if @mapview.isCholoropleth and @selectData
