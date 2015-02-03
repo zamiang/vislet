@@ -191,7 +191,7 @@ module.exports =
       flattenedData[complaintType] = []
       for dateKey in Object.keys(data)
         flattenedData[complaintType].push {
-          date: moment(new Date()).hours(dateKey).valueOf(),
+          date: moment(new Date()).hours(dateKey).minutes(0).seconds(0).valueOf(),
           value: @averageByPopulation data[dateKey][complaintType], ntaID
         }
     flattenedData
