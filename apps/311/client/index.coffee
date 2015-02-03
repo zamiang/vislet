@@ -104,6 +104,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
         @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
 
     mapview.on 'click', (params) =>
+      console.log 'helloooo'
       @lineGraph.animateNewArea(params.id)
       @stackedGraph.animateNewArea(params.id)
       @stackedGraph.changeLabel "311 reports per 1,000 residents per hour in #{neighborhoodNames[params.id]}"
@@ -126,7 +127,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       data: threeData
       startingDataset: @startingDataset
       keys: ['complaintType']
-      label: ''
+      label: '311 reports per 1,000 residents per hour'
       displayKey: (id) -> types[id]
       colorSet: d3.scale.category20c
       yAxisFormat: (x) -> x
