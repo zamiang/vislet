@@ -31,10 +31,6 @@ lr.on 'line', (line) ->
       if initials == 'miscol(almat'
         initials = 'miscol'
 
-      # Merge street light condition and traffic signal condition
-      if initials == 'trasigcon'
-        initials = 'strligcon'
-
       # Merge commercial noise with noise
       if initials == 'noi-con' or initials == 'noi-str'
         initials = 'nois'

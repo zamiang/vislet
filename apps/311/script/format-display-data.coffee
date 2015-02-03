@@ -18,6 +18,7 @@ module.exports =
     "derveh"
     "sewe"
     "strligcon"
+    "trasigcon"
     # "gencon" Recorded daily
     "deatre"
     "sancon"
@@ -40,7 +41,6 @@ module.exports =
     # eapins-f59
     # fooest
     # vend
-    # sewe
   ]
 
   complaintsDataKeys: [
