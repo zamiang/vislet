@@ -43,7 +43,7 @@ module.exports =
     else if value > 1
       Number(value.toFixed(2)).toLocaleString()
     else if value > 0
-      "#{(value * 100).toFixed(2)} %"
+      "#{(value * 100).toFixed(2)}#{@tooltipFormat}"
     else if value < 1 && value > 0
       @formatFixedPercent value
     else

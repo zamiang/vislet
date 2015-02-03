@@ -24,10 +24,12 @@ module.exports = class AreaChart extends Backbone.View
     yAxisFormat: (x) -> d3.format(".1%")(x).replace(/\.0+%$/, "%")
     computeYDomain: false
     recomputeYDomain: false
+    label: false
     ignoredIds: []
+    tooltipFormat: " %"
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @label, @speed, @colorSet, @yAxisFormat, @computeYDomain, @recomputeYDomain, @ignoredIds,
+    { @data, @width, @height, @keys, @startingDataset, @label, @speed, @colorSet, @yAxisFormat, @computeYDomain, @recomputeYDomain, @ignoredIds, @tooltipFormat,
       @displayKey, @filterDataset, @interpolate } = _.defaults(options, @defaults)
     @render()
 

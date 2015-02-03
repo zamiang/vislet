@@ -126,12 +126,13 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       data: threeData
       startingDataset: @startingDataset
       keys: ['complaintType']
-      label: ' '
+      label: ''
       displayKey: (id) -> types[id]
       colorSet: d3.scale.category20c
       yAxisFormat: (x) -> x
       computeYDomain: true
       ignoredIds: ['rode', 'heat']
+      tooltipFormat: ""
 
   renderLineGraph: ->
     width = @getWidth(490)
