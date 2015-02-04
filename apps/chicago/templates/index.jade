@@ -13,6 +13,9 @@ block body
       .heading Chicago Crime 2001-2014
       .border
     .map-svg-container
+      .select-container.visible
+        label Filter crime reports: 
+        select#crime-select
       svg#chicago-svg.svg-map.red-map
         include ../../../components/svg-map/defs.jade
       .chicago-svg-key.red-map

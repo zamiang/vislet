@@ -30,6 +30,50 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     @renderMap()
     @renderStackedGraph()
     @renderLineGraph()
+    @renderSelectBox()
+
+  renderSelectBox: ->
+    @types = {}
+    for key in Object.keys(crimeTypes)
+      @types[crimeTypes[key]] = key
+
+    html = "<option value='ALL'>ALL</option>"
+    html +=
+      (for key in Object.keys(crimeData["ALL"]["crimeType"])
+        "<option value='#{key}'>#{@types[key]}</option>"
+      ).join ''
+
+    @$('#crime-select')
+      .html(html)
+      .on 'change', => @handleSelectChange()
+
+  handleSelectChange: (event) ->
+    val = @$('#crime-select').val()
+    if val == "ALL"
+      @selectData = false
+      @mapview.showHideSlider true
+      @mapview.colorMap @mapview.slider.getValue(), 0, @mapColorMax, @mapLabel
+      return
+
+    @mapview.showHideSlider false
+
+    @selectData = []
+    @selectHash = {}
+    for NTA in Object.keys(crimeData)
+      unless NTA == "ALL"
+        rawData = crimeData[NTA]["crimeType"][val]
+        values =
+          for key in Object.keys(rawData)
+            rawData[key].value
+
+        value = d3.sum(values)
+        @selectHash[NTA] = value
+        @selectData.push({ id: NTA, value: value })
+
+    max = d3.max(@selectData, (item) -> item.value)
+    @mapview.svgMap.colorMap @selectData, 0, max, @mapLabel, true
+    @mapview.svgMap.updateMapTitle "#{@types[val]} Reports"
+
 
   renderMap: ->
     # Reformat both the neighborhood names hash and the topoJSON
@@ -42,7 +86,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     for item in topoJSON.objects.neighborhoods.geometries
       item.id = neighborhoodNames[item.id]
 
-    mapview = new MapViewBase
+    mapview = @mapview = new MapViewBase
       el: @$el
       isMobile: @isMobile
       dateFormat: "MMM, YYYY"
