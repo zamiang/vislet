@@ -13,11 +13,11 @@ block body
       .heading Chicago Crime 2001-2014
       .border
     .map-svg-container
-      svg#chicago-svg.svg-map
+      svg#chicago-svg.svg-map.red-map
         include ../../../components/svg-map/defs.jade
-      .chicago-svg-key
+      .chicago-svg-key.red-map
       a.chicago-svg.back.faux-underline-large( href="#" ) Back to overview
-      svg#chicago-date-slider.svg-slider( width='500px' )
+      svg#chicago-date-slider.svg-slider.visible( width='500px' )
     .svg-graphs
       .graph-help-text Click a neighborhood to see graphs for that area. Hover over an area to compare crime.
       .svg-graphs-content

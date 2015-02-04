@@ -50,7 +50,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       rotate: [74 + 700 / 60, -38 - 50 / 60]
 
     @mapview.on 'hover', (params) =>
-      if @mapview.isCholoropleth
+      unless @mapview.isCholoropleth
         @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
     @mapview.on 'click', (params) =>
       @lineGraph.animateNewArea(params.id)
