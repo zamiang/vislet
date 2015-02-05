@@ -155,7 +155,7 @@ module.exports =
       if data < 1 or population[nta][1] < 1
         return 0
       else
-        @formatDecimal(data / (population[nta][1] / 1000))
+        @formatDecimal((data / population[nta][1]) / 1000)
 
   formatComplaintsDataForDisplay: (originalData) ->
     formattedData = {}

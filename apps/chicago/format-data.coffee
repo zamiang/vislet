@@ -22,6 +22,7 @@ lr.on 'line', (line) ->
       nta: getInitials(json['PRI_NEIGH'], 3)
       month: date.months() + 1
       year: date.year()
+      hour: date.hours()
     }
 
 lr.on 'end', ->

@@ -2,11 +2,13 @@ d3 = require 'd3'
 moment = require 'moment'
 crimeTypes = require '../data/crime-types.json'
 neighborhoodNames = require '../data/neighborhood-names.json'
+population = require '../data/chicago-population-2000-2010.json'
 
 module.exports =
 
   months: [1..12]
   years: [2001..2014]
+  hours: [0..23]
 
   validCrimeTypes: [
     "ASS",
@@ -40,6 +42,14 @@ module.exports =
         hash[year][crimeType] = value
     hash
 
+  createHourlyCrimeTypeTypeHash: (value=0) ->
+    hash = {}
+    for hour in @hours
+      hash[hour] = {}
+      for crimeType in @crimeTypes
+        hash[hour][crimeType] = value
+    hash
+
   createDataHash: ->
     @resTotal = 0
 
@@ -47,7 +57,7 @@ module.exports =
     for key in @neighborhoodNames
       data[key] =
         crimeTally: @createMonthyHash()
-        crimeType: @createYearlyCrimeTypeHash()
+        crimeType: @createHourlyCrimeTypeHash()
     data
 
   formatNeighborhoodNames: ->
@@ -70,7 +80,7 @@ module.exports =
     for crime in models
       @tallyCounts crime, data, crime.nta
 
-    @computeCrimeTypePercent data, 'crimeType'
+    # @computeCrimeTypePercent data, 'crimeType'
 
     @formatCrimesDataForDisplay data
 
@@ -99,7 +109,7 @@ module.exports =
     @resTotal++
 
     if crime.crimeType?.length > 0
-      data[key].crimeType[crime.year][crime.crimeType]++
+      data[key].crimeType[crime.hour][crime.crimeType]++
 
   getCrimeTotals: (originalData, key) ->
     # Compute averages
@@ -110,6 +120,28 @@ module.exports =
         totals[itemKey] ||= []
         totals[itemKey].push data[itemKey]
     totals
+
+  formatDecimal: (number) ->
+    Number(Number(number).toFixed(2))
+
+  averageByPopulation: (data, nta) ->
+    if nta == 'ALL'
+      pops = for name in @neighborhoodNames
+        if population[name]
+          population[name]["TOTAL-2010"]
+        else
+          0
+
+      popTotal = _.reduce(pops, ((memo, num) -> memo + num), 0)
+      dataTotal = _.reduce(data, ((memo, num) -> memo + num), 0)
+
+      @formatDecimal dataTotal / (popTotal / 1000)
+    else
+      name = neighborhoodNames[nta]
+      if data < 1 or population[name]["TOTAL-2010"] < 1
+        return 0
+      else
+        @formatDecimal((data / population[name]["TOTAL-2010"]) / 1000)
 
   formatCrimesDataForDisplay: (originalData) ->
     formattedData = {}
@@ -126,7 +158,6 @@ module.exports =
 
         if ntaID == 'ALL'
           totals = @getCrimeTotals(originalData, key)
-          console.log key
           flattenedData["#{key}-mean"] =
             for totalKey in Object.keys(totals)
               {
@@ -134,15 +165,17 @@ module.exports =
                 value: Number(d3.mean(totals[totalKey]).toFixed(2))
               }
 
-      flattenedData.crimeType = @formatCrimeTypeData originalData[ntaID].crimeType
+      flattenedData.crimeType = @formatCrimeTypeData originalData[ntaID].crimeType, ntaID
       formattedData[ntaID] = flattenedData
     formattedData
 
-  formatCrimeTypeData: (data) ->
+  formatCrimeTypeData: (data, ntaID) ->
     flattenedData = {}
     for crimeType in @validCrimeTypes
       flattenedData[crimeType] = []
       for dateKey in Object.keys(data)
-        date = moment(dateKey, 'YYYY').valueOf()
-        flattenedData[crimeType].push { date: date, value: Number((data[dateKey][crimeType] / 100).toFixed(4)) }
+        flattenedData[crimeType].push {
+          date: moment(new Date()).hours(dateKey).minutes(0).seconds(0).valueOf(),
+          value: @averageByPopulation data[dateKey][crimeType], ntaID
+        }
     flattenedData
