@@ -1,3 +1,4 @@
+_ = require 'underscore'
 d3 = require 'd3'
 moment = require 'moment'
 crimeTypes = require '../data/crime-types.json'
@@ -42,7 +43,7 @@ module.exports =
         hash[year][crimeType] = value
     hash
 
-  createHourlyCrimeTypeTypeHash: (value=0) ->
+  createHourlyCrimeTypeHash: (value=0) ->
     hash = {}
     for hour in @hours
       hash[hour] = {}
@@ -73,14 +74,13 @@ module.exports =
     names
 
   getCrimesData: (models) ->
-    @neighborhoodNames = Object.keys @formatNeighborhoodNames()
+    @neighborhoodNamesHash = @formatNeighborhoodNames()
+    @neighborhoodNames = Object.keys @neighborhoodNamesHash
     @crimeTypes = Object.keys @formatCrimeTypes()
 
     data = @createDataHash()
     for crime in models
       @tallyCounts crime, data, crime.nta
-
-    # @computeCrimeTypePercent data, 'crimeType'
 
     @formatCrimesDataForDisplay data
 
@@ -127,8 +127,9 @@ module.exports =
   averageByPopulation: (data, nta) ->
     if nta == 'ALL'
       pops = for name in @neighborhoodNames
-        if population[name]
-          population[name]["TOTAL-2010"]
+        n = @neighborhoodNamesHash[name]
+        if population[n]
+          population[n]["TOTAL-2010"]
         else
           0
 
@@ -137,11 +138,12 @@ module.exports =
 
       @formatDecimal dataTotal / (popTotal / 1000)
     else
-      name = neighborhoodNames[nta]
+      name = @neighborhoodNamesHash[nta]
       if data < 1 or population[name]["TOTAL-2010"] < 1
         return 0
       else
-        @formatDecimal((data / population[name]["TOTAL-2010"]) / 1000)
+        pop = population[name]["TOTAL-2010"]
+        return @formatDecimal(data / (pop / 1000))
 
   formatCrimesDataForDisplay: (originalData) ->
     formattedData = {}

@@ -79,9 +79,9 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     # Reformat both the neighborhood names hash and the topoJSON
     # neighborhood names should be id: fullname
     # topojson shapes should have the id of the id in the neighborhoodNames hash
-    neighborhoods = {}
+    @neighborhoods = {}
     for name in Object.keys(neighborhoodNames)
-      neighborhoods[neighborhoodNames[name]] = name
+      @neighborhoods[neighborhoodNames[name]] = name
 
     for item in topoJSON.objects.neighborhoods.geometries
       item.id = neighborhoodNames[item.id]
@@ -89,25 +89,30 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     mapview = @mapview = new MapViewBase
       el: @$el
       isMobile: @isMobile
-      dateFormat: "MMM, YYYY"
+      dateFormat: "MMMM, YYYY"
       dataset: "crimeTally"
       scale: 0.93
       translateX: 3
       translateY: 0
       $colorKey: $('.chicago-svg-key')
       $map: $('#chicago-svg')
+      $select: $('.select-container')
       rotate: [74 + 800 / 60, -38 - 50 / 60]
       data: crimeData
       topoJSON: topoJSON
       ignoredIds: []
-      neighborhoodNames: neighborhoods
+      neighborhoodNames: @neighborhoods
 
     mapview.on 'hover', (params) =>
-      unless mapview.isCholoropleth
+      if @mapview.isCholoropleth and @selectData
+        @mapview.updateMapHoverText({id: params.hoverNTA}, @selectHash[params.hoverNTA])
+      else
         @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
+
     mapview.on 'click', (params) =>
       @lineGraph.animateNewArea(params.id)
       @stackedGraph.animateNewArea(params.id)
+      @stackedGraph.changeLabel "Crimes per 1,000 residents per hour in #{@neighborhoods[params.id]}"
 
   renderStackedGraph: ->
     width = @getWidth(490)
@@ -121,8 +126,12 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       data: crimeData
       startingDataset: @startingDataset
       keys: ['crimeType']
-      label: 'Type of Crimes as % of total'
+      label: 'Crimes per 1,000 residents per hour'
       displayKey: (id) => @crimeTypes[id]
+      colorSet: d3.scale.category20c
+      yAxisFormat: (x) -> x
+      computeYDomain: true
+      tooltipFormat: ""
 
   renderLineGraph: ->
     width = @getWidth(490)
@@ -136,7 +145,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       startingDataset: @startingDataset
       keys: ['crimeTally', 'crimeTally-mean']
       el: $('#chicago-crime-tally')
-      label: 'Number of Crimes'
+      label: 'Number of Crimes per 1,000 residents per month'
       handleHover: @handleHover
 
 module.exports.init = ->
