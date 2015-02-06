@@ -28,6 +28,9 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
   initialize: ->
     @isMobile = @$el.width() < 500
     @crimeTypes = @formatCrimeTypes()
+    @neighborhoods = {}
+    for name in Object.keys(neighborhoodNames)
+      @neighborhoods[neighborhoodNames[name]] = name
     @renderMap()
     @renderStackedGraph()
     @renderLineGraph()
@@ -76,16 +79,6 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     @mapview.svgMap.updateMapTitle "#{@types[val]} per 1,000 residents"
 
   renderMap: ->
-    # Reformat both the neighborhood names hash and the topoJSON
-    # neighborhood names should be id: fullname
-    # topojson shapes should have the id of the id in the neighborhoodNames hash
-    @neighborhoods = {}
-    for name in Object.keys(neighborhoodNames)
-      @neighborhoods[neighborhoodNames[name]] = name
-
-    for item in topoJSON.objects.neighborhoods.geometries
-      item.id = neighborhoodNames[item.id]
-
     mapview = @mapview = new MapViewBase
       el: @$el
       isMobile: @isMobile
