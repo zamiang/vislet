@@ -2,7 +2,6 @@ d3 = require 'd3'
 Backbone = require "backbone"
 Backbone.$ = $
 _ = require 'underscore'
-
 svgMapView = require('../../../components/svg-map/index.coffee')
 LineGraph = require('../../../components/line-graph/index.coffee')
 StackedGraph = require('../../../components/area-chart/index.coffee')
@@ -16,7 +15,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
   mobileWidth: 270
   getWidth: (width) -> if @isMobile then @mobileWidth else width
-  startingDataset: 'MorPar' #'Englewood'
+  startingDataset: '68'
   mapLabel: "Number of Crimes per 1,000 resident"
 
   formatCrimeTypes: ->
@@ -94,7 +93,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       data: crimeData
       topoJSON: topoJSON
       ignoredIds: []
-      neighborhoodNames: @neighborhoods
+      neighborhoodNames: neighborhoodNames
       mapLabel: @mapLabel
 
     mapview.on 'hover', (params) =>

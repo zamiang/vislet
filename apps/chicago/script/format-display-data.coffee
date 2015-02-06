@@ -23,7 +23,6 @@ module.exports =
     "CRDA"
   ]
 
-  excludedNeighborhood: [ "Jackson Park", "Museum Campus", "Grant Park", "Boystown", "Gold Coast", "Printers Row", "Andersonville", "Wriglyville"]
   crimesDataKeys: [
     'crimeTally'
   ]
@@ -56,17 +55,11 @@ module.exports =
     @resTotal = 0
 
     data = {}
-    for key in @neighborhoodNames
+    for key in Object.keys(neighborhoodNames)
       data[key] =
         crimeTally: @createMonthyHash()
         crimeType: @createHourlyCrimeTypeHash()
     data
-
-  formatNeighborhoodNames: ->
-    names = {}
-    for name in Object.keys(neighborhoodNames)
-      names[neighborhoodNames[name]] = name
-    names
 
   formatCrimeTypes: ->
     names = {}
@@ -75,8 +68,6 @@ module.exports =
     names
 
   getCrimesData: (models) ->
-    @neighborhoodNamesHash = @formatNeighborhoodNames()
-    @neighborhoodNames = Object.keys @neighborhoodNamesHash
     @crimeTypes = Object.keys @formatCrimeTypes()
 
     data = @createDataHash()
@@ -86,7 +77,7 @@ module.exports =
     @formatCrimesDataForDisplay data
 
   computeCrimeTypePercent: (data, dataKey) ->
-    for key in @neighborhoodNames
+    for key in Object.keys(neighborhoodNames)
       for date in Object.keys(data[key][dataKey])
         crimeTypes = data[key][dataKey][date]
         total = 0
@@ -127,8 +118,8 @@ module.exports =
 
   averageByPopulation: (data, nta) ->
     if nta == 'ALL'
-      pops = for name in @neighborhoodNames
-        n = @neighborhoodNamesHash[name]
+      pops = for name in Object.keys(neighborhoodNames)
+        n = neighborhoodNames[name]
         if population[n]
           population[n]["TOTAL-2010"]
         else
@@ -139,7 +130,7 @@ module.exports =
 
       @formatDecimal dataTotal / (popTotal / 1000)
     else
-      name = @neighborhoodNamesHash[nta]
+      name = neighborhoodNames[nta]
       if population[name]
         if data < 1 or population[name]["TOTAL-2010"] < 1
           0
@@ -147,7 +138,6 @@ module.exports =
           pop = population[name]["TOTAL-2010"]
           @formatDecimal data / (pop / 1000)
       else
-        console.log name, nta
         0
 
   formatCrimesDataForDisplay: (originalData) ->
