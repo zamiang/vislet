@@ -23,6 +23,7 @@ module.exports =
     "CRDA"
   ]
 
+  excludedNeighborhood: [ "Jackson Park", "Museum Campus", "Grant Park", "Boystown", "Gold Coast", "Printers Row", "Andersonville", "Wriglyville"]
   crimesDataKeys: [
     'crimeTally'
   ]
@@ -139,11 +140,15 @@ module.exports =
       @formatDecimal dataTotal / (popTotal / 1000)
     else
       name = @neighborhoodNamesHash[nta]
-      if data < 1 or population[name]["TOTAL-2010"] < 1
-        0
+      if population[name]
+        if data < 1 or population[name]["TOTAL-2010"] < 1
+          0
+        else
+          pop = population[name]["TOTAL-2010"]
+          @formatDecimal data / (pop / 1000)
       else
-        pop = population[name]["TOTAL-2010"]
-        @formatDecimal data / (pop / 1000)
+        console.log name, nta
+        0
 
   formatCrimesDataForDisplay: (originalData) ->
     formattedData = {}
