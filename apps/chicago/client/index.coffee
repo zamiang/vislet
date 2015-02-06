@@ -17,6 +17,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
   mobileWidth: 270
   getWidth: (width) -> if @isMobile then @mobileWidth else width
   startingDataset: 'MorPar' #'Englewood'
+  mapLabel: "Number of Crimes per 1,000 resident"
 
   formatCrimeTypes: ->
     names = {}
@@ -72,8 +73,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
     max = d3.max(@selectData, (item) -> item.value)
     @mapview.svgMap.colorMap @selectData, 0, max, @mapLabel, true
-    @mapview.svgMap.updateMapTitle "#{@types[val]} Reports"
-
+    @mapview.svgMap.updateMapTitle "#{@types[val]} per 1,000 residents"
 
   renderMap: ->
     # Reformat both the neighborhood names hash and the topoJSON
@@ -102,6 +102,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       topoJSON: topoJSON
       ignoredIds: []
       neighborhoodNames: @neighborhoods
+      mapLabel: @mapLabel
 
     mapview.on 'hover', (params) =>
       if @mapview.isCholoropleth and @selectData

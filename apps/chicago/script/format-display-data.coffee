@@ -140,10 +140,10 @@ module.exports =
     else
       name = @neighborhoodNamesHash[nta]
       if data < 1 or population[name]["TOTAL-2010"] < 1
-        return 0
+        0
       else
         pop = population[name]["TOTAL-2010"]
-        return @formatDecimal(data / (pop / 1000))
+        @formatDecimal data / (pop / 1000)
 
   formatCrimesDataForDisplay: (originalData) ->
     formattedData = {}
@@ -155,7 +155,7 @@ module.exports =
           for dateKey in Object.keys(data)
             {
               date: moment(dateKey, 'M-YYYY').valueOf()
-              value: data[dateKey]
+              value: @averageByPopulation data[dateKey], ntaID
             }
 
         if ntaID == 'ALL'
@@ -164,7 +164,7 @@ module.exports =
             for totalKey in Object.keys(totals)
               {
                 date: moment(totalKey, 'M-YYYY').valueOf()
-                value: Number(d3.mean(totals[totalKey]).toFixed(2))
+                value: @averageByPopulation d3.mean(totals[totalKey]), ntaID
               }
 
       flattenedData.crimeType = @formatCrimeTypeData originalData[ntaID].crimeType, ntaID
