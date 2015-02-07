@@ -115,16 +115,15 @@ module.exports = class AreaChart extends Backbone.View
 
   rescaleYAxis: ->
     times = @lines[0].values.length
-    console.log times
     max = d3.max(
       for n in [0...times]
         d3.sum(@lines.map((c) -> c.values[n].y ))
     )
-    max = max + (max * 0.3)
-
     # Only rescale the YAxis if a change threshold is met
     # This reduces the confusing shifting of the y axis on hover to ensure the shifting is meaninful
-    return if @maxY * 1.3 > max and @maxY * 0.5 < max
+    return if @maxY * 1.2 > max and @maxY * 0.5 < max
+
+    max = max + (max * 0.3)
 
     @y.domain([0, max])
 
