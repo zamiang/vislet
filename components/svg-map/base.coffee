@@ -119,18 +119,17 @@ module.exports = class MapViewBase extends Backbone.View
       formatHoverText: @formatMapHoverText
       rotate: @rotate
 
-  formatMapHoverText: (hoveredItem, value=0) =>
+  formatMapHoverText: (hoveredItem, value=-1) =>
     return unless @isCholoropleth
 
-    unless value
+    unless value > -1
       return unless @mapColorHash
       return unless @mapColorHash[@slider.getValue()]
 
       for item in @mapColorHash[@slider.getValue()]
         if item.id == hoveredItem.id
           value = item.value
-    if value > 0
-      "#{@valueFormat}#{value.toLocaleString()}: #{@neighborhoodNames[hoveredItem.id]}"
+    "#{@valueFormat}#{value.toLocaleString()}: #{@neighborhoodNames[hoveredItem.id]}"
 
   updateMapHoverText: (item, value) ->
     text = @formatMapHoverText item, value

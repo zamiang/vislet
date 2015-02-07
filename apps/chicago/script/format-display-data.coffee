@@ -20,7 +20,9 @@ module.exports =
     "ROB",
     "BUR",
     "SEOF",
-    "CRDA"
+    "CRDA",
+    "OTOF",
+    "RIT"
   ]
 
   crimesDataKeys: [

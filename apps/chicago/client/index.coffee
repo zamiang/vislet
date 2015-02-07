@@ -133,6 +133,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       displayKey: (id) => @crimeTypes[id]
       colorSet: d3.scale.category20c
       yAxisFormat: (x) -> x
+      ignoredIds: ['RIT', 'heat']
       computeYDomain: true
       tooltipFormat: ""
 
