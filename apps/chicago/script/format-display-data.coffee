@@ -8,7 +8,7 @@ population = require '../data/chicago-population-2000-2010.json'
 module.exports =
 
   months: [1..12]
-  years: [2001..2014]
+  years: [2003..2014]
   hours: [0..23]
 
   validCrimeTypes: [
@@ -92,7 +92,7 @@ module.exports =
 
   tallyCounts: (crime, data, key) ->
     return unless data[key]
-    if crime.year > 2014
+    if crime.year > 2014 or crime.year < 2003
       return
 
     dateKey = "#{crime.month}-#{crime.year}"

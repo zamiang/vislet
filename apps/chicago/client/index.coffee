@@ -17,6 +17,8 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
   getWidth: (width) -> if @isMobile then @mobileWidth else width
   startingDataset: '68'
   mapLabel: "Number of Crimes per 1,000 resident"
+  mapColorMax: 40
+  ignoredIds: ['33', '20']
 
   formatCrimeTypes: ->
     names = {}
@@ -34,6 +36,12 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     @renderStackedGraph()
     @renderLineGraph()
     @renderSelectBox()
+
+  isIgnored: (id) ->
+    for ignoredId in @ignoredIds
+      if id.indexOf(ignoredId) > -1
+        return true
+    false
 
   renderSelectBox: ->
     @types = {}
@@ -63,7 +71,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     @selectData = []
     @selectHash = {}
     for NTA in Object.keys(crimeData)
-      unless NTA == "ALL"
+      unless NTA == "ALL" or @isIgnored(NTA)
         rawData = crimeData[NTA]["crimeType"][val]
         values =
           for key in Object.keys(rawData)
@@ -94,7 +102,9 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       topoJSON: topoJSON
       ignoredIds: []
       neighborhoodNames: neighborhoodNames
+      ignoredIds: @ignoredIds
       mapLabel: @mapLabel
+      mapColorMax: @mapColorMax
 
     mapview.on 'hover', (params) =>
       if @mapview.isCholoropleth and @selectData
@@ -105,7 +115,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     mapview.on 'click', (params) =>
       @lineGraph.animateNewArea(params.id)
       @stackedGraph.animateNewArea(params.id)
-      @stackedGraph.changeLabel "Crimes per 1,000 residents per hour in #{@neighborhoods[params.id]}"
+      @stackedGraph.changeLabel "Crimes per 1,000 residents per hour in #{neighborhoodNames[params.id]}"
 
   renderStackedGraph: ->
     width = @getWidth(490)

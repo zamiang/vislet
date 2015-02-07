@@ -114,7 +114,12 @@ module.exports = class AreaChart extends Backbone.View
       .attr("d", (d) => @area(d.values) )
 
   rescaleYAxis: ->
-    max = d3.sum((@lines.map((c) -> c.values[11].y )))
+    times = @lines[0].values.length
+    console.log times
+    max = d3.max(
+      for n in [0...times]
+        d3.sum(@lines.map((c) -> c.values[n].y ))
+    )
     max = max + (max * 0.3)
 
     # Only rescale the YAxis if a change threshold is met
