@@ -10,20 +10,31 @@ salesData = require('../data/brooklyn-sales-display-data.json')
 buildingClasses = require('../data/building-class.json')
 Slider = require('../../../components/slider/index.coffee')
 topoJSON = require('../data/brooklyn.json')
+Router = require('../../../components/graph-key/router.coffee')
 
 module.exports.BrooklynView = class BrooklynView extends Backbone.View
-
-  startingDataset: 'BK60'
 
   # TODO Refactor
   mobileWidth: 270
   getWidth: (width) -> if @isMobile then @mobileWidth else width
+
+  startingDataset: 'BK60'
+  ignoredIds: ['99', '98']
 
   initialize: ->
     @isMobile = @$el.width() < 500
     @renderMap()
     @renderLineGraph()
     @renderBuildingClassGraphs()
+    @router = new Router
+      graphs: [@lineGraph, @stackedGraph]
+      map: @mapview
+
+    Backbone.history.start({
+      root: '/brooklyn',
+      pushState: true,
+      silent: false
+    })
 
   renderMap: ->
     formatNeighborhoodName = (name) -> name?.split('-').join(', ')
@@ -46,16 +57,8 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
       data: salesData
       topoJSON: topoJSON
       neighborhoodNames: neighborhoodNames
-      ignoredIds: ['99', '98']
+      ignoredIds: @ignoredIds
       rotate: [74 + 700 / 60, -38 - 50 / 60]
-
-    @mapview.on 'hover', (params) =>
-      unless @mapview.isCholoropleth
-        @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
-    @mapview.on 'click', (params) =>
-      @lineGraph.animateNewArea(params.id)
-      @stackedGraph.animateNewArea(params.id)
-      @stackedGraph.changeLabel "Building Class as % of sales in #{neighborhoodNames[params.id]}"
 
   renderBuildingClassGraphs: ->
     width = @getWidth(490)

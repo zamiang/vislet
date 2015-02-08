@@ -10,11 +10,13 @@ crimeData = require '../data/chicago-crimes-display-data.json'
 crimeTypes = require '../data/crime-types.json'
 topoJSON = require('../data/neighborhoods.json')
 neighborhoodNames = require('../data/neighborhood-names.json')
+Router = require('../../../components/graph-key/router.coffee')
 
 module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
   mobileWidth: 270
   getWidth: (width) -> if @isMobile then @mobileWidth else width
+
   startingDataset: '68'
   mapLabel: "Number of Crimes per 1,000 resident"
   mapColorMax: 40
@@ -36,6 +38,17 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     @renderStackedGraph()
     @renderLineGraph()
     @renderSelectBox()
+
+    @router = new Router
+      graphs: [@lineGraph, @stackedGraph]
+      map: @mapview
+
+    Backbone.history.start({
+      root: '/chicago',
+      pushState: true,
+      silent: false
+    })
+
 
   isIgnored: (id) ->
     for ignoredId in @ignoredIds
@@ -105,17 +118,6 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       ignoredIds: @ignoredIds
       mapLabel: @mapLabel
       mapColorMax: @mapColorMax
-
-    mapview.on 'hover', (params) =>
-      if @mapview.isCholoropleth and @selectData
-        @mapview.updateMapHoverText({id: params.hoverNTA}, @selectHash[params.hoverNTA])
-      else
-        @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
-
-    mapview.on 'click', (params) =>
-      @lineGraph.animateNewArea(params.id)
-      @stackedGraph.animateNewArea(params.id)
-      @stackedGraph.changeLabel "Crimes per 1,000 residents per hour in #{neighborhoodNames[params.id]}"
 
   renderStackedGraph: ->
     width = @getWidth(490)

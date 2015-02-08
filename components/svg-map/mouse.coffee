@@ -1,19 +1,20 @@
 _ = require 'underscore'
+Backbone = require 'backbone'
 
 module.exports =
 
   onClick: (item, path, g) ->
     if item.id == @activeId
-      @activeId = false
-      @customClickSelectedArea?()
+      Backbone.history.navigate("", trigger: true)
       return
 
     @activeId = item.id
-    @customOnClick item.id
 
     @$(".tract").attr('class', 'tract')
     @$(".tract[data-id=\"#{item.id}\"]").attr('class', 'tract selected')
     @updateMapTitle(@title)
+
+    Backbone.history.navigate("/area/#{item.id}", trigger: true)
 
     if @zoomOnClick
       bounds = path.bounds(item)
@@ -38,9 +39,10 @@ module.exports =
   mouseover: (item) ->
     return if item.id == @activeId
     @hoverText?.text @formatHoverText(item)
-    @customMouseEnter?(@activeId, item.id)
+    return unless @activeId
+    Backbone.history.navigate("/area/#{@activeId}?hover=#{item.id}", trigger: true)
 
   mouseleave: ->
+    return unless @activeId
     @hoveredId = false
     @hoverText?.text ''
-    @customMouseLeave?(@activeId)

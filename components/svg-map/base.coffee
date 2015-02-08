@@ -65,7 +65,6 @@ module.exports = class MapViewBase extends Backbone.View
       el: $('.svg-slider')
       width: if @isMobile then 340 else 502
       data: data
-      animateStart: true
       handleSelect: (date) => @colorMap(new Date(date).valueOf())
       numberTicks: @numberTicks
 
@@ -85,17 +84,13 @@ module.exports = class MapViewBase extends Backbone.View
     label = @mapLabel
     @date = date
     data = @mapColorHash[date]
+    @svgMap.activeId = false
     @svgMap.colorMap data, 0, @mapColorMax, label
     @svgMap.updateMapTitle "#{moment(date).format(@dateFormat)} - #{label}"
 
   colorMapClick: ->
-    @colorMap(@slider.getValue())
-    @updateUI true
+    Backbone.history.navigate("", trigger: true)
     false
-
-  handleGraphHover: (currentNTA, hoverNTA) =>
-    @$hoveredLabel.html(@neighborhoodNames[hoverNTA]) unless @isCholoropleth
-    @trigger 'hover', { currentNTA: currentNTA, hoverNTA: hoverNTA }
 
   renderSvgMap: (topojson) ->
     throttledGraphHover = _.throttle @handleGraphHover, 300
@@ -104,7 +99,6 @@ module.exports = class MapViewBase extends Backbone.View
       topojson: topojson
       key: 'neighborhoods'
       ignoredIds: @ignoredIds
-      customOnClick: (id) => @handleNeighborhoodClick(id)
       drawLabels: false
       zoomOnClick: false
       $colorKey: @$colorKey
@@ -113,7 +107,6 @@ module.exports = class MapViewBase extends Backbone.View
       translateY: @translateY
       colorKeyWidth: 610
       customMouseEnter: throttledGraphHover
-      customClickSelectedArea: (=> @colorMapClick())
       height: if @isMobile then 400 else 600
       width: if @isMobile then 340 else 500
       formatHoverText: @formatMapHoverText
@@ -135,9 +128,10 @@ module.exports = class MapViewBase extends Backbone.View
     text = @formatMapHoverText item, value
     @svgMap.hoverText.text text
 
-  handleNeighborhoodClick: (id) ->
-    @trigger 'click', { id: id }
+  handleNeighborhoodSelect: (id, hoverId) ->
     @$selectedLabel.html @neighborhoodNames[id]
+    if hoverId
+      @$hoveredLabel.html(@neighborhoodNames[hoverId])
     @updateUI false
 
   showHideSlider: (visible=true) ->

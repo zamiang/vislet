@@ -2,7 +2,7 @@ d3 = require 'd3'
 _ = require 'underscore'
 Backbone = require "backbone"
 
-module.exports = class Slider extends Backbone.View
+module.exports = class DateSlider extends Backbone.View
 
   defaults:
     margin:
@@ -14,8 +14,11 @@ module.exports = class Slider extends Backbone.View
     height: 38
 
   initialize: (options) ->
-    { @data, @width, @height, @margin, @handleSelect, @speed, @startValue, @animateStart } = _.defaults(options, @defaults)
+    { @data, @width, @height, @margin, @speed, @startValue } = _.defaults(options, @defaults)
     @render()
+
+  handleSelect: (date) ->
+    Backbone.history.navigate("date/#{date}", true)
 
   render: ->
     @x = d3.time.scale().range([0, @width]).clamp(true)
@@ -63,8 +66,6 @@ module.exports = class Slider extends Backbone.View
       .attr("class", "handle")
       .attr("transform", "translate(0,#{@height / 2})")
       .attr("r", 10)
-
-    @transition(slider) if @animateStart
 
   getValue: ->
     new Date(@x.invert(d3.select("##{@$el.attr('id')} circle").attr('cx'))).valueOf()

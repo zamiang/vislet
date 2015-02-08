@@ -9,38 +9,53 @@ neighborhoodNames = require('../data/nyc-neighborhood-names.json')
 threeData = require('../data/display-data.json')
 Slider = require('../../../components/slider/index.coffee')
 topoJSON = require('../data/nyc.json')
+Select = require('../../../components/select/index.coffee')
 complaintTypes = require('../data/complaint-types.json')
+formatNeighborhoodName = require('../../../components/datautil/format-name.coffee')
+Router = require('../../../components/graph-key/router.coffee')
 
 module.exports.ThreeView = class ThreeView extends Backbone.View
 
-  startingDataset: 'BK60'
-
-  # TODO Refactor
+  # TODO Refactor mobile
   mobileWidth: 270
   getWidth: (width) -> if @isMobile then @mobileWidth else width
+
   ignoredIds: ['99', '98']
   mapLabel: "311 Reports per 1,000 residents"
+  startingDataset: 'BK60'
   mapColorMax: 50
 
   initialize: ->
     @isMobile = @$el.width() < 500
+    @complaintTypesHash = {}
+    for type in Object.keys(complaintTypes)
+      @complaintTypesHash[complaintTypes[type]] = type
+
     @renderMap()
     @renderLineGraph()
     @renderStackedGraphs()
     @renderSelectBox()
+    @router = new Router
+      graphs: [@lineGraph, @stackedGraph]
+      map: @mapview
+      handleSelect: @handleSelectChange
+
+    Backbone.history.start({
+      root: '/311',
+      pushState: true,
+      silent: false
+    })
 
   renderSelectBox: ->
-    html = "<option value='ALL'>ALL</option>"
-    html +=
-      (for key in Object.keys(threeData["ALL"]["complaintType"])
-        "<option value='#{key}'>#{@types[key]}</option>"
-      ).join ''
-    @$('#three-select')
-      .html(html)
-      .on 'change', => @handleSelectChange()
+    data = {}
+    for key in Object.keys(threeData["ALL"]["complaintType"])
+      data[key] = @complaintTypesHash[key]
 
-  handleSelectChange: (event) ->
-    val = @$('#three-select').val()
+    selectBox = new Select
+      el: $('#three-select')
+      data: data
+
+  handleSelectChange: (val) =>
     if val == "ALL"
       @selectData = false
       @mapview.showHideSlider true
@@ -64,7 +79,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
 
     max = d3.max(@selectData, (item) -> item.value)
     @mapview.svgMap.colorMap @selectData, 0, max, @mapLabel, true
-    @mapview.svgMap.updateMapTitle "#{@types[val]} Reports per 1,000 residents"
+    @mapview.svgMap.updateMapTitle "#{@complaintTypesHash[val]} Reports per 1,000 residents"
 
   isIgnored: (id) ->
     for ignoredId in @ignoredIds
@@ -73,8 +88,6 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
     false
 
   renderMap: ->
-    formatNeighborhoodName = (name) -> name?.split('-').join(', ')
-
     for NTA in Object.keys(neighborhoodNames)
       neighborhoodNames[NTA] = formatNeighborhoodName neighborhoodNames[NTA]
 
@@ -82,20 +95,20 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       el: @$el
       isMobile: @isMobile
       mapLabel: @mapLabel
+      ignoredIds: @ignoredIds
+      mapColorMax: @mapColorMax
+      $colorKey: $('.three-svg-key')
+      $map: $('#three-svg')
+      $select: $('.select-container')
       dateFormat: "MMMM, YYYY"
       dataset: "complaintTally"
       scale: 1.3
       translateX: -50
       translateY: 20
-      $colorKey: $('.three-svg-key')
-      $map: $('#three-svg')
-      $select: $('.select-container')
       data: threeData
       topoJSON: topoJSON
       neighborhoodNames: neighborhoodNames
-      ignoredIds: @ignoredIds
       rotate: [74 + 700 / 50, -38 - 50 / 60]
-      mapColorMax: @mapColorMax
 
     mapview.on 'hover', (params) =>
       if @mapview.isCholoropleth and @selectData
@@ -103,21 +116,10 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       else
         @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
 
-    mapview.on 'click', (params) =>
-      @lineGraph.animateNewArea(params.id)
-      @stackedGraph.animateNewArea(params.id)
-      @stackedGraph.changeLabel "311 reports per 1,000 residents per hour in #{neighborhoodNames[params.id]}"
-
   renderStackedGraphs: ->
     width = @getWidth(490)
     blogPostWidth = @getWidth(460)
     height = 230
-
-    types = {}
-    for type in Object.keys(complaintTypes)
-      types[complaintTypes[type]] = type
-
-    @types = types
 
     @stackedGraph = new StackedGraph
       el: $('#three-complaint-type')
@@ -126,8 +128,8 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       data: threeData
       startingDataset: @startingDataset
       keys: ['complaintType']
-      label: '311 reports per 1,000 residents per hour'
-      displayKey: (id) -> types[id]
+      label: "#{@mapLabel} per hour"
+      displayKey: (id) => @complaintTypesHash[id]
       colorSet: d3.scale.category20c
       yAxisFormat: (x) -> x
       computeYDomain: true
@@ -146,7 +148,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
       startingDataset: @startingDataset
       keys: ['complaintTally', 'complaintTally-mean']
       el: $('#three-complaint-tally')
-      label: 'Number of 311 reports per 1,000 residents per month'
+      label: "#{@mapLabel} per month"
       handleHover: @handleHover
 
 module.exports.init = ->

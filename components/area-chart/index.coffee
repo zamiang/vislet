@@ -29,7 +29,8 @@ module.exports = class AreaChart extends Backbone.View
     tooltipFormat: " %"
 
   initialize: (options) ->
-    { @data, @width, @height, @keys, @startingDataset, @label, @speed, @colorSet, @yAxisFormat, @computeYDomain, @recomputeYDomain, @ignoredIds, @tooltipFormat,
+    { @data, @width, @height, @keys, @startingDataset, @label, @speed, @colorSet,
+      @yAxisFormat, @computeYDomain, @recomputeYDomain, @ignoredIds, @tooltipFormat,
       @displayKey, @filterDataset, @interpolate } = _.defaults(options, @defaults)
     @render()
 
@@ -100,7 +101,7 @@ module.exports = class AreaChart extends Backbone.View
       .attr("d", (d) => @area(d.values) )
       .style("fill", (d) => @color(d.name) )
 
-  animateNewArea: (startingDataset) ->
+  animateNewArea: (startingDataset, areaLabel) ->
     flattenedData = @getFlattenedData startingDataset
     @lines = @getLines flattenedData
 
@@ -112,6 +113,9 @@ module.exports = class AreaChart extends Backbone.View
       .transition().duration(@speed)
       .ease('linear')
       .attr("d", (d) => @area(d.values) )
+
+    if @label and areaLabel
+      @changeLabel "#{@label} in #{areaLabel}"
 
   rescaleYAxis: ->
     times = @lines[0].values.length
