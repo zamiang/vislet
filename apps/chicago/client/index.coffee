@@ -68,15 +68,15 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
   handleSelectChange: (val) =>
     if val == "ALL"
-      @selectData = false
+      @mapview.mapHoverHash = false
       @mapview.showHideSlider true
       @mapview.colorMap @mapview.slider.getValue(), 0, @mapColorMax, @mapLabel
       return
 
     @mapview.showHideSlider false
 
-    @selectData = []
-    @selectHash = {}
+    selectData = []
+    selectHash = {}
     for NTA in Object.keys(crimeData)
       unless NTA == "ALL" or @isIgnored(NTA)
         rawData = crimeData[NTA]["crimeType"][val]
@@ -85,11 +85,12 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
             rawData[key].value
 
         value = d3.sum(values)
-        @selectHash[NTA] = value
-        @selectData.push({ id: NTA, value: value })
+        selectHash[NTA] = value
+        selectData.push({ id: NTA, value: value })
 
-    max = d3.max(@selectData, (item) -> item.value)
-    @mapview.svgMap.colorMap @selectData, 0, max, @mapLabel, true
+    max = d3.max(selectData, (item) -> item.value)
+    @mapview.mapHoverHash = selectHash
+    @mapview.svgMap.colorMap selectData, 0, max, @mapLabel, true
     @mapview.svgMap.updateMapTitle "#{@types[val]} per 1,000 residents"
 
   renderMap: ->

@@ -57,15 +57,15 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
 
   handleSelectChange: (val) =>
     if val == "ALL"
-      @selectData = false
+      @mapview.mapHoverHash = false
       @mapview.showHideSlider true
       @mapview.colorMap @mapview.slider.getValue(), 0, @mapColorMax, @mapLabel
       return
 
     @mapview.showHideSlider false
 
-    @selectData = []
-    @selectHash = {}
+    selectData = []
+    selectHash = {}
     for NTA in Object.keys(threeData)
       unless NTA == "ALL" or @isIgnored(NTA)
         rawData = threeData[NTA]["complaintType"][val]
@@ -74,11 +74,12 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
             rawData[key].value
 
         value = d3.sum(values)
-        @selectHash[NTA] = value
-        @selectData.push({ id: NTA, value: value })
+        selectHash[NTA] = value
+        selectData.push({ id: NTA, value: value })
 
-    max = d3.max(@selectData, (item) -> item.value)
-    @mapview.svgMap.colorMap @selectData, 0, max, @mapLabel, true
+    max = d3.max(selectData, (item) -> item.value)
+    @mapview.mapHoverHash = selectHash
+    @mapview.svgMap.colorMap selectData, 0, max, @mapLabel, true
     @mapview.svgMap.updateMapTitle "#{@complaintTypesHash[val]} Reports per 1,000 residents"
 
   isIgnored: (id) ->

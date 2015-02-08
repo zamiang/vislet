@@ -115,7 +115,10 @@ module.exports = class MapViewBase extends Backbone.View
   formatMapHoverText: (hoveredItem, value=-1) =>
     return unless @isCholoropleth
 
-    unless value > -1
+    if @mapHoverHash
+      # Used for custom data filtering after a select box
+      value = @mapHoverHash[hoveredItem.id]
+    else unless value > -1
       return unless @mapColorHash
       return unless @mapColorHash[@slider.getValue()]
 
