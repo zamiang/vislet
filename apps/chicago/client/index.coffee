@@ -11,6 +11,7 @@ crimeTypes = require '../data/crime-types.json'
 topoJSON = require('../data/neighborhoods.json')
 neighborhoodNames = require('../data/neighborhood-names.json')
 Router = require('../../../components/graph-key/router.coffee')
+Select = require('../../../components/select/index.coffee')
 
 module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
@@ -42,13 +43,13 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
     @router = new Router
       graphs: [@lineGraph, @stackedGraph]
       map: @mapview
+      handleSelect: @handleSelectChange
 
     Backbone.history.start({
       root: '/chicago',
       pushState: true,
       silent: false
     })
-
 
   isIgnored: (id) ->
     for ignoredId in @ignoredIds
@@ -58,21 +59,14 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
   renderSelectBox: ->
     @types = {}
-    for key in Object.keys(crimeTypes)
-      @types[crimeTypes[key]] = key
+    for key in Object.keys(crimeData["ALL"]["crimeType"])
+      @types[key] = @crimeTypes[key]
 
-    html = "<option value='ALL'>ALL</option>"
-    html +=
-      (for key in Object.keys(crimeData["ALL"]["crimeType"])
-        "<option value='#{key}'>#{@types[key]}</option>"
-      ).join ''
+    selectBox = new Select
+      el: $('#crime-select')
+      data: @types
 
-    @$('#crime-select')
-      .html(html)
-      .on 'change', => @handleSelectChange()
-
-  handleSelectChange: (event) ->
-    val = @$('#crime-select').val()
+  handleSelectChange: (val) =>
     if val == "ALL"
       @selectData = false
       @mapview.showHideSlider true
@@ -118,6 +112,17 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       ignoredIds: @ignoredIds
       mapLabel: @mapLabel
       mapColorMax: @mapColorMax
+
+    mapview.on 'hover', (params) =>
+      if @mapview.isCholoropleth and @selectData
+        @mapview.updateMapHoverText({id: params.hoverNTA}, @selectHash[params.hoverNTA])
+      else
+        @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
+
+    mapview.on 'click', (params) =>
+      @lineGraph.animateNewArea(params.id)
+      @stackedGraph.animateNewArea(params.id)
+      @stackedGraph.changeLabel "Crimes per 1,000 residents per hour in #{neighborhoodNames[params.id]}"
 
   renderStackedGraph: ->
     width = @getWidth(490)
