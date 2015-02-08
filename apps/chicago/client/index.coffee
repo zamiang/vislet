@@ -113,17 +113,6 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       mapLabel: @mapLabel
       mapColorMax: @mapColorMax
 
-    mapview.on 'hover', (params) =>
-      if @mapview.isCholoropleth and @selectData
-        @mapview.updateMapHoverText({id: params.hoverNTA}, @selectHash[params.hoverNTA])
-      else
-        @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
-
-    mapview.on 'click', (params) =>
-      @lineGraph.animateNewArea(params.id)
-      @stackedGraph.animateNewArea(params.id)
-      @stackedGraph.changeLabel "Crimes per 1,000 residents per hour in #{neighborhoodNames[params.id]}"
-
   renderStackedGraph: ->
     width = @getWidth(490)
     blogPostWidth = @getWidth(460)
