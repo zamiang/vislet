@@ -3,10 +3,7 @@ Backbone.$ = $
 _ = require 'underscore'
 moment = require 'moment'
 svgMapView = require('../../../components/svg-map/index.coffee')
-# neighborhoodNames = require('../data/nyc-neighborhood-names.json')
-# threeData = require('../data/display-data.json')
 topoJSON = require('../data/north-carolina-2012-districts.json')
-# complaintTypes = require('../data/complaint-types.json')
 
 module.exports.NCView = class NCView extends Backbone.View
 
