@@ -36,7 +36,7 @@ module.exports = class SvgMap extends Backbone.View
   render: ->
     neighborhoods = topojson.feature(@topojson, @topojson.objects[@key])
 
-    projection = d3.geo.transverseMercator().rotate @rotate
+    projection = d3.geo.mercator().rotate @rotate
 
     path = d3.geo.path().projection(projection)
 
@@ -66,9 +66,10 @@ module.exports = class SvgMap extends Backbone.View
     @addMapTitle g, @label
 
   isIgnored: (id) ->
-    for ignoredId in @ignoredIds
-      if id.indexOf(ignoredId) > -1
-        return true
+    if @ignoredIds
+      for ignoredId in @ignoredIds
+        if id.indexOf(ignoredId) > -1
+          return true
     false
 
   getShapeClass: (d) =>

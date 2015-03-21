@@ -207,10 +207,49 @@ html.wf-active body a
   h2
     margin-bottom: 5px
     margin-top: 25px
+  h3
+    font-size: 26px
+    line-height: 150%
+
   time
     margin-bottom: -23px
     display: block
     color: $light-gray
+
+  blockquote
+    margin-top: 20px
+    margin-top: 10px
+    margin-left: 50px
+    padding-left: 15px;
+    border-left: 3px solid #ccc
+
+  ol
+    list-style-type: none
+    margin: 0px
+    margin-left: 3em
+    padding: 0px
+    counter-reset: li-counter
+    max-width: 560px
+    li
+      position: relative
+      margin-bottom: 20px
+      padding-left: 0.5em
+      border-left: 2px solid #CCCCCC
+      &:before
+        position: absolute
+        top: 0
+        left: -1em
+        width: 0.8em
+     
+        font-size: 32px
+        line-height: 1
+        font-weight: bold;
+        text-align: right
+        color: #464646
+ 
+        content: counter(li-counter);
+        counter-increment: li-counter;
+
   .svg-building-class
     width: 548px
   .stacked-area-chart

@@ -1,10 +1,11 @@
 Backbone = require "backbone"
 Backbone.$ = $
+_ = require 'underscore'
 moment = require 'moment'
-MapViewBase = require('../../../components/svg-map/base.coffee')
+svgMapView = require('../../../components/svg-map/index.coffee')
 # neighborhoodNames = require('../data/nyc-neighborhood-names.json')
 # threeData = require('../data/display-data.json')
-# topoJSON = require('../data/nyc.json')
+topoJSON = require('../data/north-carolina-2012-districts.json')
 # complaintTypes = require('../data/complaint-types.json')
 
 module.exports.NCView = class NCView extends Backbone.View
@@ -13,40 +14,39 @@ module.exports.NCView = class NCView extends Backbone.View
   mobileWidth: 270
   getWidth: (width) -> if @isMobile then @mobileWidth else width
 
-  ignoredIds: ['99', '98']
-  mapLabel: "311 Reports per 1,000 residents"
-  startingDataset: 'BK60'
-  mapColorMax: 50
+  scale: 2
+  translateX: 280
+  translateY: -100
+  rotate: [80, 0]
 
   initialize: ->
     @isMobile = @$el.width() < 500
-    @renderMap()
+    @renderSvgMap topoJSON, @$('#three-svg')
 
-  renderMap: ->
-    mapview = @mapview = new MapViewBase
-      el: @$el
-      isMobile: @isMobile
-      mapLabel: @mapLabel
-      ignoredIds: @ignoredIds
-      mapColorMax: @mapColorMax
-      $colorKey: $('.three-svg-key')
-      $map: $('#three-svg')
-      $select: $('.select-container')
-      dateFormat: "MMMM, YYYY"
-      dataset: "complaintTally"
-      scale: 1.3
-      translateX: -50
-      translateY: 20
-      data: threeData
-      topoJSON: topoJSON
-      neighborhoodNames: neighborhoodNames
-      rotate: [74 + 700 / 50, -38 - 50 / 60]
+  formatMapHoverText: (hoveredItem, value=-1) =>
+    "District ##{hoveredItem.id}"
 
-    mapview.on 'hover', (params) =>
-      if @mapview.isCholoropleth and @selectData
-        @mapview.updateMapHoverText({id: params.hoverNTA}, @selectHash[params.hoverNTA])
-      else
-        @lineGraph.animateNewArea(params.currentNTA, params.hoverNTA)
+  handleGraphHover: (arg) ->
+    console.log 'hello', arg
+
+  renderSvgMap: (topojson, $el) ->
+    throttledGraphHover = _.throttle @handleGraphHover, 300
+
+    @svgMap = new svgMapView
+      el: $el
+      topojson: topojson
+      key: 'districts'
+      drawLabels: false
+      zoomOnClick: false
+      ignoredIds: false
+      scale: @scale
+      translateX: @translateX
+      translateY: @translateY
+      customMouseEnter: throttledGraphHover
+      height: if @isMobile then 400 else 600
+      width: if @isMobile then 340 else 500
+      formatHoverText: @formatMapHoverText
+      rotate: @rotate
 
 module.exports.init = ->
   new NCView
