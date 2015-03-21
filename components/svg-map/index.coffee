@@ -63,7 +63,7 @@ module.exports = class SvgMap extends Backbone.View
     @setupMouseEvents()
     @drawLabels(g, neighborhoods, path) if @shouldLabel
     @addHoverText(g) if @formatHoverText
-    @addMapTitle g, @label
+    @oaddMapTitle g, @label
 
   isIgnored: (id) ->
     if @ignoredIds
