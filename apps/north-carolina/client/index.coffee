@@ -6,6 +6,7 @@ svgMapView = require('../../../components/svg-map/index.coffee')
 Select = require('../../../components/select/index.coffee')
 topoJSON = require('../data/north-carolina-2012-districts.json')
 points = require('../data/display-data.json')
+Router = require('../../../components/graph-key/router.coffee')
 
 module.exports.NCView = class NCView extends Backbone.View
 
@@ -17,7 +18,7 @@ module.exports.NCView = class NCView extends Backbone.View
   translateX: 280
   translateY: -100
   rotate: [80, 0]
-  mapLabel: "map label"
+  mapLabel: "% of the population"
 
   initialize: ->
     @isMobile = @$el.width() < 500
@@ -25,24 +26,29 @@ module.exports.NCView = class NCView extends Backbone.View
     @reverseColorKey = true
     @$colorKey = @$('.graph-key-container')
     @colorKeyWidth = 100
-    @mapColorMax = 1000
 
     @renderSvgMap topoJSON, @$('#three-svg')
     @renderPoints()
 
-    @colorMap 'Black'
     @renderSelectBox()
+
+    @router = new Router
+      map: @mapView
+      handleSelect: @handleSelectChange
+
+    Backbone.history.start({
+      root: '/north-carolina',
+      pushState: true
+    })
 
   renderSelectBox: ->
     data = {
-      'HS graduate': "Has a High-school degree"
-      'Bachelors degree': "Has a Bachelor's degree"
-      'farming': "Works in Farming"
       "White" : "White"
       "Black" : "Black"
       "Asian" : "Asian"
-      "Other" : "Other Race"
-      "Mixed" : "Mixed Race"
+      # 'HS graduate': "Has a High-school degree"
+      'Bachelors degree': "Has a Bachelor's degree"
+      'farming': "Works in Farming"
       "Have children under 18" : "Have children under 18"
       "65+" : "Over 65"
       "hh below poverty line" : "Housholds Below the poverty line"
@@ -52,9 +58,14 @@ module.exports.NCView = class NCView extends Backbone.View
       "Armed Forces" : "In the Armed Forces"
     }
 
-    selectBox = new Select
+    @selectBox = new Select
       el: $('#three-select')
       data: data
+      includeAll: false
+
+  handleSelectChange: (val) =>
+    @selectBox.$el.val(val)
+    @colorMap val
 
   formatMapHoverText: (hoveredItem, value=-1) =>
     "District ##{hoveredItem.id}"
@@ -73,9 +84,8 @@ module.exports.NCView = class NCView extends Backbone.View
   colorMap: (key) =>
     label = @mapLabel
     data = @getMapColorHash key
-    max = _.max(data, (item) -> item.value).value
     @svgMap.activeId = false
-    @svgMap.colorMap data, 0, max, label, 'circle'
+    @svgMap.colorMap data, 0, 100, label, 'circle'
     @svgMap.updateMapTitle "#{key} - #{label}"
 
   renderPoints: ->

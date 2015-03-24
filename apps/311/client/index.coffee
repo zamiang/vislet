@@ -42,8 +42,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
 
     Backbone.history.start({
       root: '/311',
-      pushState: true,
-      silent: false
+      pushState: true
     })
 
   renderSelectBox: ->

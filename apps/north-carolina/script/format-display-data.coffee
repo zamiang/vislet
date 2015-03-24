@@ -13,8 +13,8 @@ module.exports =
     # "B02001e4": "American Indian Pop"
     "B02001e5": "Asian"
     # "B02001e6": "Pacific Islander Pop"
-    "B02001e7": "Other"
-    "B02001e7": "Mixed"
+    # "B02001e7": "Other"
+    # "B02001e7": "Mixed"
 
     "B09002e1": "Have children under 18"
     "B09017e1": "65+"
