@@ -3,8 +3,8 @@ template = require '../graph-key/linear-key.jade'
 
 module.exports =
 
-  # @param {Array} Array of objects { id: 123, value: 0.5 }
-  colorMap: (data, min, max, label) ->
+  # @param {data} Array of objects { id: 123, value: 0.5 }
+  colorMap: (data, min, max, label, selector='tract') ->
     hash = {}
 
     quantize = @getColorClass min, max
@@ -14,11 +14,11 @@ module.exports =
 
     selectColor = (item) =>
       if color = hash[item.id]
-        "tract #{color}"
+        "#{selector} #{color}"
       else
-        'tract'
+        '#{selector}'
 
-    @svg.selectAll(".tract").attr('class', selectColor)
+    @svg.selectAll(".#{selector}").attr('class', selectColor)
 
     # Only draw once
     if max != @colorMax

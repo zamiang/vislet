@@ -50,6 +50,8 @@ module.exports = class SvgMap extends Backbone.View
 
     projection.scale(scale).translate(translate)
 
+    @projection = projection
+
     g = svg.append("g")
     g.selectAll("path")
       .data(neighborhoods.features)
@@ -60,10 +62,12 @@ module.exports = class SvgMap extends Backbone.View
       .on("click", (d) => @onClick(d, path, g) unless @isIgnored(d.id) )
       .append("title")
 
+    @g = g
+
     @setupMouseEvents()
     @drawLabels(g, neighborhoods, path) if @shouldLabel
     @addHoverText(g) if @formatHoverText
-    @oaddMapTitle g, @label
+    @addMapTitle g, @label
 
   isIgnored: (id) ->
     if @ignoredIds

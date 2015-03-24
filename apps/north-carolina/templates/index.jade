@@ -13,11 +13,15 @@ block body
       .heading A look at Gerrymandering in North Carolina
       .border
     .map-svg-container
+      .select-container.visible
+        label Show areas: 
+        select#three-select
       svg#three-svg.svg-map.red-map
         include ../../../components/svg-map/defs.jade
-     .markdown-text( itemtype="http://schema.org/BlogPosting" )
-        time( datetime="2014-03-29T03:24:00" itemprop="datePublished" ) March 29, 2015
-        h1( itemprop="name headline" ) A look at Gerrymandering in North Carolina
-        div( itemprop="articleBody" )
-          include:md text.md
-        include ../../../components/layout/footer/bio.jade
+      .north-carolina-svg-key.graph-key-container.visible
+    .markdown-text( itemtype="http://schema.org/BlogPosting" )
+      time( datetime="2014-03-29T03:24:00" itemprop="datePublished" ) March 29, 2015
+      h1( itemprop="name headline" ) A look at Gerrymandering in North Carolina
+      div( itemprop="articleBody" )
+        include:md text.md
+      include ../../../components/layout/footer/bio.jade
