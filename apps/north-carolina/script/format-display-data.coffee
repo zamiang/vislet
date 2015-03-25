@@ -7,7 +7,7 @@ module.exports =
   districts: [0..13]
 
   censusKeys:
-    # "B01001e1": "Pop"
+    "B01001e1": "Pop"
     "B02001e2": "White"
     "B02001e3": "Black"
     # "B02001e4": "American Indian Pop"
