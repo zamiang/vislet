@@ -5,6 +5,7 @@ svgMapView = require('../../../components/svg-map/index.coffee')
 Select = require('../../../components/select/index.coffee')
 topoJSON = require('../data/north-carolina-2012-districts.json')
 points = require('../data/display-data.json')
+partyVote = require('../data/cpvi.json')
 Router = require('../../../components/graph-key/router.coffee')
 BarChart = require('./bar.coffee')
 
@@ -21,19 +22,19 @@ module.exports.NCView = class NCView extends Backbone.View
   mapLabel: "% of the population"
 
   displayKeys:
-    "White" : "White"
-    "Black" : "Black"
-    "Asian" : "Asian"
+    "white" : "White"
+    "black" : "Black"
+    "asian" : "Asian"
     # 'HS graduate': "Has a High-school degree"
-    'Bachelors degree': "Has a Bachelor's degree"
+    'bachelors': "Has a Bachelor's degree"
     'farming': "Works in Farming"
-    "Have children under 18" : "Have children under 18"
-    "65+" : "Over 65"
-    "hh below poverty line" : "Housholds Below the poverty line"
-    "Veteran" : "Vetern"
-    "Employed" : "Employed"
-    "Unemployed" : "Unemployed"
-    "Armed Forces" : "In the Armed Forces"
+    "children" : "Have children under 18"
+    "65" : "Over 65"
+    "poverty" : "Housholds Below the poverty line"
+    "veteran" : "Vetern"
+    "employed" : "Employed"
+    "unemployed" : "Unemployed"
+    "armed" : "In the Armed Forces"
 
   initialize: ->
     @isMobile = @$el.width() < 500
@@ -57,14 +58,27 @@ module.exports.NCView = class NCView extends Backbone.View
       handleSelect: @handleSelectChange
       handleOverview: =>
 
-    Backbone.history.start({
-      root: '/north-carolina',
+    Backbone.history.start
+      root: '/north-carolina'
       pushState: true
-    })
 
     @handleSelectChange(@selectBox.$el.val())
 
+   # Input must be sorted in ascending order
+  getColorClass: (min, max) ->
+    d3.scale.quantile()
+      .domain([min, max])
+      .range(d3.range(11).map((i) -> "color#{i}" ))
+
+  getPartyVoteValue: (area) ->
+    value = partyVote[area].split('+')[1]
+    if partyVote[area].split('+')[0] == 'd'
+      value = - value
+    value
+
   renderAreaGraphs: ($el) ->
+    quantize = @getColorClass -25, 25
+
     for key in Object.keys(@displayKeys)
       id = "graph-#{key}"
       $el.append "<svg id=#{id}></svg>"
@@ -73,11 +87,13 @@ module.exports.NCView = class NCView extends Backbone.View
           {
             id: area
             value: @areaTotals[area][key]
+            color: quantize(@getPartyVoteValue(area))
           }
 
       new BarChart
         el: $("##{id}")
         data: data
+        label: "Number of #{@displayKeys[key]}"
 
   renderSelectBox: ->
     @selectBox = new Select
