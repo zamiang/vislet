@@ -1,12 +1,12 @@
 Backbone = require "backbone"
 Backbone.$ = $
 _ = require 'underscore'
-moment = require 'moment'
 svgMapView = require('../../../components/svg-map/index.coffee')
 Select = require('../../../components/select/index.coffee')
 topoJSON = require('../data/north-carolina-2012-districts.json')
 points = require('../data/display-data.json')
 Router = require('../../../components/graph-key/router.coffee')
+BarChart = require('./bar.coffee')
 
 module.exports.NCView = class NCView extends Backbone.View
 
@@ -20,6 +20,21 @@ module.exports.NCView = class NCView extends Backbone.View
   rotate: [80, 0]
   mapLabel: "% of the population"
 
+  displayKeys:
+    "White" : "White"
+    "Black" : "Black"
+    "Asian" : "Asian"
+    # 'HS graduate': "Has a High-school degree"
+    'Bachelors degree': "Has a Bachelor's degree"
+    'farming': "Works in Farming"
+    "Have children under 18" : "Have children under 18"
+    "65+" : "Over 65"
+    "hh below poverty line" : "Housholds Below the poverty line"
+    "Veteran" : "Vetern"
+    "Employed" : "Employed"
+    "Unemployed" : "Unemployed"
+    "Armed Forces" : "In the Armed Forces"
+
   initialize: ->
     @isMobile = @$el.width() < 500
 
@@ -30,37 +45,44 @@ module.exports.NCView = class NCView extends Backbone.View
     @renderSvgMap topoJSON, @$('#three-svg')
     @renderPoints()
 
+    @stateTotals = @getStateTotals()
+    @areaTotals = @getAreaTotals()
+    @renderAreaGraphs @$('.graph-section')
+
     @renderSelectBox()
 
     @router = new Router
-      map: @mapView
+      graphs: []
+      map: { handleNeighborhoodSelect: @handleNeighborhoodSelect }
       handleSelect: @handleSelectChange
+      handleOverview: =>
 
     Backbone.history.start({
       root: '/north-carolina',
       pushState: true
     })
 
-  renderSelectBox: ->
-    data = {
-      "White" : "White"
-      "Black" : "Black"
-      "Asian" : "Asian"
-      # 'HS graduate': "Has a High-school degree"
-      'Bachelors degree': "Has a Bachelor's degree"
-      'farming': "Works in Farming"
-      "Have children under 18" : "Have children under 18"
-      "65+" : "Over 65"
-      "hh below poverty line" : "Housholds Below the poverty line"
-      "Veteran" : "Vetern"
-      "Employed" : "Employed"
-      "Unemployed" : "Unemployed"
-      "Armed Forces" : "In the Armed Forces"
-    }
+    @handleSelectChange(@selectBox.$el.val())
 
+  renderAreaGraphs: ($el) ->
+    for key in Object.keys(@displayKeys)
+      id = "graph-#{key}"
+      $el.append "<svg id=#{id}></svg>"
+      data =
+        for area in [1..13]
+          {
+            id: area
+            value: @areaTotals[area][key]
+          }
+
+      new BarChart
+        el: $("##{id}")
+        data: data
+
+  renderSelectBox: ->
     @selectBox = new Select
       el: $('#three-select')
-      data: data
+      data: @displayKeys
       includeAll: false
 
   handleSelectChange: (val) =>
@@ -86,7 +108,7 @@ module.exports.NCView = class NCView extends Backbone.View
     data = @getMapColorHash key
     @svgMap.activeId = false
     @svgMap.colorMap data, 0, 100, label, 'circle'
-    @svgMap.updateMapTitle "#{key} - #{label}"
+    @svgMap.updateMapTitle "#{label} that is #{key}"
 
   renderPoints: ->
     projection = d3.geo.mercator().rotate @rotate
@@ -122,6 +144,45 @@ module.exports.NCView = class NCView extends Backbone.View
       rotate: @rotate
       $colorKey: @$colorKey
       reverseColorKey: false
+
+  getStateTotals: ->
+    keys = Object.keys(@displayKeys)
+    totals = {}
+
+    for key in keys
+      totals[key] = 0
+
+    for item in points
+      for key in keys
+        totals[key] += item[key]
+
+    totals
+
+  getAreaTotals: ->
+    areas = [1..13]
+    totals = {}
+
+    for area in areas
+      totals[area] = @getTotalsForArea area
+
+    totals
+
+  getTotalsForArea: (area) ->
+    keys = Object.keys(@displayKeys)
+    totals = {}
+
+    for key in keys
+      totals[key] = 0
+
+    for item in points
+      if item.district == String(area)
+        for key in keys
+          totals[key] += item[key]
+
+    totals
+
+  handleNeighborhoodSelect: (area, hoverArea) =>
+    console.log area, hoverArea
 
 module.exports.init = ->
   new NCView

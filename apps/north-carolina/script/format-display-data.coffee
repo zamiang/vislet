@@ -53,5 +53,8 @@ module.exports =
       data['Bachelors degree'] = properties["B15002e15"] + properties["B15002e32"]
       data['farming'] = properties["C24010e31"] + properties["C24010e67"]
 
-      # TODO - Add Points
+      # Remove any decimals to save space
+      for key in Object.keys(data)
+        data[key] = Math.round(data[key])
+
       data

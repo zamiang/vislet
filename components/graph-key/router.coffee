@@ -13,11 +13,16 @@ module.exports = class Router extends Backbone.Router
     @graphs = options.graphs
     @map = options.map
     @handleSelect = options.handleSelect
+    @handleOverview = options.handleOverview
 
   overview: ->
-    @map.colorMap(@map.slider.getValue())
-    @map.updateUI true
+    if @handleOverview
+      @handleOverview()
+    else
+      @map.colorMap(@map.slider.getValue())
+      @map.updateUI true
 
+  # TODO: these should just trigger events and not call methods on passed in objects :-/
   nta: (nta, hover) ->
     for graph in @graphs
       graph.animateNewArea nta, hover
