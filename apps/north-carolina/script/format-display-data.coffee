@@ -47,7 +47,7 @@ module.exports =
         id: properties.GEOID
 
       for key in Object.keys(@censusKeys)
-        data[@censusKeys[key]] = (properties[key] / properties['B01001e1']) * 100
+        data[@censusKeys[key]] = properties[key] # / properties['B01001e1']) * 100
 
       data['HS graduate'] = properties["B15002e11"] + properties["B15002e28"]
       data['Bachelors degree'] = properties["B15002e15"] + properties["B15002e32"]
