@@ -2,12 +2,14 @@ Backbone = require "backbone"
 Backbone.$ = $
 _ = require 'underscore'
 svgMapView = require('../../../components/svg-map/index.coffee')
-Select = require('../../../components/select/index.coffee')
-topoJSON = require('../data/north-carolina-2012-districts.json')
+# topoJSON = require('../data/north-carolina-2012-districts.json')
+topoJSON = require('../data/shortest-splitline.json')
 points = require('../data/display-data.json')
 partyVote = require('../data/cpvi.json')
 Router = require('../../../components/graph-key/router.coffee')
 BarChart = require('./bar.coffee')
+keyTemplate = require '../../../components/graph-key/linear-key.jade'
+optionsTemplate = require('../templates/options.jade')
 
 module.exports.NCView = class NCView extends Backbone.View
 
@@ -26,12 +28,12 @@ module.exports.NCView = class NCView extends Backbone.View
     "black" : "Black"
     "asian" : "Asian"
     # 'HS graduate': "Has a High-school degree"
-    'bachelors': "Has a Bachelor's degree"
-    'farming': "Works in Farming"
-    "children" : "Have children under 18"
+    'bachelors': "with a Bachelor's degree"
+    'farming': "who work in Farming"
+    "children" : "with children under 18"
     "65" : "Over 65"
-    "poverty" : "Housholds Below the poverty line"
-    "veteran" : "Vetern"
+    "poverty" : "of Housholds Below the poverty line"
+    "veteran" : "of Veterns"
     "employed" : "Employed"
     "unemployed" : "Unemployed"
     "armed" : "In the Armed Forces"
@@ -40,7 +42,7 @@ module.exports.NCView = class NCView extends Backbone.View
     @isMobile = @$el.width() < 500
 
     @reverseColorKey = true
-    @$colorKey = @$('.graph-key-container')
+    @$colorKey = @$('.north-carolina-svg-key')
     @colorKeyWidth = 100
 
     @renderSvgMap topoJSON, @$('#three-svg')
@@ -48,9 +50,9 @@ module.exports.NCView = class NCView extends Backbone.View
 
     @stateTotals = @getStateTotals()
     @areaTotals = @getAreaTotals()
-    @renderAreaGraphs @$('.graph-section')
+    @renderAreaGraphs @$('.graph-section .svg-container')
 
-    @renderSelectBox()
+    @renderFilterOptions()
 
     @router = new Router
       graphs: []
@@ -61,8 +63,6 @@ module.exports.NCView = class NCView extends Backbone.View
     Backbone.history.start
       root: '/north-carolina'
       pushState: true
-
-    @handleSelectChange(@selectBox.$el.val())
 
    # Input must be sorted in ascending order
   getColorClass: (min, max) ->
@@ -95,14 +95,36 @@ module.exports.NCView = class NCView extends Backbone.View
         data: data
         label: "Number of #{@displayKeys[key]}"
 
-  renderSelectBox: ->
-    @selectBox = new Select
-      el: $('#three-select')
-      data: @displayKeys
-      includeAll: false
+    @drawAreaGraphsKey @$('.north-carolina-stats-svg-key')
+
+  drawAreaGraphsKey: ($el) ->
+    classes = for num in [0..10]
+      "color#{num}"
+
+    values = for num in [0..10]
+      if num < 1
+        "More Democrat"
+      else if num > 9
+        "More Republican"
+
+    $el.after(keyTemplate(width: 25, classes: classes, values: values, margin: { left: 0}))
+
+  events:
+    "click .option" : "optionClick"
+
+  optionClick: (event) ->
+    $target = $(event.target)
+    val = $target.attr('data-id')
+    @handleSelectChange val
+    false
+
+  renderFilterOptions: ->
+    @$('.options-container').html optionsTemplate(keys: @displayKeys)
 
   handleSelectChange: (val) =>
-    @selectBox.$el.val(val)
+    @$(".options-container .option").removeClass 'active'
+    @$(".options-container .option[data-id=#{val}]").addClass 'active'
+
     @colorMap val
 
   formatMapHoverText: (hoveredItem, value=-1) =>
@@ -124,7 +146,7 @@ module.exports.NCView = class NCView extends Backbone.View
     data = @getMapColorHash key
     @svgMap.activeId = false
     @svgMap.colorMap data, 0, 100, label, 'circle'
-    @svgMap.updateMapTitle "#{label} that is #{key}"
+    @svgMap.updateMapTitle "#{label} #{key}"
 
   renderPoints: ->
     projection = d3.geo.mercator().rotate @rotate

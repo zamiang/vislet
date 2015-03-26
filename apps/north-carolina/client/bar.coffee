@@ -58,9 +58,10 @@ module.exports = class BarChart extends Backbone.View
 
     # Append keys
     bar.append("text")
-      .attr("x", -@marginLeft)
+      .attr('class', 'key-label')
+      .attr("x", -5)
       .attr("y", @barHeight / 2)
       .attr("dy", ".35em")
-      .text((d) => "##{d.id}" )
+      .text((d) => d.id )
 
     @addLabel(chart, @label) if @label

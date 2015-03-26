@@ -13,13 +13,22 @@ block body
       .heading A look at Gerrymandering in North Carolina
       .border
     .map-svg-container
-      .select-container.visible
-        label % population that is: 
-        select#three-select
-      svg#three-svg.svg-map
+      .map-types
+        .map-type Official 2012
+        .map-type Shortest Splitline
+        .map-type Brian Olsen
+      svg#three-svg.svg-map.red-map
         include ../../../components/svg-map/defs.jade
-      .north-carolina-svg-key.graph-key-container.visible
+      .north-carolina-svg-key.graph-key-container.visible.red-map
+      .options-container
     .graph-section.bar-graph-section.political-section
+      .heading-container
+        h1 Politial groups by the numbers
+        p The census purpose stems from helping decide how to apportion the number of members of the House. Here we take a look at some of the census groups to see if they are evenly, or unevenly distributed around the state.
+        p Y axis is the district number (todo label this!)
+      .key-container
+        .north-carolina-stats-svg-key.graph-key-container.visible
+      .svg-container
     .markdown-text( itemtype="http://schema.org/BlogPosting" )
       time( datetime="2014-03-29T03:24:00" itemprop="datePublished" ) March 29, 2015
       h1( itemprop="name headline" ) A look at Gerrymandering in North Carolina
