@@ -1,9 +1,9 @@
 Backbone = require "backbone"
 Backbone.$ = $
 _ = require 'underscore'
-svgMapView = require('../../../components/svg-map/index.coffee')
-# topoJSON = require('../data/north-carolina-2012-districts.json')
-topoJSON = require('../data/shortest-splitline.json')
+svgMapView = require('./map.coffee')
+topoJSON = require('../data/north-carolina-2012-districts.json')
+spltlineTopoJSON = require('../data/shortest-splitline.json')
 points = require('../data/display-data.json')
 partyVote = require('../data/cpvi.json')
 Router = require('../../../components/graph-key/router.coffee')
@@ -27,6 +27,8 @@ module.exports.NCView = class NCView extends Backbone.View
     "white" : "White"
     "black" : "Black"
     "asian" : "Asian"
+    "republican": "republican"
+    "democrat": "democrat"
     # 'HS graduate': "Has a High-school degree"
     'bachelors': "with a Bachelor's degree"
     'farming': "who work in Farming"
@@ -50,6 +52,7 @@ module.exports.NCView = class NCView extends Backbone.View
 
     @stateTotals = @getStateTotals()
     @areaTotals = @getAreaTotals()
+
     @renderAreaGraphs @$('.graph-section .svg-container')
 
     @renderFilterOptions()
@@ -111,11 +114,19 @@ module.exports.NCView = class NCView extends Backbone.View
 
   events:
     "click .option" : "optionClick"
+    "click .map-type" : "mapTypeClick"
 
   optionClick: (event) ->
     $target = $(event.target)
     val = $target.attr('data-id')
     @handleSelectChange val
+    false
+
+  mapTypeClick: (event) ->
+    @$(".map-type").removeClass 'active'
+    $(event.target).addClass 'active'
+
+    Backbone.history.navigate($(event.target).attr('href').replace('/north-carolina', ''), trigger: true)
     false
 
   renderFilterOptions: ->
@@ -219,8 +230,16 @@ module.exports.NCView = class NCView extends Backbone.View
 
     totals
 
+  areaHash:
+    'official-2012': topoJSON
+    'splitline': spltlineTopoJSON
+
   handleNeighborhoodSelect: (area, hoverArea) =>
     console.log area, hoverArea
+    if area != @svgMap.mapType
+      @svgMap.mapType = area
+      @svgMap.drawMap @areaHash[area]
+
 
 module.exports.init = ->
   new NCView

@@ -69,6 +69,12 @@ module.exports = class SvgMap extends Backbone.View
     @addHoverText(g) if @formatHoverText
     @addMapTitle g, @label
 
+  drawMap: (topo) ->
+    neighborhoods = topojson.feature(topo, topo.objects[@key])
+    @g.selectAll('path')
+      .data(neighborhoods.features)
+      .attr("d", d3.geo.path().projection(@projection))
+
   isIgnored: (id) ->
     if @ignoredIds
       for ignoredId in @ignoredIds

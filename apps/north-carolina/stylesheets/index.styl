@@ -7,7 +7,7 @@
   background: url('/images/north-carolina.jpg')
   background-size: cover
   height: 400px
-  width: 1054px
+  width: 1052px
   @media screen and (max-width: 500px)
     width: 340px
     height: 400px
@@ -106,6 +106,41 @@
     vertical-align: top
     margin-top: 43px
     margin-left: 34px
+
+header
+  p.center
+    text-align: center
+    width: 70%
+    margin-left: auto
+    margin-right: auto
+
+.map-svg-container
+  font-size: 18px
+  .heading
+    font-size: 22px
+  .map-types
+    width: 1056px
+    .map-type
+      font-size: 16px
+      text-align: center
+      display: inline-block
+      width: calc(25% - 2px)
+      padding: 4px 0px
+      border: 1px solid $border-color
+      border-right: 0px solid
+      border-bottom: 0px solid
+      cursor: pointer
+      transition: all 0.2s
+      &:last-child
+        border-right: 1px solid $border-color
+        width: calc(25% - 1px)
+      &:hover
+        background: rgba(87, 144, 188, 0.2)
+      &.active
+        background: #5790BC
+        color: white
+        font-weight: bold
+        
 
 .political-section
   .color10

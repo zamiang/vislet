@@ -16,7 +16,7 @@ module.exports =
       if color = hash[item.id]
         "#{selector} #{color}"
       else
-        '#{selector}'
+        "#{selector}"
 
     @svg.selectAll(".#{selector}").attr('class', selectColor)
 

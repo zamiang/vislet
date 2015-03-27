@@ -10,15 +10,17 @@ block body
   #three.map-app
     include ../../../components/layout/header/intro.jade
     header
-      .heading A look at Gerrymandering in North Carolina
+      .heading To Gerrymandering and back again
+      p.center I used to think drawing congressional districts was this totally computer solveable problem. Now&#8230;not so much. This post is about why.
       .border
     .map-svg-container
+      .heading Ways to draw districts
       .map-types
-        .map-type Official 2012
-        .map-type Shortest Splitline
-        .map-type Brian Olsen
+        a.map-type( href="/north-carolina/area/official-2012" ) Official 2012
+        a.map-type( href="/north-carolina/area/official-1930" ) Official 1930
+        a.map-type( href="/north-carolina/area/splitline" ) Shortest Splitline
+        a.map-type( href="/north-carolina/area/brian" ) Brian Olsen
       svg#three-svg.svg-map.red-map
-        include ../../../components/svg-map/defs.jade
       .north-carolina-svg-key.graph-key-container.visible.red-map
       .options-container
     .graph-section.bar-graph-section.political-section
@@ -31,7 +33,7 @@ block body
       .svg-container
     .markdown-text( itemtype="http://schema.org/BlogPosting" )
       time( datetime="2014-03-29T03:24:00" itemprop="datePublished" ) March 29, 2015
-      h1( itemprop="name headline" ) A look at Gerrymandering in North Carolina
+      h1( itemprop="name headline" ) A look at Gerrymandering through the lens of North Carolina
       div( itemprop="articleBody" )
         include:md text.md
       include ../../../components/layout/footer/bio.jade
