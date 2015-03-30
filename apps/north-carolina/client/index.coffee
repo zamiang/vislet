@@ -26,19 +26,13 @@ module.exports.NCView = class NCView extends Backbone.View
   displayKeys:
     "white" : "White"
     "black" : "Black"
-    "asian" : "Asian"
     "republican": "republican"
     "democrat": "democrat"
-    # 'HS graduate': "Has a High-school degree"
     'bachelors': "with a Bachelor's degree"
-    'farming': "who work in Farming"
-    "children" : "with children under 18"
-    "65" : "Over 65"
     "poverty" : "of Housholds Below the poverty line"
     "veteran" : "of Veterns"
     "employed" : "Employed"
     "unemployed" : "Unemployed"
-    "armed" : "In the Armed Forces"
 
   initialize: ->
     @isMobile = @$el.width() < 500
@@ -53,7 +47,7 @@ module.exports.NCView = class NCView extends Backbone.View
     @stateTotals = @getStateTotals()
     @areaTotals = @getAreaTotals()
 
-    @renderAreaGraphs @$('.graph-section .svg-container')
+    # @renderAreaGraphs @$('.graph-section .svg-container')
 
     @renderFilterOptions()
 
@@ -62,6 +56,9 @@ module.exports.NCView = class NCView extends Backbone.View
       map: { handleNeighborhoodSelect: @handleNeighborhoodSelect }
       handleSelect: @handleSelectChange
       handleOverview: =>
+        @handleNeighborhoodSelect('official-2012')
+        @handleSelectChange('white')
+        $('.map-type:first').addClass('active')
 
     Backbone.history.start
       root: '/north-carolina'
@@ -162,6 +159,18 @@ module.exports.NCView = class NCView extends Backbone.View
   renderPoints: ->
     projection = d3.geo.mercator().rotate @rotate
     path = d3.geo.path().projection(projection)
+
+    data = for point in points
+      obj = {
+        point: point.point
+      }
+
+      for key in Object.keys(@displayKeys)
+        point[key] = (point[key] / point.pop) * 100
+
+      obj
+
+    console.log @svgMap
 
     @svgMap.svg.selectAll('circle')
       .data(points)
