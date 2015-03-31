@@ -38,7 +38,21 @@ module.exports =
     "C24010e31": "Male Farming"
     "C24010e67": "Female Farming"
 
-  getData: (features) ->
+  tallyVotesByPrec: (rawVotes) ->
+    votes = {}
+    for vote in rawVotes
+      unless votes[vote.precinct_abbrv]
+        votes[vote.precinct_abbrv] = { REP: 0, DEM: 0, UNA: 0, LIB: 0, total: 0 }
+
+      votes[vote.precinct_abbrv][vote.party_cd] += Number(vote.total_voters)
+      votes[vote.precinct_abbrv].total += Number(vote.total_voters)
+
+    votes
+
+  getData: (features, rawVotes) ->
+    votes = @tallyVotesByPrec rawVotes
+    failTally = 0
+
     formattedData = for feature in features
       if feature.geometry.coordinates
         properties = feature.properties
@@ -51,7 +65,18 @@ module.exports =
           data[@censusKeys[key]] = properties[key] # / properties['B01001e1']) * 100
 
         # data['hs graduate'] = properties["B15002e11"] + properties["B15002e28"]
+        # data['farming'] = properties["C24010e31"] + properties["C24010e67"]
+
         data['bachelors'] = properties["B15002e15"] + properties["B15002e32"]
-        data['farming'] = properties["C24010e31"] + properties["C24010e67"]
+
+        precID = properties.prec_id
+
+        if votes[precID]
+          data.democrat = (votes[precID].DEM / votes[precID].total) * 100
+          data.republican = (votes[precID].REP / votes[precID].total) * 100
+          # data.total = votes[precID].total
+        else
+          failTally++
+          console.log 'fail', precID
 
         data

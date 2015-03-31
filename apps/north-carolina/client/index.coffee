@@ -166,7 +166,8 @@ module.exports.NCView = class NCView extends Backbone.View
       }
 
       for key in Object.keys(@displayKeys)
-        point[key] = (point[key] / point.pop) * 100
+        unless key == 'democrat' or key == 'republican'
+          point[key] = (point[key] / point.pop) * 100
 
       obj
 
