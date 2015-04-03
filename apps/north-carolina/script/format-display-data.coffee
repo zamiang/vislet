@@ -28,15 +28,14 @@ module.exports =
     "B23025e5": "unemployed"
     "B23025e6": "armed"
 
-  combineCensusKeys:
-    "B15002e11": "Male HS graduate"
-    "B15002e28": "Female HS graduate"
+    # "B15002e11": "Male HS graduate"
+    # "B15002e28": "Female HS graduate"
 
-    "B15002e15": "Male Bachelor's degree"
-    "B15002e32": "Female Bachelor's degree"
+    # "B15002e15": "Male Bachelor's degree"
+    # "B15002e32": "Female Bachelor's degree"
 
-    "C24010e31": "Male Farming"
-    "C24010e67": "Female Farming"
+    # "C24010e31": "Male Farming"
+    # "C24010e67": "Female Farming"
 
   tallyVotesByPrec: (rawVotes) ->
     votes = {}
@@ -75,6 +74,7 @@ module.exports =
           data.democrat = (votes[precID].DEM / votes[precID].total) * 100
           data.republican = (votes[precID].REP / votes[precID].total) * 100
           # data.total = votes[precID].total
+
         else
           failTally++
           console.log 'fail', precID
