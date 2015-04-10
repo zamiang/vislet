@@ -138,9 +138,6 @@ module.exports.NCView = class NCView extends Backbone.View
   formatMapHoverText: (hoveredItem, value=-1) =>
     "District ##{hoveredItem.id}"
 
-  handleGraphHover: (arg) ->
-    console.log 'hello', arg
-
   getMapColorHash: (key) ->
     items = for item in points
       {
@@ -243,6 +240,9 @@ module.exports.NCView = class NCView extends Backbone.View
   areaHash:
     'official-2012': topoJSON
     'splitline': spltlineTopoJSON
+
+  handleGraphHover: (arg) ->
+    console.log 'hello', arg
 
   handleNeighborhoodSelect: (area, hoverArea) =>
     console.log area, hoverArea
