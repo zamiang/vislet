@@ -195,7 +195,7 @@ html.wf-active body a
     color: #333
     display: none
 
-.markdown-text
+html.wf-active body .markdown-text
   font-size: 15px
   h1, h2, p
     max-width: 548px
@@ -216,12 +216,24 @@ html.wf-active body a
     display: block
     color: $light-gray
 
+  img
+    min-width: 650px
+
+  a
+    color: rgba(0, 0, 0, 0.8)
+    text-decoration: underline
+
   blockquote
     margin-top: 20px
     margin-top: 10px
     margin-left: 50px
-    padding-left: 15px;
-    border-left: 3px solid #ccc
+    font-size: 25px
+    p
+      max-width: 900px
+      a
+        font-size: 16px
+        color: #AAA
+        text-decoration: none
 
   ol
     list-style-type: none

@@ -1,47 +1,32 @@
 {
-    "name": "Vislet",
-    "version": "0.0.1",
-    "private": true,
-    "scripts": {
-        "start": "make s"
-    },
-    "engines": {
-        "node": "0.12.x"
-    },
-    "dependencies": {
-        "express": "*",
-        "jade": "*",
-        "sharify": "*",
-        "backbone": "*",
-        "underscore": "*",
-        "underscore.string": "*",
-        "marked": "*",
-        "coffee-script": "*",
-        "superagent": "*",
-        "lodash-node": "*",
-        "bucket-assets": "*",
-        "moment": "*",
-        "node-env-file": "*"
-    },
-    "devDependencies": {
-        "hoverintent": "*",
-        "nice-json2csv": "*",
-        "d3": "*",
-        "topojson": "*",
-        "line-by-line": "*",
-        "browserify": "*",
-        "stylus": "*",
-        "nib": "*",
-        "jadeify": "*",
-        "browserify-dev-middleware": "*",
-        "should": "*",
-        "mocha": "*",
-        "sinon": "*",
-        "benv": "*",
-        "zombie": "*",
-        "html5": "*",
-        "sqwish": "*",
-        "uglify-js": "*",
-        "caching-coffeeify": "*"
-    }
+  "name": "Vislet",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "make s"
+  },
+  "engines": {
+    "node": "0.12.x"
+  },
+  "devDependencies": {
+    "jade": "*",
+    "backbone": "*",
+    "underscore": "*",
+    "underscore.string": "*",
+    "marked": "*",
+    "coffee-script": "*",
+    "d3": "*",
+    "stylus": "*",
+    "hoverintent": "*",
+    "moment": "*",
+    "gulp": "*",
+    "gulp-jade": "*",
+    "gulp-stylus": "*",
+    "gulp-concat": "*",
+    "gulp-uglify": "*",
+    "gulp-coffee": "*",
+    "del": "*",
+    "nice-json2csv": "*",
+    "topojson": "*"
+  }
 }
