@@ -128,8 +128,8 @@ gulp.task("publish", ["scripts", "styles", "images", "templates", "compress"], f
 });
 
 gulp.task("watch", function() {
-  gulp.watch(["/apps/**/*.coffee", "/components/**/*.coffee"], ["scripts"]);
-  gulp.watch(["/apps/**/*.styl", "/components/**/*.styl"], ["styles"]);
+  gulp.watch(["./components/**/*.coffee", "./apps/**/*.coffee"], ["scripts"]);
+  gulp.watch(["./apps/**/*.styl", "./components/**/*.styl"], ["styles"]);
   gulp.watch(paths.templates, ["templates"]);
 });
 

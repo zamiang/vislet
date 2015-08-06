@@ -14,7 +14,7 @@ module.exports =
     @$(".tract[data-id=\"#{item.id}\"]").attr('class', 'tract selected')
     @updateMapTitle(@title)
 
-    Backbone.history.navigate("/area/#{item.id}", trigger: true)
+    Backbone.history.navigate("?area=#{item.id}", trigger: true)
 
     if @zoomOnClick
       bounds = path.bounds(item)
@@ -40,7 +40,7 @@ module.exports =
     return if item.id == @activeId
     @hoverText?.text @formatHoverText(item)
     return unless @activeId
-    Backbone.history.navigate("/area/#{@activeId}?hover=#{item.id}", trigger: true)
+    Backbone.history.navigate("?area=#{@activeId}&hover=#{item.id}", trigger: true)
 
   mouseleave: ->
     return unless @activeId

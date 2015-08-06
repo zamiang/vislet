@@ -46,7 +46,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
       handleSelect: @handleSelectChange
 
     Backbone.history.start({
-      root: '/chicago',
+      root: '/chicago/',
       pushState: true,
       silent: false
     })
