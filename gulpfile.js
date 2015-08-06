@@ -12,9 +12,9 @@ var rename = require("gulp-rename");
 var glob = require("glob");
 var es = require("event-stream");
 var imagemin = require('gulp-imagemin');
+var s3 = require('gulp-s3');
 var fs = require('fs');
-
-var awsCredentials = JSON.parse(fs.readFileSync('./aws.json'));
+var server = require('gulp-server-livereload');
 
 var paths = {
   scripts: ["assets/*.coffee"],
@@ -25,6 +25,14 @@ var paths = {
 
 gulp.task("clean", function(cb) {
   del(["dist"], cb);
+});
+
+gulp.task('server', function() {
+  gulp.src('./dist')
+    .pipe(server({
+      livereload: true,
+      open: true
+    }));
 });
 
 gulp.task("scripts", function(done) {
@@ -68,7 +76,6 @@ gulp.task("templates", function() {
       locals: LOCALS
     }))
     .pipe(rename(function (path) {
-      console.log(path.dirname);
       path.dirname = path.dirname.replace("/templates", "");
 
       // Move the home app template to index.html
@@ -86,8 +93,9 @@ gulp.task("images", function() {
 });
 
 gulp.task("publish", function() {
+  var aws = JSON.parse(fs.readFileSync('./aws.json'));
   var options = { headers: {"Cache-Control": "max-age=315360000, no-transform, public"} };
-  gulp.src("./dist/**", { read: false })
+  gulp.src("./dist/**")
     .pipe(s3(aws, options));
 });
 
@@ -97,4 +105,4 @@ gulp.task("watch", function() {
   gulp.watch(paths.templates, ["templates"]);
 });
 
-gulp.task("default", ["clean", "scripts", "styles", "images", "templates"]);
+gulp.task("default", ["scripts", "styles", "images", "templates"]);

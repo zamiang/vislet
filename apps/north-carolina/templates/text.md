@@ -2,7 +2,7 @@ Gerrymandering is is a strange little political practice. It is something that s
 
 ## What is Gerrymandering?
 
-![Wonkblog image explaining Gerrymandering based off reddit post](/images/gerrymandering-explained.jpg)
+![Wonkblog image explaining Gerrymandering based off reddit post](/img/gerrymandering-explained.jpg)
 
 The above illustration is incredible in that it explains gerrymandering so well while, unintentionally, showing why it is nearly impossible to define 'fair' congressional districts. We can all see that number 3 is unfair. But, I would contest, that number 1 is equally unfair. Solution 2 is labeled as 'unfair' but does give red a chance and, by not being homogenous, may create a more balanced political climate within the district. The chart also has labels for 'compactness', hinting that it is important. But, why would 'compactness' be beneficial since it does not make votes more or less fair? In the real world, there are even more factors, like swing voters, races, industries and political interest groups. With so many factors to take into account, it is difficult for people, much less computers, to agree on what makes a 'fair' district. If gerrymandering is bad, what is a fair way to draw congressional districts? If we can define it, could a computer do it and maybe take out some of the human bias?
 
@@ -17,7 +17,7 @@ Perhaps what makes drawing congressional districts so difficult is that it is di
 
 Many engineers try to 'solve' gerrymandering with automated solutions that minimize the irregularity of districts (compactness).  Complex districts act like a sign saying 'someone messed with this'. However, a complex district does not a 'gerrymandered' district make! Complex districts correlate with historic gerrymandering events but, they don't actually cause gerrymandering. Because similar people tend to live in similar areas, it may take complex district lines to distribute groups such that all votes are equal. Jowei Chen and Jonathan Rodden's research [found](http://www-personal.umich.edu/~jowei/florida.pdf) that Democrats generally do worse when districts are compact simple shapes because they tend to congregate in urban areas. Because of this, we may want to throw out this 'compactness' metric, but as usual, there are other things to consider.
 
-![NYTimes image of complex congressional districts](/images/nytimes-districts.jpg)
+![NYTimes image of complex congressional districts](/img/nytimes-districts.jpg)
 > [Bill Marsh, NYTimes](http://www.nytimes.com/interactive/2013/02/03/sunday-review/imbalance-of-power.html)
 
 In the figure above, you can see how districts are complex around the country. In the case of North Carolina, district 12 (shown above) was originally drawn by Democrats to encompass the black population so that they can always get at least get one seat. Automated solutions that focus on compactness would, while eliminating some nefarious gerrymandering, would also eliminate 'good gerrymandering. This may turn out to be a good thing since this 'good gerrymandering' later worked to the Democrats disadvantage. Recently, Republicans further packed the district with Democrats, limiting their influence in the more competitive surrounding districts. Gerrymandering is hard!

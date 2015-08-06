@@ -37,6 +37,8 @@
     "gulp-minify-css": "*",
     "gulp-rename": "*",
     "gulp-imagemin": "*",
+    "gulp-server-livereload": "*",
+    "gulp-s3": "*",
     "jstransformer-marked": "*",
     "del": "*",
     "nice-json2csv": "*",
