@@ -24,6 +24,8 @@ var paths = {
   templates: ["apps/*/templates/index.jade"]
 };
 
+var aws = JSON.parse(fs.readFileSync('./aws.json'));
+
 gulp.task("clean", function(cb) {
   del(["dist"], cb);
 });
@@ -98,8 +100,8 @@ gulp.task("compress", function() {
     .pipe(gulp.dest("./dist"));
 });
 
-gulp.task("publish", ["scripts", "styles", "images", "templates", "compress"], function() {
-  var aws = JSON.parse(fs.readFileSync('./aws.json'));
+// TODO: Combine publish tasks
+gulp.task("publish-html", ['default', 'compress'], function() {
   var options = {
     headers: {
       "Cache-Control": "max-age=315360000, no-transform, public",
@@ -107,24 +109,46 @@ gulp.task("publish", ["scripts", "styles", "images", "templates", "compress"], f
       'charset': 'utf-8'
     }};
 
-  // Upload html
   gulp.src("./dist/*/*.html")
     .pipe(s3(aws, options));
+});
 
-  // Upload JS
+gulp.task("publish-images", ['default', 'compress'], function() {
+  var options = {
+    headers: {
+      "Cache-Control": "max-age=315360000, no-transform, public"
+    }};
+
+  gulp.src("./dist/img/*")
+    .pipe(s3(aws, options));
+});
+
+gulp.task("publish-scripts", ['default', 'compress'], function() {
+  var options = {
+    headers: {
+      "Cache-Control": "max-age=315360000, no-transform, public",
+      'Content-Type': 'application/javascript'
+    }};
+
   options.headers['Content-Type'] = 'application/javascript';
   options.headers['Content-Encoding'] = 'gzip';
 
-  gulp.src("./dist/*/*.js")
+  gulp.src("./dist/js/*.js")
     .pipe(gzip({ append: false }))
     .pipe(s3(aws, options));
+});
 
-  // Upload CSS
-  options.headers['Content-Type'] = 'text/css';
+gulp.task("publish-styles", ['default', 'compress'], function() {
+  var options = {
+    headers: {
+      "Cache-Control": "max-age=315360000, no-transform, public",
+      'Content-Type': 'text/css',
+      'charset': 'utf-8'
+    }};
 
-  gulp.src("./dist/*/*.css")
+  gulp.src("./dist/css/*.css")
     .pipe(gzip({ append: false }))
-     .pipe(s3(aws, options));
+    .pipe(s3(aws, options));
 });
 
 gulp.task("watch", function() {
@@ -134,3 +158,4 @@ gulp.task("watch", function() {
 });
 
 gulp.task("default", ["scripts", "styles", "images", "templates"]);
+gulp.task("publish", ["default", "publish-html", "publish-scripts", "publish-styles", "publish-images"]);
