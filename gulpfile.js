@@ -15,6 +15,7 @@ var imagemin = require('gulp-imagemin');
 var s3 = require('gulp-s3');
 var fs = require('fs');
 var server = require('gulp-server-livereload');
+var gzip = require('gulp-gzip');
 
 var paths = {
   scripts: ["assets/*.coffee"],
@@ -43,7 +44,6 @@ gulp.task("scripts", function(done) {
       return browserify({ entries: [entry] })
         .transform("coffeeify")
         .transform("jadeify")
-        .transform("uglifyify")
         .bundle()
         .pipe(source(entry))
         .pipe(rename({
@@ -92,16 +92,44 @@ gulp.task("images", function() {
     .pipe(gulp.dest("./dist/img"));
 });
 
-gulp.task("publish", function() {
+gulp.task("compress", function() {
+  gulp.src("./dist/*/*.js")
+    .pipe(uglify())
+    .pipe(gulp.dest("./dist"));
+});
+
+gulp.task("publish", ["scripts", "styles", "images", "templates", "compress"], function() {
   var aws = JSON.parse(fs.readFileSync('./aws.json'));
-  var options = { headers: {"Cache-Control": "max-age=315360000, no-transform, public"} };
-  gulp.src("./dist/**")
+  var options = {
+    headers: {
+      "Cache-Control": "max-age=315360000, no-transform, public",
+      'Content-Type': 'text/html',
+      'charset': 'utf-8'
+    }};
+
+  // Upload html
+  gulp.src("./dist/*/*.html")
     .pipe(s3(aws, options));
+
+  // Upload JS
+  options.headers['Content-Type'] = 'application/javascript';
+  options.headers['Content-Encoding'] = 'gzip';
+
+  gulp.src("./dist/*/*.js")
+    .pipe(gzip({ append: false }))
+    .pipe(s3(aws, options));
+
+  // Upload CSS
+  options.headers['Content-Type'] = 'text/css';
+
+  gulp.src("./dist/*/*.css")
+    .pipe(gzip({ append: false }))
+     .pipe(s3(aws, options));
 });
 
 gulp.task("watch", function() {
-  gulp.watch(paths.scripts, ["scripts"]);
-  gulp.watch(paths.styles, ["styles"]);
+  gulp.watch(["/apps/**/*.coffee", "/components/**/*.coffee"], ["scripts"]);
+  gulp.watch(["/apps/**/*.styl", "/components/**/*.styl"], ["styles"]);
   gulp.watch(paths.templates, ["templates"]);
 });
 
