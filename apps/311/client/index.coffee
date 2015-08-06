@@ -78,7 +78,7 @@ module.exports.ThreeView = class ThreeView extends Backbone.View
 
     max = d3.max(selectData, (item) -> item.value)
     @mapview.mapHoverHash = selectHash
-    @mapview.svgMap.colorMap selectData, 0, max, @mapLabel, true
+    @mapview.svgMap.colorMap selectData, 0, max, @mapLabel
     @mapview.svgMap.updateMapTitle "#{@complaintTypesHash[val]} Reports per 1,000 residents"
 
   isIgnored: (id) ->

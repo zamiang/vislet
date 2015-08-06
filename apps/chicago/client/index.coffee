@@ -77,6 +77,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
     selectData = []
     selectHash = {}
+
     for NTA in Object.keys(crimeData)
       unless NTA == "ALL" or @isIgnored(NTA)
         rawData = crimeData[NTA]["crimeType"][val]
@@ -90,7 +91,7 @@ module.exports.ChicagoView = class ChicagoView extends Backbone.View
 
     max = d3.max(selectData, (item) -> item.value)
     @mapview.mapHoverHash = selectHash
-    @mapview.svgMap.colorMap selectData, 0, max, @mapLabel, true
+    @mapview.svgMap.colorMap selectData, 0, max, @mapLabel
     @mapview.svgMap.updateMapTitle "#{@types[val]} per 1,000 residents"
 
   renderMap: ->

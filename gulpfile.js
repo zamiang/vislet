@@ -25,6 +25,7 @@ var paths = {
 };
 
 var aws = JSON.parse(fs.readFileSync('./aws.json'));
+var defaultCacheControl = "max-age=315360000, no-transform, public";
 
 gulp.task("clean", function(cb) {
   del(["dist"], cb);
@@ -33,7 +34,7 @@ gulp.task("clean", function(cb) {
 gulp.task('server', function() {
   gulp.src('./dist')
     .pipe(server({
-      livereload: true,
+      livereload: false, // does not work well
       open: true
     }));
 });
@@ -104,9 +105,8 @@ gulp.task("compress", function() {
 gulp.task("publish-html", ['default', 'compress'], function() {
   var options = {
     headers: {
-      "Cache-Control": "max-age=315360000, no-transform, public",
-      'Content-Type': 'text/html',
-      'charset': 'utf-8'
+      "Cache-Control": defaultCacheControl,
+      'Content-Type': 'text/html'
     }};
 
   gulp.src("./dist/*/*.html")
@@ -116,24 +116,24 @@ gulp.task("publish-html", ['default', 'compress'], function() {
 gulp.task("publish-images", ['default', 'compress'], function() {
   var options = {
     headers: {
-      "Cache-Control": "max-age=315360000, no-transform, public"
+      "Cache-Control": defaultCacheControl
     }};
 
-  gulp.src("./dist/img/*")
+  gulp.src(["./dist/*/*.png","./dist/**/*.jpg"])
     .pipe(s3(aws, options));
 });
 
 gulp.task("publish-scripts", ['default', 'compress'], function() {
   var options = {
     headers: {
-      "Cache-Control": "max-age=315360000, no-transform, public",
+      "Cache-Control": defaultCacheControl,
       'Content-Type': 'application/javascript'
     }};
 
   options.headers['Content-Type'] = 'application/javascript';
   options.headers['Content-Encoding'] = 'gzip';
 
-  gulp.src("./dist/js/*.js")
+  gulp.src("./dist/*/*.js")
     .pipe(gzip({ append: false }))
     .pipe(s3(aws, options));
 });
@@ -141,12 +141,12 @@ gulp.task("publish-scripts", ['default', 'compress'], function() {
 gulp.task("publish-styles", ['default', 'compress'], function() {
   var options = {
     headers: {
-      "Cache-Control": "max-age=315360000, no-transform, public",
+      "Cache-Control": defaultCacheControl,
       'Content-Type': 'text/css',
       'charset': 'utf-8'
     }};
 
-  gulp.src("./dist/css/*.css")
+  gulp.src("./dist/*/*.css")
     .pipe(gzip({ append: false }))
     .pipe(s3(aws, options));
 });

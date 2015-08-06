@@ -19,7 +19,7 @@ module.exports = class Router extends Backbone.Router
     if options.area
       @nta options.area, options.hover
     else if options.type
-      @type options.type
+      @handleType options.type
     else if options.date
       @date options.date
     else
@@ -38,7 +38,7 @@ module.exports = class Router extends Backbone.Router
       graph.animateNewArea nta, hover
     @map.handleNeighborhoodSelect nta, hover
 
-  type: (type) ->
+  handleType: (type) ->
     @handleSelect type
 
   date: (date) ->
