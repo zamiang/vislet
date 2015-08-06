@@ -1,51 +1,100 @@
-var gulp = require('gulp');
-var coffee = require('gulp-coffee');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var del = require('del');
-var jade = require('gulp-jade');
-var stylus = require('gulp-stylus');
+var gulp = require("gulp");
+var coffee = require("gulp-coffee");
+var concat = require("gulp-concat");
+var uglify = require("gulp-uglify");
+var del = require("del");
+var jade = require("gulp-jade");
+var stylus = require("gulp-stylus");
+var minifyCss = require("gulp-minify-css");
+var browserify = require("browserify");
+var source = require("vinyl-source-stream");
+var rename = require("gulp-rename");
+var glob = require("glob");
+var es = require("event-stream");
+var imagemin = require('gulp-imagemin');
+var fs = require('fs');
+
+var awsCredentials = JSON.parse(fs.readFileSync('./aws.json'));
 
 var paths = {
-  scripts: ['assets/*.coffee'],
-  styles: ['assets/*.styl'],
-  templates: ['apps/*/templates/*.jade']
+  scripts: ["assets/*.coffee"],
+  styles: ["assets/*.styl"],
+  images: ["images/*"],
+  templates: ["apps/*/templates/index.jade"]
 };
 
-gulp.task('clean', function(cb) {
-  del(['build'], cb);
+gulp.task("clean", function(cb) {
+  del(["dist"], cb);
 });
 
-gulp.task('scripts', ['clean'], function() {
-  return gulp.src(paths.scripts)
-    .pipe(coffee())
-    .pipe(uglify())
-    .pipe(gulp.dest('build/js'));
+gulp.task("scripts", function(done) {
+  glob(paths.scripts[0], function(err, files) {
+    if (err) done(err);
+
+    var tasks = files.map(function(entry) {
+      return browserify({ entries: [entry] })
+        .transform("coffeeify")
+        .transform("jadeify")
+        .transform("uglifyify")
+        .bundle()
+        .pipe(source(entry))
+        .pipe(rename({
+          extname: ".js",
+          dirname: ""
+        }))
+        .pipe(gulp.dest("./dist/js"));
+    });
+    es.merge(tasks).on("end", done);
+  });
 });
 
-gulp.task('styles', function () {
+gulp.task("styles", function () {
   gulp.src(paths.styles)
     .pipe(stylus())
-    .pipe(gulp.dest('./dist/css'));
+    .pipe(minifyCss())
+    .pipe(gulp.dest("./dist/css"));
 });
 
-gulp.task('templates', function() {
-  var YOUR_LOCALS = {};
+gulp.task("templates", function() {
+  var LOCALS = {
+    JS_EXT: ".js",
+    CSS_EXT: ".css",
+    APP_URL: "http://www.vislet.com",
+    NODE_ENV: process.env.NODE_ENV
+  };
 
   gulp.src(paths.templates)
     .pipe(jade({
-      locals: 'YOUR_LOCALS'
+      locals: LOCALS
     }))
-    .pipe(gulp.dest('./build/'));
+    .pipe(rename(function (path) {
+      console.log(path.dirname);
+      path.dirname = path.dirname.replace("/templates", "");
+
+      // Move the home app template to index.html
+      if (path.dirname == "home") {
+        path.dirname = "";
+      }
+    }))
+    .pipe(gulp.dest("./dist"));
 });
 
-
-// Rerun the task when a file changes
-gulp.task('watch', function() {
-  gulp.watch(paths.scripts, ['scripts']);
-  gulp.watch(paths.styles, ['styles']);
-  gulp.watch(paths.templates, ['templates']);
+gulp.task("images", function() {
+  return gulp.src(paths.images)
+    .pipe(imagemin({optimizationLevel: 5}))
+    .pipe(gulp.dest("./dist/img"));
 });
 
-// The default task (called when you run `gulp` from cli)
-gulp.task('default', ['watch', 'scripts', 'styles','templates']);
+gulp.task("publish", function() {
+  var options = { headers: {"Cache-Control": "max-age=315360000, no-transform, public"} };
+  gulp.src("./dist/**", { read: false })
+    .pipe(s3(aws, options));
+});
+
+gulp.task("watch", function() {
+  gulp.watch(paths.scripts, ["scripts"]);
+  gulp.watch(paths.styles, ["styles"]);
+  gulp.watch(paths.templates, ["templates"]);
+});
+
+gulp.task("default", ["clean", "scripts", "styles", "images", "templates"]);

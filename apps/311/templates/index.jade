@@ -4,23 +4,26 @@ block head
   include meta
 
 append locals
-  - assetPackage = 'brooklyn'
+  - assetPackage = 'three'
 
 block body
-  #brooklyn.map-app
+  #three.map-app
     include ../../../components/layout/header/intro.jade
     header
-      .heading Brooklyn Residential Sales 2003-2014
+      .heading 311 Calls in NYC from 2010-2014
       .border
     .map-svg-container
-      svg#brooklyn-svg.svg-map
+      .select-container.visible
+        label Filter 311 reports: 
+        select#three-select
+      svg#three-svg.svg-map.red-map
         include ../../../components/svg-map/defs.jade
-      .brooklyn-svg-key.graph-key-container.visible
-      a.brooklyn-svg.back.faux-underline-large( href="#" ) Back to overview
-      svg#brooklyn-date-slider.svg-slider.visible( width='500px' )
+      .three-svg-key.red-map.graph-key-container.visible
+      a.three-svg.back.faux-underline-large( href="#" ) Back to overview
+      svg#three-date-slider.svg-slider.visible( width='500px' )
     .svg-graphs
       .graph-help-text
-        | Click on a neighborhood like "Willamsburg" to see how the housing market has changed since 2003.
+        | Click on a neighborhood to see how the residents use 311.
       .svg-graphs-content
         .graph-heading-container
           .selected-neighborhood-name
@@ -33,11 +36,11 @@ block body
             .circle-key.gray
             .graph-heading Borough Average
         .residential-sales.sales-group
-          svg#brooklyn-residential-price-tally.svg-line-graph
-          svg#brooklyn-residential-building-class.stacked-area-chart.svg-building-class
+          svg#three-complaint-tally.svg-line-graph
+          svg#three-complaint-type.stacked-area-chart.svg-building-class
      .markdown-text( itemtype="http://schema.org/BlogPosting" )
-        time( datetime="2014-01-12T03:24:00" itemprop="datePublished" ) January 12, 2015
-        h1( itemprop="name headline" ) How Residential Property Sales can help us better understand changes in Brooklyn
+        time( datetime="2015-01-22T03:24:00" itemprop="datePublished" ) January 22, 2015
+        h1( itemprop="name headline" ) How 311 Data can help us understand NYC
         div( itemprop="articleBody" )
-          include:md text.md
+          include:marked text.md
         include ../../../components/layout/footer/bio.jade
