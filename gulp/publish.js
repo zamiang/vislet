@@ -4,7 +4,7 @@ var gzip = require('gulp-gzip');
 var config = require('./config.js');
 
 // TODO: Combine publish tasks
-gulp.task("publish-html", ['default', 'compress'], function(cb) {
+gulp.task("publish-html", ['assets', 'compress'], function(cb) {
   var options = {
     headers: {
       "Cache-Control": config.defaultCacheControl,
@@ -17,7 +17,7 @@ gulp.task("publish-html", ['default', 'compress'], function(cb) {
     .on('end', cb);
 });
 
-gulp.task("publish-images", ['default', 'compress'], function(cb) {
+gulp.task("publish-images", ['assets', 'compress'], function(cb) {
   var options = {
     headers: {
       "Cache-Control": config.defaultCacheControl
@@ -29,7 +29,7 @@ gulp.task("publish-images", ['default', 'compress'], function(cb) {
     .on('end', cb);
 });
 
-gulp.task("publish-scripts", ['default', 'compress'], function(cb) {
+gulp.task("publish-scripts", ['assets', 'compress'], function(cb) {
   var options = {
     headers: {
       "Cache-Control": config.defaultCacheControl,
@@ -44,7 +44,7 @@ gulp.task("publish-scripts", ['default', 'compress'], function(cb) {
     .on('end', cb);
 });
 
-gulp.task("publish-styles", ['default', 'compress'], function(cb) {
+gulp.task("publish-styles", ['assets', 'compress'], function(cb) {
   var options = {
     headers: {
       "Cache-Control": config.defaultCacheControl,

@@ -10,5 +10,5 @@ module.exports = {
     templates: ["apps/*/templates/index.jade"]
   },
   aws: JSON.parse(fs.readFileSync('./aws.json')),
-  defaultCacheControl: "max-age=315360000, no-transform, public"
+  defaultCacheControl: "max-age=86400, no-transform, public"
 };
