@@ -6,6 +6,7 @@ html
   head
     include head
     block head
+    link( type='text/css', rel='stylesheet', href='/css/app' + CSS_EXT )
     link( type='text/css', rel='stylesheet', href='/css/' + assetPackage + CSS_EXT )
   body
     #main-layout-container
@@ -16,3 +17,4 @@ html
       script( src='/js/' + assetPackage + JS_EXT )
       block scripts
     include ../footer/template
+

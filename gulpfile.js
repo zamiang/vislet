@@ -3,13 +3,15 @@ var server = require('gulp-server-livereload');
 var requireDir = require('require-dir');
 requireDir('./gulp/');
 
-// Commonly used tasks
-gulp.task("watch", function() {
+// Watch for changes with assets
+gulp.task("watch", ['assets'], function() {
   gulp.watch(["./components/**/*.coffee", "./apps/**/*.coffee"], ["scripts"]);
   gulp.watch(["./apps/**/*.styl", "./components/**/*.styl"], ["styles"]);
   gulp.watch(["./apps/*/templates/index.jade"], ["templates"]);
 });
 
-gulp.task("default", ["scripts", "styles", "images", "templates"]);
-gulp.task("publish", ["publish-html", "publish-scripts", "publish-styles", "publish-images"]);
-gulp.task("s", ["server"]);
+// Compile assets
+gulp.task("assets", ["scripts", "styles", "images", "templates"]);
+
+// Gulp deploy:
+gulp.task("deploy", ["clean", "publish-html", "publish-scripts", "publish-styles", "publish-images"]);

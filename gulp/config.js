@@ -2,6 +2,7 @@ var fs = require('fs');
 
 module.exports = {
   dest: './dist',
+  public: "./public",
   paths: {
     scripts: ["assets/*.coffee"],
     styles: ["assets/*.styl"],

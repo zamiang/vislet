@@ -1,15 +1,40 @@
 # Vislet
 
-This is an [Ezel](https://github.com/artsy/ezel) project which allows
-use of Backbone on the client/server for sharing rendering between the
-client/server.
+This is an [Ezel](https://github.com/artsy/ezel) project setup to be a
+static site deployed via [gulp](http://gulpjs.com/) to S3. It serves as an
+example of a workflow for developing static sites that require
+rich interaction.
 
-Run the server with `foreman start`
+## Development workflow
 
-To deploy, create a `.env` file in root and add the respective keys
+To get started:
+- Run the server with `gulp server`
+- In a new tab, run `gulp watch`
+
+./dest contains assets for development
+./public contains assets for production
+
+## Deploying
+
+To deploy, create an `aws.json` file like so
+```json
+{
+  "key": "key",
+  "secret": "secret",
+  "bucket": "www.url.com",
+  "region": "us-east-1"
+}
 ```
-NYC_API_ID=abc
-NYC_API_KEY=123
-S3_KEY=abc
-S3_SECRET=123
-```
+Deploy by running `gulp deploy`
+Gulp deploy will:
+
+1. freshly compile the assets and html files to ./dest
+2. generate asset hash and move to ./public
+3. update references to assets in *.html files and move html files to ./public
+4. compress assets using uglify
+5. upload assets to s3
+
+## TODO
+
+- Gulp should run tests
+- Should auto-deploy on commit via Travis

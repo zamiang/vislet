@@ -15,6 +15,7 @@ node_modules
 dump.rdb
 aws.json
 dist/
+public/
 
 apps/brooklyn/data/brooklyn-sales.json
 apps/brooklyn/data/raw-brooklyn-sales.json

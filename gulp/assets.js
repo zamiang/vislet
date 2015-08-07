@@ -1,7 +1,6 @@
 // Scripts for compiling assets and jade templates
 var gulp = require("gulp");
 var coffee = require("gulp-coffee");
-var uglify = require("gulp-uglify");
 var del = require("del");
 var jade = require("gulp-jade");
 var stylus = require("gulp-stylus");
@@ -22,7 +21,7 @@ var LOCALS = {
 };
 
 gulp.task("clean", function(cb) {
-  del(["dist"], cb);
+  del(["dist", "public"], cb);
 });
 
 gulp.task("scripts", function(done) {
@@ -71,11 +70,4 @@ gulp.task("images", function() {
   return gulp.src(config.paths.images)
     .pipe(imagemin({optimizationLevel: 5}))
     .pipe(gulp.dest(config.dest + "/img"));
-});
-
-gulp.task("compress", ['scripts'], function(cb) {
-  gulp.src(config.dest + "/*/*.js")
-    .pipe(uglify())
-    .pipe(gulp.dest(config.dest))
-    .on('end', cb);
 });
