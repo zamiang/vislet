@@ -13,5 +13,5 @@ gulp.task("watch", ['assets'], function() {
 // Compile assets
 gulp.task("assets", ["scripts", "styles", "images", "templates"]);
 
-// Gulp deploy:
+// Gulp deploy
 gulp.task("deploy", ["clean", "publish-html", "publish-scripts", "publish-styles", "publish-images"]);
