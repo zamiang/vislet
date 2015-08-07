@@ -3,7 +3,7 @@
 This is an [Ezel](https://github.com/artsy/ezel) project setup to be a
 static site deployed via [gulp](http://gulpjs.com/) to S3. It serves as an
 example of a workflow for developing static sites that require
-rich interaction.
+rich interaction and unique asset packages per page.
 
 ## Development workflow
 
