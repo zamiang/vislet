@@ -8,10 +8,12 @@ rich interaction.
 ## Development workflow
 
 To get started:
-- Run the server with `gulp server`
-- In a new tab, run `gulp watch`
+- `$ npm -g install gulp`
+- Run the server with `$ gulp server`
+- In a new tab, run `$ gulp watch`
 
 ./dest contains assets for development
+
 ./public contains assets for production
 
 ## Deploying
@@ -25,14 +27,13 @@ To deploy, create an `aws.json` file like so
   "region": "us-east-1"
 }
 ```
-Deploy by running `gulp deploy`
-Gulp deploy will:
+Deploy by running `gulp deploy`. Gulp deploy will:
 
 1. freshly compile the assets and html files to ./dest
 2. generate asset hash and move to ./public
 3. update references to assets in *.html files and move html files to ./public
 4. compress assets using uglify
-5. upload assets to s3
+5. upload assets and html to s3
 
 ## TODO
 
