@@ -12,7 +12,7 @@ gulp.task("compress", ['scripts', "revision", "revreplace"], function(cb) {
     .on('end', cb);
 });
 
-// move assets to /public/* and give asset hash
+// copy assets to /public/* and attach asset hash to filenames
 gulp.task("revision", ["scripts", "styles"], function() {
   return gulp.src(["./dist/css/*.css", "./dist/js/*.js"], { base: config.dest })
     .pipe(rev())
@@ -21,7 +21,7 @@ gulp.task("revision", ["scripts", "styles"], function() {
     .pipe(gulp.dest(config.dest));
 });
 
-// move html files into /public and edit asset references to include asset hash
+// copy html files into /public and edit asset references to include asset hash
 gulp.task("revreplace", ["revision"], function(){
   var manifest = gulp.src(config.dest + "/rev-manifest.json");
 
