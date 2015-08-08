@@ -12,21 +12,28 @@ body
   font-style: normal
   font-size: 20px
   line-height: 1.6em
-  color: #fff
+  color: transparent
   garamond() 
   a, h1, h2, h1 a, h2 a, h1, h3, h4, h5, h6
-    color: #fff
+    color: transparent
+    transition: color 0.2s ease-in-out
 
 html.wf-active body
-  color: rgba(0,0,0,0.8)
+  color: $default-font-color
   a
     color: #39c
 
   h1, h2, h1 a, h2 a, h1
-    color: #222
+    color: $default-font-color
 
   h3, h4, h5, h6
     color: #494949
+
+  a.faux-underline-large
+    color: $default-font-color
+
+  .faux-underline-large:before
+    border-color: #333
 
 h1, h2, h3, h4, h5, h6
   margin: 0 0 20px
@@ -156,7 +163,7 @@ hr
     height: 1em
     width: 100%
     margin-top: 0.4em
-    border-bottom: 2px solid #333
+    border-bottom: 2px solid transparent
     color: rgb(80, 80, 80)
 
   &:hover
@@ -167,7 +174,6 @@ hr
   font-size: 28px
   text-align: center
   letter-spacing: 2px
-  color: #333
   margin-bottom: 16px
   line-height: 148%
   font-weight: normal
