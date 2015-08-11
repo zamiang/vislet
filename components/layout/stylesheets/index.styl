@@ -35,6 +35,11 @@ html.wf-active body
   .faux-underline-large:before
     border-color: #333
 
+  .faux-underline-hover
+    color: $default-font-color
+    &:before
+      border-color: $border-color
+
 h1, h2, h3, h4, h5, h6
   margin: 0 0 20px
 
@@ -57,16 +62,15 @@ ol
 ol:last-child, p:last-child
   margin-bottom: 0px
 
-h1, h2
+h2
   franklin-gothic()
   line-height: 148%
   font-weight: normal
-  
 
 h1
   font-size: 28px
   text-align: center
-  letter-spacing: 2px
+  letter-spacing: 1px
 
 h2
   font-size: 16px
@@ -147,10 +151,9 @@ hr
 
 #main-layout-container
   height: auto !important
-  //margin-top: 100px
   margin-bottom: 100px
 
-.faux-underline-large
+.faux-underline-large, .faux-underline-hover
   &
     display: inline-block
     position: relative
@@ -164,16 +167,19 @@ hr
     width: 100%
     margin-top: 0.4em
     border-bottom: 2px solid transparent
+    transition: border-color 0.3s
     color: rgb(80, 80, 80)
 
+a.faux-underline-large, .faux-underline-hover
   &:hover
     text-decoration: none
+    &:before
+      border-color: $highlight !important
 
 .heading
-  franklin-gothic()
-  font-size: 28px
+  font-size: 36px
   text-align: center
-  letter-spacing: 2px
+  letter-spacing: 1px
   margin-bottom: 16px
   line-height: 148%
   font-weight: normal
@@ -209,7 +215,7 @@ html.wf-active body .markdown-text
     text-align: left
     margin-top: 20px
     margin-bottom: 6px
-    line-height: 136%
+    line-height: 121%
   h2
     margin-bottom: 5px
     margin-top: 25px
@@ -278,7 +284,7 @@ html.wf-active body .markdown-text
   opacity: 0.1
 
 .graph-help-text
-  top: 415px
+  top: 236px
   width: 376px
   padding: 0px 100px
   position: absolute
@@ -346,6 +352,7 @@ html.wf-active body .markdown-text
     display: inline-block
     width: 541px
     margin-left: 13px
+    position: relative
   .map-svg-container
     display: inline-block
     max-width: 500px

@@ -1,20 +1,26 @@
 html.wf-active body
   .vislet-intro
     font-size: 15px
-    padding: 9px 0px 0px
-    margin-bottom: 60px
+    padding: 11px 0px 0px
+    margin-bottom: 110px
     text-align: center
     a
       color: #555
-      &:hover
-        text-decoration: underline
-    b
+    .items
+      a
+        display: inline-block
+        margin: 0px 20px
+        franklin-gothic()
+        text-transform: uppercase
+        letter-spacing: 2px
+        line-height: 150%
+        color: $default-font-color
+    .title
       color: black
-      franklin-gothic()
       font-weight: normal
       letter-spacing: 1px
-    .small-border
-      width: 360px
-      height: 1px
-      background: #ECECEC
-      margin: 7px auto 0px
+      line-height: 141%
+      font-size: 20px
+      margin-bottom: 10px
+    .about
+      margin: 0px auto 3px
