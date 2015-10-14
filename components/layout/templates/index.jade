@@ -8,7 +8,7 @@ html
     block head
     link( type='text/css', rel='stylesheet', href='/css/app' + CSS_EXT )
     link( type='text/css', rel='stylesheet', href='/css/' + assetPackage + CSS_EXT )
-    include ../templates/google_analytics
+    include ./google_analytics.html
   body
     #main-layout-container
       block body
@@ -19,4 +19,3 @@ html
       block scripts
     include ../footer/template
     script( src='/js/app' + JS_EXT )
-
