@@ -1,4 +1,5 @@
 # Component for coloring the map
+d3 = require 'd3'
 template = require '../graph-key/linear-key.jade'
 
 module.exports =

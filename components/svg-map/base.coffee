@@ -1,3 +1,4 @@
+d3 = require 'd3'
 Backbone = require "backbone"
 _ = require 'underscore'
 moment = require 'moment'

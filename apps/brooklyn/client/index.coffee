@@ -1,3 +1,4 @@
+d3 = require 'd3'
 Backbone = require "backbone"
 Backbone.$ = $
 moment = require 'moment'
@@ -23,6 +24,7 @@ module.exports.BrooklynView = class BrooklynView extends Backbone.View
 
   initialize: ->
     @isMobile = @$el.width() < 500
+
     @renderMap()
     @renderLineGraph()
     @renderBuildingClassGraphs()
