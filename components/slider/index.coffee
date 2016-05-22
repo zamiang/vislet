@@ -18,7 +18,7 @@ module.exports = class DateSlider extends Backbone.View
     @render()
 
   handleSelect: (date) ->
-    Backbone.history.navigate("?date=#{date}", true)
+    Backbone.history.navigate("?date=#{date}", { trigger: true, replace: true })
 
   render: ->
     @x = d3.time.scale().range([0, @width]).clamp(true)

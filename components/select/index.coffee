@@ -22,4 +22,4 @@ module.exports = class SelectBox extends Backbone.View
     @$el
       .html(html)
       .on 'change', =>
-        Backbone.history.navigate("?type=#{@$el.val()}", trigger: true)
+        Backbone.history.navigate("?type=#{@$el.val()}", { trigger: true, replace: true })

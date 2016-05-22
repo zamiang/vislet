@@ -90,7 +90,7 @@ module.exports = class MapViewBase extends Backbone.View
     @svgMap.updateMapTitle "#{moment(date).format(@dateFormat)} - #{label}"
 
   colorMapClick: ->
-    Backbone.history.navigate("", trigger: true)
+    Backbone.history.navigate("", { trigger: true, replace: true })
     false
 
   renderSvgMap: (topojson) ->
