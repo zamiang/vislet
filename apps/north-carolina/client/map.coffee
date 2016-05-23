@@ -6,7 +6,7 @@ module.exports = class SvgMap extends SvgMapView
 
   onClick: (item, path, g) -> return
 
+  # @override
   mouseover: (item) ->
-    Backbone.history.navigate("/area/#{@mapType}?hover=#{item.id}", trigger: true)
-
-    @trigger 'hover', item.id
+    super
+    Backbone.history.navigate("?area=#{@mapType}&hover=#{item.id}", trigger: true)

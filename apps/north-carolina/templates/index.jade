@@ -10,19 +10,22 @@ block body
   #three.map-app
     include ../../../components/layout/header/intro.jade
     header
-      .heading To Gerrymandering and back again
-      p.center I used to think drawing congressional districts was this totally computer solveable problem. Now&#8230;not so much. This post is about why.
+      .heading Gerrymandering in North Carolina
+      p.center Investigating gerymandering in my home state to better understand what 'equal representation' really means.
       .border
     .map-svg-container
       .heading Ways to draw districts
       .map-types
-        a.map-type( href="/north-carolina/area/official-2012" ) Official 2012
-        a.map-type( href="/north-carolina/area/official-1930" ) Official 1930
-        a.map-type( href="/north-carolina/area/splitline" ) Shortest Splitline
-        a.map-type( href="/north-carolina/area/brian" ) Brian Olsen
-      svg#three-svg.svg-map.red-map
-      .north-carolina-svg-key.graph-key-container.visible.red-map
-      .options-container
+        a.map-type( href="/north-carolina?area=official-2012" ) Official 2012
+        a.map-type( href="/north-carolina?area=splitline" ) Shortest Splitline
+        a.map-type( href="/north-carolina?area=brian" ) Brian Olsen
+      .left-section      
+        svg#three-svg.svg-map.red-map
+        .north-carolina-svg-key.graph-key-container.visible.red-map
+        .options-container
+      .right-section
+        .current-area
+          .representation
     .graph-section.bar-graph-section.political-section
       .heading-container
         h1 Politial groups by the numbers

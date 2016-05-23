@@ -1,8 +1,20 @@
 @import '../../../components/layout/stylesheets/stylus_lib.styl'
 
 #three
+  width: 1350px;
   .map-svg-container
     max-width: 100%
+    width: 100%
+    .left-section
+      position: relative
+      display: inline-block
+      vertical-align: top
+      width: 1052px
+    .right-section
+      position: relative
+      display: inline-block
+      vertical-align: top
+      width: 200px
 
 #three-svg
   border: 1px solid $border-color
@@ -142,6 +154,27 @@ header
         background: #5790BC
         color: white
         font-weight: bold
+
+.representation-list
+  padding-left: 20px
+  .small-text
+    font-size: 11px
+  .representation-list__item
+    border-bottom: 1px solid $border-color
+    &:first-child
+      border-top: 1px solid $border-color
+    .representation-list__item__title
+      font-weight: bold
+      text-transform: uppercase
+      font-size: 13px
+      display: inline-block
+      width: 50%
+      text-align: left
+    .representation-list__item__value
+      display: inline-block
+      width: 50%
+      text-align: right
+
         
 
 .political-section

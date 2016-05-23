@@ -1,0 +1,8 @@
+.representation
+  .subheading= "Disctrict # " + disctrictNumber
+  .representation-list
+    for key in keys
+      .representation-list__item
+        .representation-list__item__title= key
+        .representation-list__item__value= percentChange[key]
+  .small-text % difference from state average

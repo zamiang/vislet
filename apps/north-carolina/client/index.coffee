@@ -1,3 +1,4 @@
+d3 = require 'd3'
 Backbone = require "backbone"
 Backbone.$ = $
 _ = require 'underscore'
@@ -9,6 +10,7 @@ partyVote = require('../data/cpvi.json')
 Router = require('../../../components/graph-key/router.coffee')
 BarChart = require('./bar.coffee')
 keyTemplate = require '../../../components/graph-key/linear-key.jade'
+representationTemplate = require '../templates/representation.jade'
 optionsTemplate = require('../templates/options.jade')
 
 module.exports.NCView = class NCView extends Backbone.View
@@ -47,7 +49,7 @@ module.exports.NCView = class NCView extends Backbone.View
     @stateTotals = @getStateTotals()
     @areaTotals = @getAreaTotals()
 
-    # @renderAreaGraphs @$('.graph-section .svg-container')
+    @renderAreaGraphs @$('.graph-section .svg-container')
 
     @renderFilterOptions()
 
@@ -60,9 +62,11 @@ module.exports.NCView = class NCView extends Backbone.View
         @handleSelectChange('white')
         $('.map-type:first').addClass('active')
 
-    Backbone.history.start
+    Backbone.history.start({
       root: '/north-carolina'
       pushState: true
+      silent: false
+    })
 
    # Input must be sorted in ascending order
   getColorClass: (min, max) ->
@@ -135,8 +139,34 @@ module.exports.NCView = class NCView extends Backbone.View
 
     @colorMap val
 
-  formatMapHoverText: (hoveredItem, value=-1) =>
+  formatMapHoverText: (hoveredItem) =>
+    @drawRepresentationForArea hoveredItem.id
     "District ##{hoveredItem.id}"
+
+  drawRepresentationForArea: (areaId) ->
+    if !@representationAverage
+      @representationAverage = {}
+
+      # Total all values for each key
+      for area in Object.keys(@areaTotals)
+        for key in Object.keys(@areaTotals[area])
+          @representationAverage[key] = (@representationAverage[key] || 0) + @areaTotals[area][key]
+
+      # Average them
+      for key in Object.keys(@representationAverage)
+        @representationAverage[key] = @representationAverage[key] / Object.keys(@areaTotals).length
+
+    percentChange = {}
+    for key in Object.keys(@representationAverage)
+      increase = @areaTotals[areaId][key] - @representationAverage[key]
+      change = Math.round((increase / @representationAverage[key]) * 100)
+      percentChange[key] = if change > 0 then "+#{change}%" else "#{change}%"
+
+    @$('.representation').html representationTemplate(
+      disctrictNumber: areaId
+      keys: Object.keys(percentChange)
+      percentChange: percentChange
+    )
 
   getMapColorHash: (key) ->
     items = for item in points
@@ -167,8 +197,6 @@ module.exports.NCView = class NCView extends Backbone.View
           point[key] = (point[key] / point.pop) * 100
 
       obj
-
-    console.log @svgMap
 
     @svgMap.svg.selectAll('circle')
       .data(points)
@@ -233,8 +261,7 @@ module.exports.NCView = class NCView extends Backbone.View
     for item in points
       if item.district == String(area)
         for key in keys
-          totals[key] += item[key]
-
+          totals[key] += (item[key] || 0)
     totals
 
   areaHash:
@@ -245,7 +272,6 @@ module.exports.NCView = class NCView extends Backbone.View
     console.log 'hello', arg
 
   handleNeighborhoodSelect: (area, hoverArea) =>
-    console.log area, hoverArea
     if area != @svgMap.mapType
       @svgMap.mapType = area
       @svgMap.drawMap @areaHash[area]

@@ -1,6 +1,6 @@
-Backbone = require "backbone"
-_ = require 'underscore'
 d3 = require 'd3'
+_ = require 'underscore'
+Backbone = require "backbone"
 
 module.exports = class BarChart extends Backbone.View
 
