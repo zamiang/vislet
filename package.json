@@ -6,7 +6,7 @@
     "start": "make s"
   },
   "engines": {
-    "node": "0.12.x"
+    "node": "16.x.x"
   },
   "devDependencies": {
     "backbone": "*",

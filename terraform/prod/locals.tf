@@ -1,9 +1,9 @@
 locals {
   # Define the Airflow environment name
-  airflow_environment_name = "Sec-Airflow"
+  airflow_environment_name = "Vislet-Airflow"
 
   # Default team tag
-  team_tag = "security-operations"
+  team_tag = "vislet"
 
   # List of bucket names to be used as DAG outputs
   s3_bucket_names = {
@@ -13,28 +13,28 @@ locals {
   # Bucket where airflow DAGS, plugins, and
   # requirements.txt are loaded from
   airflow_dags_s3_bucket_name = {
-    prod = "airflow-data-prod"
+    prod = "vislet-airflow-data-prod"
   }
 
   # Default AWS VPC name to use for airflow
   airflow_vpc_name = {
-    prod = "sec-vpc"
+    prod = "vislet-vpc"
   }
 
   # Default AWS subnet IDs to use for airflow
   airflow_subnet_id_list = {
     prod = [
-      "fake-subnet-0b323342346dfa",
-      "fake-subnet-0b3233631965ca"
+      "subnet-0bfe13e5b68924446",
+      "subnet-0704cd7242004bba8"
     ]
   }
 
   # Override default service tag for data buckets and SQS queues when enabled
-  data_service_tag = "sec-data"
+  data_service_tag = "vislet-data"
 
   # SSM root path for reading parameter store secrets
   # arn:aws:ssm:${region}:${account_id}:parameter/${ssm_parameter_path}/*
-  ssm_parameter_path = "sec-airflow"
+  ssm_parameter_path = "vislet-airflow"
 
   # Enable SQS queues for all Airflow DAG output buckets
   sqs = {

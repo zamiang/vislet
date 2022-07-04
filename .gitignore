@@ -17,12 +17,6 @@ aws.json
 dist/
 public/
 
-apps/brooklyn/data/brooklyn-sales.json
-apps/brooklyn/data/raw-brooklyn-sales.json
-apps/311/data/311-by-neighborhood.json
-apps/311/data/311-by-neighborhood-small.json
-apps/chicago/data/chicago-crimes.json
-apps/chicago/data/crimes.csv
-apps/chicago/data/chicago-crimes-small.json
-apps/north-carolina/data/census-block-by-district.json
-apps/north-carolina/data/vote-tally.json
+.terraform
+.terraform.lock.hcl
+plugins.zip
