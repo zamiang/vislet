@@ -1,5 +1,5 @@
 # Setup for Apache Airflow managed by AWS
-resource "aws_mwaa_environment" "infosec_airflow" {
+resource "aws_mwaa_environment" "vislet" {
   name               = var.airflow_environment_name
   execution_role_arn = var.execution_role_arn
   environment_class  = var.airflow_environment_class

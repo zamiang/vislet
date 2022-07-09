@@ -1,4 +1,4 @@
-# Airflow for Infosec
+# Airflow for Vislet
 
 Use [Airflow](https://airflow.apache.org/) to pull in remote data via API, pub/sub, kinesis, s3, and more.
 Data can be stored using one of multiple outputs such as s3, aurora, postgres etc.

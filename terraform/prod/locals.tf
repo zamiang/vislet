@@ -24,8 +24,8 @@ locals {
   # Default AWS subnet IDs to use for airflow
   airflow_subnet_id_list = {
     prod = [
-      "subnet-0bfe13e5b68924446",
-      "subnet-0704cd7242004bba8"
+      "subnet-06aba32c0ca2807ee",
+      "subnet-0b261865a15c0529b"
     ]
   }
 
