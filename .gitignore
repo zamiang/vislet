@@ -1,22 +1,21 @@
-*.seed
-*.log
-*.csv
-*.dat
-*.out
-*.pid
-*.gz
-.env
-pids
-logs
-results
-npm-debug.log
-node_modules
+# OSX
 .DS_Store
-dump.rdb
-aws.json
-dist/
-public/
 
-.terraform
-.terraform.lock.hcl
-plugins.zip
+# node.js
+node_modules/
+
+dist
+dist.zip
+
+# logs
+*.log
+npm-debug.log*
+
+# idea(s)
+.idea
+
+.cache
+
+.next
+
+.env.local
