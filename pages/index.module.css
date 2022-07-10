@@ -1,0 +1,117 @@
+.postTitle {
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease-in;
+  color: var(--color-text-default);
+  line-height: 1.27;
+  margin-block-start: 24px;
+  font-size: calc(var(--font-size) + 0.75vw);
+  line-height: 1.4;
+  opacity: 1;
+  margin: 0.5em 0 1em;
+}
+
+.postTitle:hover {
+  border-color: var(--color-text-default);
+}
+
+.postDate {
+  color: var(--color-text-gray);
+  margin: 0.5em 0 0.5em;
+}
+
+.postExcerpt {
+  margin: 0.5em 0 1em;
+}
+
+.post {
+  margin: 2em 0 3em;
+}
+
+.posts {
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+}
+
+.section {
+  padding-bottom: 32px;
+  margin-bottom: 32px;
+}
+
+.section:last-child {
+  border-bottom: 0px solid;
+}
+
+.divider {
+  width: 60px;
+  height: 1px;
+  border-top: 1px solid var(--color-text-default);
+  margin: 20px 0 0;
+}
+
+.centerDivider {
+  width: 60px;
+  height: 1px;
+  border-top: 1px solid var(--color-text-default);
+  margin: 40px auto;
+}
+
+.grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-content: flex-start;
+  gap: 46px;
+  margin-top: 2rem;
+}
+
+.gridItem {
+  flex: 46.4% 0;
+  flex-grow: 0;
+}
+
+@media only screen and (max-width: 600px) {
+  .gridItem {
+    flex: 100% 1;
+  }
+}
+
+.photoTitle {
+  margin: 3px 0;
+  min-height: 24px;
+  margin: 0.6em 0 0.4em;
+  font-weight: 200;
+  font-size: calc(var(--font-size) + 0.75vw);
+  line-height: 1.3;
+  white-space: normal;
+}
+
+.photoLink {
+  opacity: 1;
+  border-bottom: 1px solid transparent;
+}
+.photoLink:hover {
+  border-color: var(--color-text-default);
+}
+
+.photoLinkImage {
+  opacity: 1;
+  border-bottom: 1px solid transparent;
+}
+
+.photoLinkImage:hover {
+  opacity: 0.7;
+}
+
+.profilePhoto {
+  background-image: url('/about.jpg');
+  background-size: cover;
+  background-position: center;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  margin: 0px auto;
+}

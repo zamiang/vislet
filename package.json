@@ -2,7 +2,7 @@
   "name": "vislet",
   "version": "0.0.1",
   "private": true,
-  "description": "Small interactive visualizations",
+  "description": "Small interactive visualizations about the cities we live in",
   "homepage": "https://www.vislet.com",
   "repository": "https://github.com/zamiang/vislet",
   "license": "SEE LICENSE IN LICENSE",

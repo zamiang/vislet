@@ -1,0 +1,355 @@
+/* --- Change default colors --- */
+:root {
+  --color-bg-default: #f9f6f0;
+  --color-text-default: rgb(75, 86, 115);
+  --color-text-default-light: #4b5673;
+  --color-text-gray: #959ba9;
+  --font-size: 15px;
+}
+
+/*******************
+ RESET
+ *******************/
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/*******************
+ Core body defaults
+ @see https://hankchizljaw.com/wrote/a-modern-css-reset/
+ *******************/
+body {
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+}
+
+/****************************
+ Generic Margins and Paddings
+ ****************************/
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ul,
+ol,
+li,
+p,
+pre,
+blockquote,
+figure,
+figcaption,
+hr,
+dl,
+dd {
+  margin: 0;
+  padding: 0;
+}
+
+/*******************
+ Lists
+ *******************/
+ul {
+  list-style: none;
+}
+
+/*******************
+ Forms and buttons
+ *******************/
+input,
+textarea,
+select,
+button {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+/* I usually expand input and textarea to full-width */
+input[type='text'],
+textarea {
+  width: 100%;
+}
+
+/* More friendly border */
+input,
+textarea,
+button {
+  border: 1px solid gray;
+}
+
+/* Some defaults for one-liner buttons */
+button {
+  padding: 0.75em 1em;
+  line-height: inherit;
+  border-radius: 0;
+  background-color: transparent;
+}
+
+button * {
+  pointer-events: none;
+}
+
+/***********************************
+ Easy responsive for media elements
+ ***********************************/
+img,
+iframe,
+video,
+object,
+embed {
+  display: block;
+  max-width: 100%;
+}
+
+svg {
+  max-width: 100%;
+}
+
+/*******************
+ Useful table styles
+ *******************/
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/*******************
+ The hidden attribute
+ *******************/
+[hidden] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/*******************
+ Noscript
+ *******************/
+noscript {
+  display: block;
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+/*******************
+ Tabindex
+ *******************/
+[tabindex='-1'] {
+  outline: none !important;
+}
+
+/*******************
+ Remove animations and transitions
+ @see https://hankchizljaw.com/wrote/a-modern-css-reset/
+ *******************/
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*******************
+END  RESET
+ *******************/
+
+html,
+body {
+  margin: 0;
+
+  font-family: Ivar Text, Georgia;
+
+  /* Make the text nice and crisp */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
+
+  /* Improve kerning for good measure */
+  text-rendering: optimizeLegibility;
+  color: var(--color-text-default);
+  font-size: var(--font-size);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-text-default-light);
+  opacity: 0.7;
+  transition: border-color 0.1s ease-in, opacity 0.1s ease-in;
+}
+
+a:hover {
+  opacity: 1;
+}
+
+p {
+  padding: 8px 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1 {
+  line-height: 1.27;
+  margin: 0;
+  margin-block-start: 24px;
+  font-size: calc(var(--font-size) + 0.75vw);
+  line-height: 1.4;
+  font-weight: 700;
+  display: block;
+}
+
+h2 {
+  display: block;
+  margin-block-start: 0.83em;
+  margin-block-end: 0.83em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.25em;
+  text-indent: -0.05em;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: calc(var(--font-size) + 0.5vw);
+}
+
+h3 {
+  margin-top: 1.75rem;
+  font-size: calc(var(--font-size) + 0.25vw);
+  font-weight: 500;
+  margin-bottom: 0.25em;
+}
+
+strong {
+  font-weight: 500;
+}
+
+article {
+  width: 100%;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 150px;
+  margin-bottom: 150px;
+  padding: 20px;
+}
+
+@media only screen and (max-width: 600px) {
+  article {
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+}
+
+figure {
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+  margin: 0px;
+  margin-bottom: 2em;
+  margin-top: 2em;
+  max-width: 100%;
+}
+
+figure img {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+figcaption {
+  text-align: center;
+  padding: 6px 0 0;
+  color: var(--color-text-gray);
+  line-height: 1.7;
+}
+
+/* Fix border colour for captions that contain links */
+figcaption a {
+  opacity: 1;
+  border-color: var(--color-text-gray);
+}
+
+blockquote {
+  display: block;
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  padding-left: 1.5em;
+  border-left: 4px solid #c7cad2;
+  line-height: 1.7;
+}
+
+p {
+  min-height: 20px;
+}
+
+ol,
+ul {
+  margin: 2px 0;
+  padding-inline-start: calc(1.5em + 4px);
+  line-height: 1.5;
+  padding-left: 1.25em;
+  margin-bottom: 0.5em;
+  list-style-type: disc;
+}
+
+li {
+  margin: 2px 0;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  white-space: pre-line;
+}
+
+li a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-text-default-light);
+  opacity: 0.7;
+  transition: border-color 0.1s ease-in, opacity 0.1s ease-in;
+}
+
+li a:hover {
+  opacity: 1;
+}
+
+P {
+  line-height: 1.7;
+}
+
+pre {
+  color: var(--color-text-default);
+  background: #f5f2f0;
+  text-shadow: 0 1px white;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  tab-size: 4;
+  hyphens: none;
+  padding: 1em;
+  margin: 0.5em 0;
+  overflow: auto;
+}
+
+.twitter-tweet {
+  margin-left: auto;
+  margin-right: auto;
+}
