@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "removeComments": false,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "incremental": true
+  },
+  "include": [
+    "./components/**/*.ts",
+    "./components/**/*.tsx",
+    "./lib/**/*.ts",
+    "./pages/**/*.ts",
+    "./pages/**/*.tsx",
+    "@types/**.*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

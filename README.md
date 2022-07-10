@@ -1,44 +1,34 @@
 # Vislet
 
-This is an [Ezel](https://github.com/artsy/ezel) project setup to be a
-static site deployed via [gulp](http://gulpjs.com/) to S3. It serves as an
-example of a workflow for developing static sites that require
-rich interaction and unique asset packages per page.
+This is Nextjs and Airflow project. The frontend is deployed to Vercel and the Airflow portion uses MWAA.
 
 ## Development workflow
 
 To get started:
-- `$ npm -g install gulp`
-- `$ npm install`
-- Run the server with `$ gulp server`
-- In a new tab, run `$ gulp watch`
 
-./dest contains assets for development
+- `$ npm run dev`
 
-./public contains assets for production
+## Deploying for Next.js
 
-## Deploying
+Just merge to master and it auto deploys to vercel.
 
-To deploy, create an `aws.json` file like so
-```json
-{
-  "key": "key",
-  "secret": "secret",
-  "bucket": "www.url.com",
-  "region": "us-east-1"
-}
+## Deploying Airflow
+
+Start an [Amazon MWAA](https://aws.amazon.com/managed-workflows-for-apache-airflow/)
+
+To setup CI, setup [encrypted secrets](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions)
+
 ```
-Deploy by running `gulp deploy`. Deploy will:
-
-1. freshly compile all assets and html files to ./dest
-1. generate asset hash for individual assets
-1. move assets to ./public and rename files to include asset hash
-1. move html files to ./public
-1. update references to assets in *.html
-1. compress assets using uglify
-1. upload assets, images and html to s3
+	AWS_S3_BUCKET
+	AWS_ACCESS_KEY_ID
+  AWS_SECRET_ACCESS_KEY
+```
 
 ## TODO
 
-- Gulp should run tests
-- auto-deploy on commit via Travis
+- Migrate previous apps from coffeescript and D3 "3.5.17" to typescript and recent d3
+- Airflow job
+
+# Airflow
+
+First setup the VPC (https://docs.aws.amazon.com/mwaa/latest/userguide/vpc-create.html) and on page two of the configuration, select 'Create VPC' and select public.
