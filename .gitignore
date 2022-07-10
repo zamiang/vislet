@@ -4,15 +4,13 @@
 # node.js
 node_modules/
 
-dist
-dist.zip
-
 # logs
 *.log
 npm-debug.log*
 
-# idea(s)
-.idea
+__pycache__
+airflow/logs
+.env
 
 .cache
 

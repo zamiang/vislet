@@ -26,8 +26,8 @@ To setup CI, setup [encrypted secrets](https://docs.github.com/en/actions/using-
 
 ## TODO
 
-- Gulp should run tests
-- auto-deploy on commit via Travis
+- Migrate previous apps from coffeescript and D3 "3.5.17" to typescript and recent d3
+- Airflow job
 
 # Airflow
 
