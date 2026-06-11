@@ -1,0 +1,89 @@
+---
+/**
+ * Shared base layout for every Vislet page.
+ *
+ * Ports the legacy Jade shared layout (components/layout/templates/index.jade,
+ * header/intro.jade, footer/bio.jade) and page <head> metadata
+ * (templates/common_head.jade) to a single typed Astro layout. Every migrated
+ * page wraps its content in this.
+ */
+import { config } from '@/lib/config';
+
+import '@/styles/globals.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = config.site.title, description = config.site.description } = Astro.props;
+const canonical = Astro.url.href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={config.site.author} />
+    <link rel="canonical" href={canonical} />
+
+    {/* Open Graph / Twitter — mirrors legacy common_head.jade */}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:description" content={description} />
+
+    <link rel="icon" href="/favicon.ico" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <slot name="head" />
+  </head>
+  <body class="font-sans bg-background text-foreground">
+    <div id="main-layout-container">
+      {/* Shared intro/header — ported from header/intro.jade */}
+      <header class="vislet-intro">
+        <a class="title faux-underline-large" href="/">VISLET</a>
+        <p class="about">
+          Small interactive visualizations to help us understand the cities we live in.
+        </p>
+        <nav class="items">
+          {
+            config.nav.map((item) => (
+              <a class="faux-underline-hover" href={item.href}>
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+      </header>
+
+      <main>
+        <slot />
+      </main>
+
+      {/* Shared footer — ported from footer/bio.jade */}
+      <footer class="author">
+        <span class="written-by-note">Created by</span>
+        <a class="name faux-underline-large" href="https://www.zamiang.com">Brennan Moore</a>
+        <p class="call-to-action">
+          Follow me on Twitter
+          <a class="faux-underline-hover" href="https://twitter.com/zamiang">here</a>.
+        </p>
+        <a class="faux-underline-hover" href="https://github.com/zamiang/vislet">Source</a>
+      </footer>
+    </div>
+  </body>
+</html>

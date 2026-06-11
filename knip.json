@@ -1,0 +1,31 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": ["src/pages/**/*.{ts,astro}", "src/layouts/**/*.astro"],
+  "project": ["src/**/*.{ts,tsx,astro}", "__tests__/**/*.{ts,tsx}"],
+  "ignore": ["src/types/index.ts"],
+  "ignoreDependencies": [
+    "tailwindcss",
+    "d3",
+    "@types/d3",
+    "topojson-client",
+    "@types/topojson-client",
+    "@testing-library/dom",
+    "@testing-library/react"
+  ],
+  "ignoreExportsUsedInFile": {
+    "interface": true,
+    "type": true
+  },
+  "astro": {
+    "entry": ["astro.config.{js,ts,mjs}", "src/pages/**/*.astro", "src/layouts/**/*.astro"]
+  },
+  "vitest": {
+    "entry": ["vitest.config.{js,ts}", "__tests__/**/*.{test,spec}.{ts,tsx}"]
+  },
+  "eslint": {
+    "entry": ["eslint.config.{js,mjs}"]
+  },
+  "postcss": {
+    "entry": ["postcss.config.{js,mjs}"]
+  }
+}
