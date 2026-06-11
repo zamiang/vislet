@@ -1,0 +1,25 @@
+version: 2
+updates:
+  # npm dependencies (root package.json)
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 5
+    groups:
+      # Collapse minor + patch bumps into a single PR to cut noise.
+      npm-minor-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+
+  # GitHub Actions used in workflows
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    groups:
+      actions-minor-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
