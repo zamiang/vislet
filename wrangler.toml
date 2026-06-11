@@ -1,0 +1,7 @@
+# Cloudflare Pages configuration.
+# This site is purely static — no Workers/Functions needed.
+name = "vislet"
+pages_build_output_dir = "dist"
+
+# Build command: `astro build` → output `dist/`.
+# PRs get preview deploys automatically; `master` deploys to production.

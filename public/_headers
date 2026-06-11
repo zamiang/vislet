@@ -1,0 +1,14 @@
+# Security headers for all pages (Cloudflare Pages).
+# Note: Content-Security-Policy is emitted by Astro as a <meta http-equiv> tag
+# (see security.csp in astro.config.mjs); setting it here too would intersect
+# with the meta policy and block Astro's hashed inline scripts.
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Static display data — long cache, immutable.
+/data/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

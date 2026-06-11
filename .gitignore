@@ -1,28 +1,52 @@
-*.seed
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.astro/
+.swc/
+*.tsbuildinfo
+
+# Test / coverage
+coverage/
+
+# Secrets & local config — NEVER commit (see CLAUDE.md security note)
+.env
+.env.*
+!.env.example
+aws.json
+*.credentials
+*.pem
+*.key
+
+# OS / editor
+.DS_Store
 *.log
-*.csv
-*.dat
+*.seed
 *.out
 *.pid
 *.gz
-.env
+npm-debug.log
 pids
 logs
 results
-npm-debug.log
-node_modules
-.DS_Store
 dump.rdb
-aws.json
-dist/
-public/
 
+# Legacy raw source datasets (multi-hundred-MB; processed offline into the
+# committed display JSON). Kept out of git, same as the old build.
+*.csv
+*.dat
 apps/brooklyn/data/brooklyn-sales.json
 apps/brooklyn/data/raw-brooklyn-sales.json
 apps/311/data/311-by-neighborhood.json
 apps/311/data/311-by-neighborhood-small.json
 apps/chicago/data/chicago-crimes.json
-apps/chicago/data/crimes.csv
 apps/chicago/data/chicago-crimes-small.json
 apps/north-carolina/data/census-block-by-district.json
 apps/north-carolina/data/vote-tally.json
+
+# Migrated display data IS committed under public/data/<app>/ and served as
+# static assets by Cloudflare Pages (pending god sign-off on commit-vs-CDN;
+# see outbox query). The 12 MB apps/brooklyn/data/bbl-to-lat-long.json is
+# intentionally NOT under public/ — it must not ship to the client and is
+# pre-joined at build time in Phase 2.3.
