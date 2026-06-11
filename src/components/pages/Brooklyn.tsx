@@ -170,74 +170,75 @@ export function Brooklyn() {
       </header>
 
       <div className="map-row">
-      <div className="map-svg-container">
-        <SvgMap
-          topology={topology as Parameters<typeof SvgMap>[0]['topology']}
-          objectKey="neighborhoods"
-          width={MAP_WIDTH}
-          height={MAP_HEIGHT}
-          scale={1.07}
-          translateX={37}
-          translateY={0}
-          ignoredIds={IGNORED_IDS}
-          colorData={colorData}
-          colorMin={0}
-          colorMax={mapColorMax}
-          selectedId={selectedId}
-          hoveredId={hoveredId ?? undefined}
-          onSelect={(id) => setSelectedId(id ?? DEFAULT_SELECTED_ID)}
-          onHover={setHoveredId}
-          title="Avg Price per SQFT"
-          formatHoverText={formatHoverText}
-        />
-
-        <DateSlider
-          dates={dates}
-          value={selectedDate}
-          onChange={setSelectedDate}
-          width={SLIDER_WIDTH}
-        />
-      </div>
-
-      <div className="svg-graphs">
-        <p className="graph-help-text">
-          Click on a neighborhood like &ldquo;Williamsburg&rdquo; to see how the housing market has
-          changed since 2003.
-        </p>
-        <div className="svg-graphs-content">
-          <div className="graph-heading-container">
-            <div className="selected-neighborhood-name">
-              <span className="circle-key blue" />
-              <span className="graph-heading">{selectedName}</span>
-            </div>
-            <div className="avg-neighborhood-name">
-              <span className="circle-key gray" />
-              <span className="graph-heading">Borough Average</span>
-            </div>
-          </div>
-
-          <LineGraph
-            data={lineData}
-            keys={['residentialPrices', 'residentialPrices-mean']}
-            startingDataset={selectedId}
-            width={CHART_WIDTH}
-            height={CHART_HEIGHT}
-            label="Avg Price per Sqft"
-            yAxisFormat={(v) => `$${v}`}
-            showTooltips
+        <div className="map-svg-container">
+          <SvgMap
+            topology={topology as Parameters<typeof SvgMap>[0]['topology']}
+            objectKey="neighborhoods"
+            width={MAP_WIDTH}
+            height={MAP_HEIGHT}
+            scale={1.07}
+            translateX={37}
+            translateY={0}
+            ignoredIds={IGNORED_IDS}
+            colorData={colorData}
+            colorMin={0}
+            colorMax={mapColorMax}
+            selectedId={selectedId}
+            hoveredId={hoveredId ?? undefined}
+            onSelect={(id) => setSelectedId(id ?? DEFAULT_SELECTED_ID)}
+            onHover={setHoveredId}
+            title="Avg Price per SQFT"
+            formatHoverText={formatHoverText}
           />
 
-          <AreaChart
-            data={areaData}
-            width={CHART_WIDTH}
-            height={CHART_HEIGHT}
-            label="Building Class as % of sales"
-            keyLabel={(abbrev) => buildingClasses[abbrev] ?? abbrev}
-            showTooltips
+          <DateSlider
+            dates={dates}
+            value={selectedDate}
+            onChange={setSelectedDate}
+            width={SLIDER_WIDTH}
           />
         </div>
+
+        <div className="svg-graphs">
+          <p className="graph-help-text">
+            Click on a neighborhood like &ldquo;Williamsburg&rdquo; to see how the housing market
+            has changed since 2003.
+          </p>
+          <div className="svg-graphs-content">
+            <div className="graph-heading-container">
+              <div className="selected-neighborhood-name">
+                <span className="circle-key blue" />
+                <span className="graph-heading">{selectedName}</span>
+              </div>
+              <div className="avg-neighborhood-name">
+                <span className="circle-key gray" />
+                <span className="graph-heading">Borough Average</span>
+              </div>
+            </div>
+
+            <LineGraph
+              data={lineData}
+              keys={['residentialPrices', 'residentialPrices-mean']}
+              startingDataset={selectedId}
+              width={CHART_WIDTH}
+              height={CHART_HEIGHT}
+              label="Avg Price per Sqft"
+              yAxisFormat={(v) => `$${v}`}
+              showTooltips
+            />
+
+            <AreaChart
+              data={areaData}
+              width={CHART_WIDTH}
+              height={CHART_HEIGHT}
+              label="Building Class as % of sales"
+              keyLabel={(abbrev) => buildingClasses[abbrev] ?? abbrev}
+              showTooltips
+            />
+          </div>
+        </div>
       </div>
-      </div>{/* end .map-row */}
+      {/* end .map-row */}
 
       <div className="markdown-text">
         <time dateTime="2014-01-12">January 12, 2015</time>

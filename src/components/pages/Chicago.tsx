@@ -301,78 +301,79 @@ export function Chicago() {
       </header>
 
       <div className="map-row">
-      <div className="map-svg-container">
-        <SvgMap
-          topology={topology as unknown as Parameters<typeof SvgMap>[0]['topology']}
-          objectKey="neighborhoods"
-          width={MAP_WIDTH}
-          height={MAP_HEIGHT}
-          rotate={CHICAGO_ROTATE}
-          scale={0.93}
-          translateX={3}
-          translateY={0}
-          ignoredIds={IGNORED_IDS}
-          colorData={colorData}
-          colorMin={0}
-          colorMax={40}
-          selectedId={selectedId}
-          hoveredId={hoveredId}
-          onSelect={handleSelect}
-          onHover={handleHover}
-          title="Crime Rate per 1,000 Residents"
-          formatHoverText={formatHoverText}
-          reverseColorKey
-          zoomOnClick
-        />
-
-        {selectedType === 'ALL' && sliderDates.length > 0 && (
-          <DateSlider
-            id="chicago-date-slider"
-            dates={sliderDates}
-            value={selectedDate}
-            onChange={handleDateChange}
+        <div className="map-svg-container">
+          <SvgMap
+            topology={topology as unknown as Parameters<typeof SvgMap>[0]['topology']}
+            objectKey="neighborhoods"
             width={MAP_WIDTH}
+            height={MAP_HEIGHT}
+            rotate={CHICAGO_ROTATE}
+            scale={0.93}
+            translateX={3}
+            translateY={0}
+            ignoredIds={IGNORED_IDS}
+            colorData={colorData}
+            colorMin={0}
+            colorMax={40}
+            selectedId={selectedId}
+            hoveredId={hoveredId}
+            onSelect={handleSelect}
+            onHover={handleHover}
+            title="Crime Rate per 1,000 Residents"
+            formatHoverText={formatHoverText}
+            reverseColorKey
+            zoomOnClick
           />
-        )}
-      </div>
 
-      {selectedId && lineData && (
-        <div className="svg-graphs">
-          <div className="graph-header">
-            <h2 className="graph-title">{activeNeighborhoodName}</h2>
-            <button className="graph-back" onClick={() => handleSelect(null)} type="button">
-              Back to overview
-            </button>
-          </div>
-
-          <div className="graph-row">
-            <LineGraph
-              data={lineData}
-              keys={['crimeTally', 'crimeTally-mean']}
-              startingDataset={selectedId}
-              width={GRAPH_WIDTH}
-              height={GRAPH_HEIGHT}
-              label="Crime Tally"
-              keyLabel={lineKeyLabel}
-              showTooltips
+          {selectedType === 'ALL' && sliderDates.length > 0 && (
+            <DateSlider
+              id="chicago-date-slider"
+              dates={sliderDates}
+              value={selectedDate}
+              onChange={handleDateChange}
+              width={MAP_WIDTH}
             />
-          </div>
+          )}
+        </div>
 
-          {areaData && (
+        {selectedId && lineData && (
+          <div className="svg-graphs">
+            <div className="graph-header">
+              <h2 className="graph-title">{activeNeighborhoodName}</h2>
+              <button className="graph-back" onClick={() => handleSelect(null)} type="button">
+                Back to overview
+              </button>
+            </div>
+
             <div className="graph-row">
-              <AreaChart
-                data={areaData}
+              <LineGraph
+                data={lineData}
+                keys={['crimeTally', 'crimeTally-mean']}
+                startingDataset={selectedId}
                 width={GRAPH_WIDTH}
                 height={GRAPH_HEIGHT}
-                label="Crime Type Breakdown"
-                keyLabel={areaKeyLabel}
+                label="Crime Tally"
+                keyLabel={lineKeyLabel}
                 showTooltips
               />
             </div>
-          )}
-        </div>
-      )}
-      </div>{/* end .map-row */}
+
+            {areaData && (
+              <div className="graph-row">
+                <AreaChart
+                  data={areaData}
+                  width={GRAPH_WIDTH}
+                  height={GRAPH_HEIGHT}
+                  label="Crime Type Breakdown"
+                  keyLabel={areaKeyLabel}
+                  showTooltips
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      {/* end .map-row */}
     </div>
   );
 }
