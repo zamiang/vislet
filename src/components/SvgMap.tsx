@@ -11,13 +11,20 @@
  *     state (and the URL `?area=&hover=` contract via `@/lib/url-state`).
  *   - `onSelect(id | null)` / `onHover(id | null)`: events out (replace the
  *     legacy `Backbone.history.navigate("?area=…")` calls).
+ *   - `children(projection)`: optional render-prop receiving the live
+ *     `GeoProjection`. The consumer projects its own `[lng, lat]` points (e.g.
+ *     NC census-tract circles) and returns SVG to overlay ON TOP of the
+ *     choropleth, inside the same zoom group — so overlays share the map's
+ *     projection AND its click-zoom transform. SvgMap never styles these marks.
  *
  * D3 owns the math (`geoMercator` + `geoPath`, fit-to-bounds, `scaleQuantile`);
  * React owns every `<path>`/`<text>`. Click-zoom is a CSS transform on the
  * group (no `d3.select` transition).
  */
 import { geoMercator, geoPath } from 'd3';
+import type { GeoProjection } from 'd3';
 import type { FeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
+import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 import { feature } from 'topojson-client';
 
@@ -62,6 +69,13 @@ export interface SvgMapProps {
   colorKeyWidth?: number;
   /** Animate a zoom-to-feature on selection (legacy default true). */
   zoomOnClick?: boolean;
+  /**
+   * Optional overlay render-prop. Receives the live `GeoProjection` (already
+   * fit to the viewport) so the consumer can project `[lng, lat]` → `[x, y]`
+   * and return SVG (e.g. `<circle>` tract markers) drawn on top of the
+   * choropleth, within the same zoom group. Omit for a plain choropleth.
+   */
+  children?: (projection: GeoProjection) => ReactNode;
 }
 
 const DEFAULT_ROTATE: [number, number] = [74 + 700 / 60, -38 - 50 / 60];
@@ -88,11 +102,12 @@ export function SvgMap({
   reverseColorKey = true,
   colorKeyWidth,
   zoomOnClick = true,
+  children,
 }: SvgMapProps) {
   const isIgnored = (id: string) => ignoredIds.some((ignored) => id.includes(ignored));
 
   // Build the projection + path generator and fit the features to the viewport.
-  const { features, path } = useMemo(() => {
+  const { features, path, projection } = useMemo(() => {
     const objects = (topology as { objects: Record<string, unknown> }).objects;
     const fc = feature(
       topology,
@@ -110,7 +125,7 @@ export function SvgMap({
       (height - fitScale * (bounds[1][1] + bounds[0][1])) / 2 + translateY,
     ];
     projection.scale(fitScale).translate(translate);
-    return { features: fc.features, path: pathGen };
+    return { features: fc.features, path: pathGen, projection };
   }, [topology, objectKey, width, height, rotate, scale, translateX, translateY]);
 
   // Per-id color class from the quantile scale (mirrors `colorMap`).
@@ -171,6 +186,9 @@ export function SvgMap({
               />
             );
           })}
+          {/* Consumer overlay (e.g. projected tract circles), aligned to the
+              same projection and zoomed with the choropleth. */}
+          {children?.(projection)}
         </g>
         {title && (
           <text className="label-text" x={10} y={20}>
