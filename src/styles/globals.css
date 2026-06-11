@@ -38,3 +38,225 @@ body {
 .faux-underline-large {
   text-decoration: none;
 }
+
+/* ==========================================================================
+   Visualization chart + map styles
+   Ported from legacy Stylus per-app stylesheets.
+   ========================================================================== */
+
+/* Choropleth map paths */
+.tract {
+  fill: #ccc;
+  stroke: #fff;
+  stroke-width: 0.5px;
+  cursor: pointer;
+}
+.tract.selected {
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+.tract.park {
+  fill: url(#hatch);
+  cursor: default;
+}
+
+/* 9 choropleth color classes (color0=lightest, color8=darkest red) */
+.tract.color0 {
+  fill: #fee5d9;
+}
+.tract.color1 {
+  fill: #fcbba1;
+}
+.tract.color2 {
+  fill: #fc9272;
+}
+.tract.color3 {
+  fill: #fb6a4a;
+}
+.tract.color4 {
+  fill: #ef3b2c;
+}
+.tract.color5 {
+  fill: #cb181d;
+}
+.tract.color6 {
+  fill: #a50f15;
+}
+.tract.color7 {
+  fill: #67000d;
+}
+.tract.color8 {
+  fill: #40000a;
+}
+
+/* Date slider handle */
+.handle {
+  fill: steelblue;
+  stroke: #fff;
+  stroke-width: 1.5px;
+  cursor: ew-resize;
+}
+
+/* Axis tick/label styles */
+.tick text {
+  font-size: 11px;
+  fill: #555;
+}
+.domain {
+  stroke: #999;
+}
+
+/* Line chart strokes */
+.line {
+  fill: none;
+  stroke-width: 1.5px;
+}
+.trend-area {
+  fill: steelblue;
+  opacity: 0.15;
+}
+
+/* Area chart fills already use inline style from color scale */
+.area {
+  opacity: 0.8;
+}
+
+/* Color key */
+.color-key {
+  display: flex;
+  flex-direction: row;
+}
+.color-key-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10px;
+}
+.color-key-swatch {
+  height: 8px;
+  width: 100%;
+}
+
+/* Map app layout */
+.map-app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+.map-app header {
+  margin-bottom: 16px;
+}
+.map-app header .heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.map-app header .border {
+  border-bottom: 1px solid #333;
+  margin-bottom: 16px;
+}
+.map-svg-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.svg-graphs {
+  margin-top: 24px;
+}
+.graph-help-text {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 12px;
+}
+.graph-heading-container {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 12px;
+  font-size: 0.75rem;
+}
+.circle-key {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+.circle-key.blue {
+  background: steelblue;
+}
+.circle-key.red {
+  background: #d53f50;
+}
+.circle-key.gray {
+  background: lightgray;
+}
+.select-container label {
+  font-size: 0.875rem;
+  margin-right: 8px;
+}
+.markdown-text {
+  max-width: 680px;
+  margin-top: 48px;
+  line-height: 1.7;
+}
+.markdown-text h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.markdown-text h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+.markdown-text p {
+  margin-bottom: 12px;
+}
+.markdown-text img {
+  max-width: 100%;
+  margin: 16px 0;
+}
+.markdown-text blockquote {
+  border-left: 3px solid #ccc;
+  padding-left: 16px;
+  color: #555;
+  margin: 16px 0;
+}
+
+/* Home page */
+.projects {
+  margin-top: 32px;
+}
+.project-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.project {
+  display: block;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+  text-decoration: none;
+  color: inherit;
+}
+.project .title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.project .description {
+  font-size: 0.875rem;
+  color: #555;
+}
+
+/* Back link */
+.back {
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+/* SVG text labels */
+text.label-text,
+text.hover-text {
+  font-size: 11px;
+  fill: #333;
+}

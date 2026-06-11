@@ -1,0 +1,17 @@
+---
+/**
+ * Chicago Crime page — /chicago
+ *
+ * Ports apps/chicago. The React island owns all data fetching, state, and
+ * URL deep-link wiring. BaseLayout supplies the shared header/footer.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { Chicago } from '@/components/pages/Chicago';
+---
+
+<BaseLayout
+  title="Chicago Crime 2003-2014 — Vislet"
+  description="5,712,201 crimes shown across Chicago neighborhoods from 2003 to 2014."
+>
+  <Chicago client:only="react" />
+</BaseLayout>

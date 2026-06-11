@@ -1,0 +1,174 @@
+---
+/**
+ * North Carolina gerrymandering visualization page.
+ *
+ * Ports apps/north-carolina/ to Astro + React. URL contract:
+ *   /north-carolina                            → overview (official-2012, white)
+ *   /north-carolina?area=official-2012         → official districts map
+ *   /north-carolina?area=splitline             → splitline map
+ *   /north-carolina?area=brian                 → shows "not available" message
+ *   /north-carolina?area=<type>&hover=<id>     → hover/selected state
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { NorthCarolina } from '@/components/pages/NorthCarolina';
+---
+
+<BaseLayout
+  title="Gerrymandering in North Carolina — Vislet"
+  description="An interactive look at North Carolina's congressional districts: compare official 2012 boundaries against algorithmic alternatives, colored by demographic and electoral metrics."
+>
+  <NorthCarolina client:only="react" />
+</BaseLayout>
+
+<style>
+  :global(.nc-page) {
+    padding: 1rem 0 3rem;
+  }
+
+  :global(.nc-loading) {
+    padding: 2rem 0;
+    color: #666;
+  }
+
+  :global(.nc-title) {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  :global(.nc-map-type) {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  :global(.nc-map-type-label) {
+    font-weight: 700;
+    margin-right: 0.25rem;
+  }
+
+  :global(.nc-map-link) {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    color: inherit;
+  }
+
+  :global(.nc-map-link--active) {
+    font-weight: 700;
+  }
+
+  :global(.nc-metric-link) {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    color: inherit;
+  }
+
+  :global(.nc-metric-link--active) {
+    font-weight: 700;
+  }
+
+  :global(.nc-sep) {
+    color: #999;
+  }
+
+  :global(.nc-main) {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  :global(.nc-map-col) {
+    flex: 0 0 auto;
+  }
+
+  :global(.nc-metrics) {
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    max-width: 500px;
+    line-height: 1.8;
+  }
+
+  :global(.nc-metrics-label) {
+    font-weight: 700;
+    margin-right: 0.25rem;
+  }
+
+  :global(.nc-chart-col) {
+    flex: 1 1 280px;
+    min-width: 260px;
+  }
+
+  :global(.nc-chart-title) {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  :global(.nc-bar-chart) {
+    display: block;
+    overflow: visible;
+  }
+
+  :global(.nc-bar-group) {
+    transition: opacity 0.15s;
+  }
+
+  :global(.nc-bar-group--selected rect) {
+    stroke: #333;
+    stroke-width: 1.5px;
+  }
+
+  :global(.nc-brian-unavailable) {
+    width: 500px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    color: #666;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  :global(.nc-essay) {
+    margin-top: 2.5rem;
+    max-width: 700px;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  :global(.nc-essay h2) {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  :global(.nc-essay blockquote) {
+    border-left: 3px solid #ccc;
+    margin: 1rem 0 1rem 0;
+    padding: 0.5rem 1rem;
+    color: #555;
+    font-style: italic;
+  }
+
+  :global(.nc-essay cite) {
+    font-style: normal;
+    font-size: 0.85rem;
+  }
+
+  :global(.nc-essay p) {
+    margin-bottom: 0.75rem;
+  }
+</style>

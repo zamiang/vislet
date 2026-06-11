@@ -43,3 +43,54 @@ export interface ColorDatum {
   id: string;
   value: number;
 }
+
+// ─── NC display-data.json ────────────────────────────────────────────────────
+export interface NCCensusTract {
+  id: string;
+  district: string;
+  point: [number, number];
+  pop: number;
+  white: number;
+  black: number;
+  asian: number;
+  children: number;
+  poverty: number;
+  veteran: number;
+  employed: number;
+  unemployed: number;
+  armed: number;
+  bachelors: number;
+  democrat: number;
+  republican: number;
+  [key: string]: unknown;
+}
+
+// ─── Chicago display-data ────────────────────────────────────────────────────
+export interface ChicagoNeighborhoodData {
+  crimeTally: DataPoint[];
+  crimeType: Record<string, DataPoint[]>;
+}
+export type ChicagoData = Record<
+  string,
+  ChicagoNeighborhoodData & { 'crimeTally-mean'?: DataPoint[] }
+>;
+
+// ─── 311 display-data ────────────────────────────────────────────────────────
+export interface ThreeOneOneNeighborhoodData {
+  complaintTally: DataPoint[];
+  complaintType: Record<string, DataPoint[]>;
+}
+export type ThreeOneOneData = Record<
+  string,
+  ThreeOneOneNeighborhoodData & { 'complaintTally-mean'?: DataPoint[] }
+>;
+
+// ─── Brooklyn display-data ───────────────────────────────────────────────────
+export interface BrooklynNeighborhoodData {
+  residentialPrices: DataPoint[];
+  buildingClass: Record<string, DataPoint[]>;
+}
+export type BrooklynData = Record<
+  string,
+  BrooklynNeighborhoodData & { 'residentialPrices-mean'?: DataPoint[] }
+>;
