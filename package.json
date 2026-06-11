@@ -16,7 +16,9 @@
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "data:build": "tsx scripts/etl/build.ts",
+    "data:build:brooklyn": "tsx scripts/etl/brooklyn/build.ts"
   },
   "dependencies": {
     "@astrojs/react": "5.0.7",
@@ -52,6 +54,7 @@
     "postcss": "8.5.15",
     "prettier": "3.8.3",
     "prettier-plugin-astro": "0.14.1",
+    "tsx": "4.20.6",
     "typescript": "6.0.3",
     "typescript-eslint": "8.60.1",
     "vite-tsconfig-paths": "6.1.1",
