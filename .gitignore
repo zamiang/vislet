@@ -15,6 +15,9 @@ coverage/
 .env.*
 !.env.example
 aws.json
+*.credentials
+*.pem
+*.key
 
 # OS / editor
 .DS_Store
