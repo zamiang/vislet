@@ -131,4 +131,16 @@ test.describe('North Carolina page (/north-carolina)', () => {
     await expect(page.locator('svg').first()).toBeVisible();
     expect(getErrors()).toHaveLength(0);
   });
+
+  test('census-tract circles render as SVG circle elements', async ({ page }) => {
+    const getErrors = collectErrors(page);
+    await page.goto('/north-carolina', { waitUntil: 'networkidle' });
+
+    // The overlay renders hundreds of <circle> elements inside the choropleth SVG
+    const circles = page.locator('svg circle');
+    await expect(circles.first()).toBeVisible();
+    const count = await circles.count();
+    expect(count).toBeGreaterThan(100);
+    expect(getErrors()).toHaveLength(0);
+  });
 });

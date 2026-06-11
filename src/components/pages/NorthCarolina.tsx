@@ -5,11 +5,25 @@
  * URL contract: ?area=official-2012|splitline|brian  ?hover=<districtId>
  */
 'use client';
+import { scaleQuantile } from 'd3';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { SvgMap, type SvgMapProps } from '@/components/SvgMap';
 import { parseGraphState, serializeGraphState } from '@/lib/url-state';
 import type { ColorDatum, NCCensusTract } from '@/types';
+
+// Legacy svg-map color0–color8 palette (Spectral, blue→red for low→high)
+const CIRCLE_COLORS = [
+  '#3288bd',
+  '#66c2a5',
+  '#abdda4',
+  '#e6f598',
+  '#ffffbf',
+  '#fee08b',
+  '#fdae61',
+  '#f46d43',
+  '#d53e4f',
+] as const;
 
 type SvgMapTopology = SvgMapProps['topology'];
 
@@ -214,6 +228,19 @@ export function NorthCarolina() {
     [districtData, metric],
   );
 
+  // Per-tract metric value (normalized) + quantile fill color for overlay circles
+  const tractCircleData = useMemo(() => {
+    if (!tracts.length) return [];
+    const vals = tracts.map((t) => {
+      const raw = (t[metric] as number) ?? 0;
+      return POP_NORMALIZED.has(metric) ? (t.pop > 0 ? (raw / t.pop) * 100 : 0) : raw;
+    });
+    const colorScale = scaleQuantile<string>()
+      .domain(vals)
+      .range([...CIRCLE_COLORS]);
+    return tracts.map((t, i) => ({ tract: t, fill: colorScale(vals[i]!) }));
+  }, [tracts, metric]);
+
   if (loading) {
     return (
       <div className="nc-loading">
@@ -278,7 +305,23 @@ export function NorthCarolina() {
                 const cpviStr = cpvi[id] ?? '';
                 return `District ${id}: ${val.toFixed(1)}% ${cpviStr ? `(${cpviStr.toUpperCase()})` : ''}`;
               }}
-            />
+            >
+              {(projection) =>
+                tractCircleData.map(({ tract, fill }) => {
+                  const xy = projection(tract.point as [number, number]);
+                  return xy ? (
+                    <circle
+                      key={tract.id}
+                      cx={xy[0]}
+                      cy={xy[1]}
+                      r={2}
+                      fill={fill}
+                      style={{ pointerEvents: 'none', stroke: 'none' }}
+                    />
+                  ) : null;
+                })
+              }
+            </SvgMap>
           ) : (
             <p>Map data unavailable.</p>
           )}
