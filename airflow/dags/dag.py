@@ -1,14 +1,13 @@
 import datetime
 import pendulum
 import os
-import requests
 from airflow.decorators import dag, task
 from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.providers.postgres.operators.postgres import PostgresOperator
-import pandas as pd
+import pandas
 import boto3
-from io import StringIO
 import io
+import numpy
 
 
 @dag(
@@ -18,6 +17,12 @@ import io
     dagrun_timeout=datetime.timedelta(minutes=60),
 )
 def Etl():
+    list_keys = S3ListOperator(
+        task_id="s3_list_files",
+        bucket='vislet-dags',
+        prefix='data',
+    )
+
     create_sales_table = PostgresOperator(
         task_id="create_sales_table",
         postgres_conn_id="vislet_create_pg_conn",
@@ -37,7 +42,7 @@ def Etl():
             gross_sq_ft INTEGER,
             year_built INTEGER,
             sale_price INTEGER,
-            sale_date DATE,
+            sale_date DATE
         );""",
     )
 
@@ -63,25 +68,27 @@ def Etl():
                 bucket_list.append(file.key)
 
         # Initializing empty list of dataframes
-        converted_df = pd.DataFrame(columns=[
-            'BOROUGH', 'NEIGHBORHOOD', 'BUILDING CLASS CATEGORY', 'TAX CLASS AT PRESENT', 'BLOCK', 'LOT', 'EASE-MENT', 'BUILDING CLASS AT PRESENT', 'ADDRESS', 'APARTMENT NUMBER', 'ZIP CODE', 'RESIDENTIAL UNITS', 'COMMERCIAL UNITS', 'TOTAL UNITS', 'LAND SQUARE FEET', 'GROSS SQUARE FEET', 'YEAR BUILT', 'TAX CLASS AT TIME OF SALE', 'BUILDING CLASS AT TIME OF SALE', 'SALE PRICE', 'SALE DATE'
-        ])
-
         df = []
         for file in bucket_list:
             obj = s3.Object(s3_bucket_name, file)
             data = obj.get()['Body'].read()
-            df.append(pd.read_csv(io.BytesIO(data), header=1,
+            df.append(pandas.read_csv(io.BytesIO(data), header=1,
                       delimiter=",", low_memory=False))
+
+        converted_df = pandas.DataFrame(columns=[
+            'BOROUGH', 'NEIGHBORHOOD', 'BUILDING CLASS CATEGORY', 'TAX CLASS AT PRESENT', 'BLOCK', 'LOT', 'EASE-MENT', 'BUILDING CLASS AT PRESENT', 'ADDRESS', 'APARTMENT NUMBER', 'ZIP CODE', 'RESIDENTIAL UNITS', 'COMMERCIAL UNITS', 'TOTAL UNITS', 'LAND SQUARE FEET', 'GROSS SQUARE FEET', 'YEAR BUILT', 'TAX CLASS AT TIME OF SALE', 'BUILDING CLASS AT TIME OF SALE', 'SALE PRICE', 'SALE DATE'
+        ])
+        for file in df:
+            converted_df1 = pandas.DataFrame(data=file)
+            converted_df = pandas.DataFrame(numpy.concatenate(
+                [converted_df.values, converted_df1.values]), columns=converted_df.columns)
 
         postgres_hook = PostgresHook(postgres_conn_id="vislet_pg_conn")
         conn = postgres_hook.get_conn()
-        cur = conn.cursor()
-        # with open(data_path, "r") as file:
-        #    cur.copy_expert(
-        #        "COPY employees_temp FROM STDIN WITH CSV HEADER DELIMITER AS ',' QUOTE '\"'",
-        #        file,
-        #    )
+
+        df.to_sql('data', con=conn, if_exists='replace',
+                  index=False)
+
         conn.commit()
 
     [create_sales_table] >> get_data()
