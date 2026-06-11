@@ -22,6 +22,13 @@ describe('parseGraphState', () => {
     expect(parseGraphState('?date=1388534400000')).toEqual({ kind: 'date', date: 1388534400000 });
   });
 
+  it('decodes the north-carolina map-type variants (legacy deep-link parity)', () => {
+    for (const type of ['official-2012', 'splitline', 'brian']) {
+      expect(parseGraphState(`?type=${type}`)).toEqual({ kind: 'type', type });
+      expect(serializeGraphState({ kind: 'type', type })).toBe(`type=${type}`);
+    }
+  });
+
   it('honors legacy precedence area > type > date', () => {
     expect(parseGraphState('?area=BK01&type=foo&date=123')).toEqual({
       kind: 'area',

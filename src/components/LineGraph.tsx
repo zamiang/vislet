@@ -21,6 +21,7 @@ import {
 
 import { Axis } from '@/components/Axis';
 import { Legend, type LegendEntry } from '@/components/Legend';
+import { TooltipLayer } from '@/components/TooltipLayer';
 import { type LineGraphData, getFlattenedData, getLines, lineColor, yDomain } from '@/lib/line-chart';
 import type { DataPoint, Margin, Series, TrendPoint } from '@/types';
 
@@ -45,6 +46,8 @@ export interface LineGraphProps {
   displayTrend?: boolean;
   /** When provided, renders a legend; maps a series id/name to its label. */
   keyLabel?: (idOrName: string) => string;
+  /** Render the interactive hover tooltips overlay. */
+  showTooltips?: boolean;
 }
 
 function hasTrend(values: DataPoint[]): values is TrendPoint[] {
@@ -65,6 +68,7 @@ export function LineGraph({
   displayLineLabels = false,
   displayTrend = false,
   keyLabel,
+  showTooltips = false,
 }: LineGraphProps) {
   const flattened = getFlattenedData(data, keys, startingDataset);
   const lines = getLines(flattened, startingDataset).filter((line) => line.values.length > 0);
@@ -118,6 +122,19 @@ export function LineGraph({
             <text className="label-text" x={10} y={5} dy="1em" textAnchor="start">
               {label}
             </text>
+          )}
+
+          {showTooltips && (
+            <TooltipLayer
+              lines={lines}
+              xScale={x}
+              yScale={y}
+              width={width}
+              height={height}
+              value={(p) => p.value}
+              displayValue={(p) => p.value}
+              color={lineColor}
+            />
           )}
         </g>
       </svg>

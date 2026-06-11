@@ -9,6 +9,7 @@ import { area as d3area, curveCardinal, curveLinear, extent, format, scaleLinear
 
 import { Axis } from '@/components/Axis';
 import { Legend, type LegendEntry } from '@/components/Legend';
+import { TooltipLayer } from '@/components/TooltipLayer';
 import { type AreaData, type AreaPoint, CATEGORY_20C, areaYMax, stackAreaSeries } from '@/lib/area-chart';
 import type { Margin } from '@/types';
 
@@ -32,6 +33,10 @@ export interface AreaChartProps {
   label?: string;
   /** When provided, renders a legend mapping a series name to its label. */
   keyLabel?: (name: string) => string;
+  /** Tooltip value suffix (legacy `tooltipFormat`, default `" %"`). */
+  tooltipFormat?: string;
+  /** Render the interactive hover tooltips overlay. */
+  showTooltips?: boolean;
 }
 
 export function AreaChart({
@@ -45,6 +50,8 @@ export function AreaChart({
   computeYDomain = false,
   label,
   keyLabel,
+  tooltipFormat,
+  showTooltips = false,
 }: AreaChartProps) {
   const series = stackAreaSeries(data, ignoredIds);
   const color = scaleOrdinal<string, string>()
@@ -87,6 +94,20 @@ export function AreaChart({
             <text className="label-text" x={10} y={margin.top} textAnchor="start">
               {label}
             </text>
+          )}
+
+          {showTooltips && (
+            <TooltipLayer
+              lines={series}
+              xScale={x}
+              yScale={y}
+              width={width}
+              height={height}
+              value={(p: AreaPoint) => p.y0 + p.y}
+              displayValue={(p: AreaPoint) => p.y}
+              suffix={tooltipFormat}
+              color={color}
+            />
           )}
         </g>
       </svg>

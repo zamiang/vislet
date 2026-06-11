@@ -27,7 +27,7 @@ export interface TrendPoint extends DataPoint {
 }
 
 /** One rendered line/series: a name, the points, and an optional display id. */
-export interface Series<P extends DataPoint = DataPoint> {
+export interface Series<P extends { date: number } = DataPoint> {
   /** Series key (e.g. neighborhood name, or `…-mean`). */
   name: string;
   /** Optional display id (e.g. dataset name, or `"Borough Average"`). */
