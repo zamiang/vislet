@@ -206,6 +206,7 @@ export function ThreeOneOne() {
         <div className="border" />
       </header>
 
+      <div className="map-row">
       <div className="map-svg-container">
         <div className="select-container visible" style={{ marginBottom: '8px' }}>
           <label htmlFor="three-select">Filter 311 reports: </label>
@@ -286,6 +287,7 @@ export function ThreeOneOne() {
           />
         </div>
       </div>
+      </div>{/* end .map-row */}
 
       <div className="markdown-text">
         <time dateTime="2015-01-22">January 22, 2015</time>

@@ -9,8 +9,11 @@
   --color-foreground: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
-  --font-sans: 'Lato', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+  /* EB Garamond ≈ Adobe Garamond Pro (legacy body); Libre Franklin ≈ Franklin Gothic URW (legacy nav/labels) */
+  --font-body: 'EB Garamond', Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-heading: 'Libre Franklin', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  --font-sans: var(--font-heading);
+  --font-serif: var(--font-body);
 }
 
 :root {
@@ -28,15 +31,133 @@ html {
 
 body {
   margin: 0;
+  font-family: var(--font-body);
+  font-size: 20px;
+  line-height: 1.6em;
+  letter-spacing: 0.01rem;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.8);
 }
 
-/* Legacy "faux underline" affordance, ported from components/layout styles. */
+/* Faux-underline affordance — ported from components/layout/stylesheets */
+.faux-underline-large,
 .faux-underline-hover {
+  display: inline-block;
+  position: relative;
   text-decoration: none;
-  border-bottom: 1px solid currentColor;
 }
-.faux-underline-large {
-  text-decoration: none;
+.faux-underline-large::before,
+.faux-underline-hover::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  display: inline-block;
+  height: 1em;
+  width: 100%;
+  margin-top: 0.4em;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+.faux-underline-large::before {
+  border-color: #333;
+}
+.faux-underline-large:hover::before,
+.faux-underline-hover:hover::before,
+.faux-underline-hover.active::before {
+  border-color: steelblue;
+}
+
+/* ---- vislet-intro header ---- */
+.vislet-intro {
+  font-size: 15px;
+  padding: 11px 0 0;
+  margin-bottom: 80px;
+  text-align: center;
+}
+.vislet-intro a {
+  color: #555;
+}
+.vislet-intro .title {
+  color: black;
+  font-weight: normal;
+  letter-spacing: 1px;
+  line-height: 141%;
+  font-size: 20px;
+  margin-bottom: 10px;
+  font-family: var(--font-heading);
+}
+.vislet-intro .about {
+  margin: 0 auto 3px;
+  font-family: var(--font-body);
+}
+.vislet-intro .items {
+  margin-top: 6px;
+}
+.vislet-intro .items a {
+  display: inline-block;
+  margin: 0 20px;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  line-height: 150%;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+/* ---- author / footer bio ---- */
+.author {
+  border-top: 1px solid #f2f2f2;
+  text-align: center;
+  font-size: 20px;
+  margin: 60px auto 0;
+  padding-top: 20px;
+}
+.author .written-by-note {
+  font-family: var(--font-heading);
+  line-height: 148%;
+  font-weight: normal;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 13px;
+  margin-top: 26px;
+  margin-bottom: 10px;
+}
+.author .portrait {
+  border-radius: 50%;
+  border: 3px solid #fff;
+  background: #fff;
+  height: 200px;
+  width: 200px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+.author .portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.author .name {
+  font-size: 28px;
+  font-family: var(--font-heading);
+  letter-spacing: 2px;
+  margin-bottom: 28px;
+  line-height: 148%;
+  font-weight: normal;
+  color: rgba(0, 0, 0, 0.8);
+}
+.author .info {
+  margin-bottom: 21px;
+}
+.author .call-to-action {
+  font-family: var(--font-body);
+  margin: 0 auto;
+}
+.author .border {
+  width: 30px;
+  margin: 16px auto;
+  background: #333;
+  height: 2px;
+  display: block;
 }
 
 /* ==========================================================================
@@ -137,31 +258,60 @@ body {
   width: 100%;
 }
 
-/* Map app layout */
+/* Map app layout — legacy used width: 1054px centered */
 .map-app {
-  max-width: 960px;
+  width: 1054px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0;
 }
 .map-app header {
   margin-bottom: 16px;
+  text-align: center;
 }
 .map-app header .heading {
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: normal;
+  font-family: var(--font-body);
   margin-bottom: 8px;
+  text-align: center;
 }
 .map-app header .border {
-  border-bottom: 1px solid #333;
-  margin-bottom: 16px;
+  width: 30px;
+  height: 2px;
+  background: #333;
+  margin: 0 auto 16px;
 }
+
+/* Side-by-side map + charts row (Brooklyn, 311) */
+.map-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 13px;
+}
+.map-row .map-svg-container {
+  flex: 0 0 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.map-row .svg-graphs {
+  flex: 0 0 541px;
+}
+/* Chicago uses narrower chart panel (450px) — override via the map-app direct child */
+.map-row > .svg-graphs {
+  flex-basis: auto;
+  flex-grow: 1;
+}
+
+/* Chicago: map-svg-container is the whole content area */
 .map-svg-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 .svg-graphs {
-  margin-top: 24px;
+  margin-top: 0;
 }
 .graph-help-text {
   font-size: 0.875rem;
@@ -173,6 +323,9 @@ body {
   gap: 24px;
   margin-bottom: 12px;
   font-size: 0.75rem;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 .circle-key {
   display: inline-block;
@@ -224,28 +377,70 @@ body {
   margin: 16px 0;
 }
 
-/* Home page */
+/* Home page — centered column, legacy: max-width 800px, margin: 0 auto */
+#home {
+  margin-top: 50px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#home header {
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+#home .heading {
+  font-size: 36px;
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+  line-height: 148%;
+  font-weight: normal;
+  font-family: var(--font-heading);
+}
+#home .sub-heading {
+  text-align: center;
+  margin-bottom: 21px;
+  font-family: var(--font-body);
+}
+
+/* Legacy .projects within #home */
 .projects {
-  margin-top: 32px;
+  max-width: 600px;
+  margin: 0 auto 80px;
 }
 .project-title {
-  font-weight: 700;
-  margin-bottom: 8px;
+  margin: 80px 0 0;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 2px;
+  font-weight: normal;
+  font-size: 1rem;
+}
+.projects > .border {
+  width: 30px;
+  height: 2px;
+  background: #333;
+  margin: 8px auto 30px;
+  display: block;
 }
 .project {
   display: block;
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
+  margin: 40px 0;
   text-decoration: none;
   color: inherit;
 }
 .project .title {
-  font-weight: 600;
-  margin-bottom: 4px;
+  font-size: 26px;
+  line-height: 160%;
+  font-family: var(--font-body);
 }
 .project .description {
-  font-size: 0.875rem;
-  color: #555;
+  margin-top: 2px;
+  font-size: 20px;
+  line-height: 148%;
+  font-family: var(--font-body);
 }
 
 /* Back link */

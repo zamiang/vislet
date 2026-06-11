@@ -24,59 +24,27 @@ const projects = [
     name: 'Chicago Crime',
     description: '5,712,201 crimes in shown across the city of Chicago from 2003 to 2014.',
   },
+  {
+    href: '/north-carolina',
+    name: 'North Carolina Districts',
+    description: 'Investigating gerrymandering to better understand what "equal representation" really means.',
+  },
 ];
 ---
 
 <BaseLayout>
-  <section class="featured-projects">
-    <h2 class="section-title">Featured Projects</h2>
-    <ul class="project-list">
+  <div id="home">
+    <div class="projects">
+      <div class="project-title">Featured Projects</div>
+      <div class="border"></div>
       {
         projects.map((project) => (
-          <li class="project-item">
-            <a class="project-link faux-underline-hover" href={project.href}>
-              {project.name}
-            </a>
-            <p class="project-description">{project.description}</p>
-          </li>
+          <a class="project faux-underline-hover" href={project.href}>
+            <div class="title faux-underline-large">{project.name}</div>
+            <div class="description">{project.description}</div>
+          </a>
         ))
       }
-    </ul>
-  </section>
+    </div>
+  </div>
 </BaseLayout>
-
-<style>
-  .featured-projects {
-    margin-top: 2rem;
-  }
-
-  .section-title {
-    border-bottom: 1px solid currentColor;
-    padding-bottom: 0.25rem;
-    margin-bottom: 1.25rem;
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .project-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .project-link {
-    font-weight: 700;
-    font-size: 1rem;
-    text-decoration: none;
-  }
-
-  .project-description {
-    margin: 0.25rem 0 0;
-    font-size: 0.9rem;
-  }
-</style>

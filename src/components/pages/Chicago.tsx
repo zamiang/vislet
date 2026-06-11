@@ -300,6 +300,7 @@ export function Chicago() {
         </div>
       </header>
 
+      <div className="map-row">
       <div className="map-svg-container">
         <SvgMap
           topology={topology as unknown as Parameters<typeof SvgMap>[0]['topology']}
@@ -323,10 +324,8 @@ export function Chicago() {
           reverseColorKey
           zoomOnClick
         />
-      </div>
 
-      {selectedType === 'ALL' && sliderDates.length > 0 && (
-        <div className="slider-container">
+        {selectedType === 'ALL' && sliderDates.length > 0 && (
           <DateSlider
             id="chicago-date-slider"
             dates={sliderDates}
@@ -334,8 +333,8 @@ export function Chicago() {
             onChange={handleDateChange}
             width={MAP_WIDTH}
           />
-        </div>
-      )}
+        )}
+      </div>
 
       {selectedId && lineData && (
         <div className="svg-graphs">
@@ -373,6 +372,7 @@ export function Chicago() {
           )}
         </div>
       )}
+      </div>{/* end .map-row */}
     </div>
   );
 }

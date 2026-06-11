@@ -169,6 +169,7 @@ export function Brooklyn() {
         <div className="border" />
       </header>
 
+      <div className="map-row">
       <div className="map-svg-container">
         <SvgMap
           topology={topology as Parameters<typeof SvgMap>[0]['topology']}
@@ -236,6 +237,7 @@ export function Brooklyn() {
           />
         </div>
       </div>
+      </div>{/* end .map-row */}
 
       <div className="markdown-text">
         <time dateTime="2014-01-12">January 12, 2015</time>
