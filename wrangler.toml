@@ -1,7 +1,18 @@
 # Cloudflare Pages configuration.
-# This site is purely static — no Workers/Functions needed.
+# vislet is a purely static Astro site (astro.config.mjs → output: "static" → dist/).
+# Served via classic Cloudflare Pages — no Workers/Functions needed.
 name = "vislet"
 pages_build_output_dir = "dist"
 
-# Build command: `astro build` → output `dist/`.
-# PRs get preview deploys automatically; `master` deploys to production.
+# Deploy model: connect this repo to a Cloudflare **Pages** project (Git integration).
+#   Build command:           npm run build   (astro build → dist/)
+#   Build output directory:  dist
+#   Production branch:        main            (PRs get automatic preview deploys)
+#
+# Manual deploys use `npx wrangler pages deploy dist` — NOT `wrangler deploy`,
+# which is Workers-mode and fails with:
+#   "Missing entry-point to Worker script or to assets directory".
+#
+# Observability: classic Pages has no wrangler `[observability]` block (that is
+# Workers-only, and a no-op for purely static assets). Use Cloudflare Web
+# Analytics (dashboard / RUM beacon) for traffic + Core Web Vitals instead.
