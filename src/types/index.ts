@@ -8,31 +8,31 @@
 
 /** Chart margins, matching the legacy `margin` objects. */
 export interface Margin {
-	top: number;
-	right: number;
-	bottom: number;
-	left: number;
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
 }
 
 /** A single time-series point. `date` is epoch milliseconds. */
 export interface DataPoint {
-	date: number;
-	value: number;
+  date: number;
+  value: number;
 }
 
 /** A time-series point carrying an inter-quartile band (line-graph trend variant). */
 export interface TrendPoint extends DataPoint {
-	pct25: number;
-	pct75: number;
+  pct25: number;
+  pct75: number;
 }
 
 /** One rendered line/series: a name, the points, and an optional display id. */
 export interface Series<P extends { date: number } = DataPoint> {
-	/** Series key (e.g. neighborhood name, or `…-mean`). */
-	name: string;
-	/** Optional display id (e.g. dataset name, or `"Borough Average"`). */
-	id?: string;
-	values: P[];
+  /** Series key (e.g. neighborhood name, or `…-mean`). */
+  name: string;
+  /** Optional display id (e.g. dataset name, or `"Borough Average"`). */
+  id?: string;
+  values: P[];
 }
 
 /**
@@ -40,6 +40,6 @@ export interface Series<P extends { date: number } = DataPoint> {
  * Mirrors the `{ id, value }` shape consumed by `svg-map/color.coffee`.
  */
 export interface ColorDatum {
-	id: string;
-	value: number;
+  id: string;
+  value: number;
 }

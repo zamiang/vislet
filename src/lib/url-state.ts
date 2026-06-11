@@ -13,10 +13,10 @@
 
 /** A decoded deep-link state. Discriminated on `kind`. */
 export type GraphState =
-	| { kind: 'overview' }
-	| { kind: 'area'; area: string; hover?: string }
-	| { kind: 'type'; type: string }
-	| { kind: 'date'; date: number };
+  | { kind: 'overview' }
+  | { kind: 'area'; area: string; hover?: string }
+  | { kind: 'type'; type: string }
+  | { kind: 'date'; date: number };
 
 /**
  * Decode a query string (with or without leading `?`) or a `URLSearchParams`
@@ -24,31 +24,31 @@ export type GraphState =
  * overview. Unknown params are ignored.
  */
 export function parseGraphState(input: string | URLSearchParams): GraphState {
-	const params =
-		typeof input === 'string'
-			? new URLSearchParams(input.startsWith('?') ? input.slice(1) : input)
-			: input;
+  const params =
+    typeof input === 'string'
+      ? new URLSearchParams(input.startsWith('?') ? input.slice(1) : input)
+      : input;
 
-	const area = params.get('area');
-	if (area) {
-		const hover = params.get('hover');
-		return hover ? { kind: 'area', area, hover } : { kind: 'area', area };
-	}
+  const area = params.get('area');
+  if (area) {
+    const hover = params.get('hover');
+    return hover ? { kind: 'area', area, hover } : { kind: 'area', area };
+  }
 
-	const type = params.get('type');
-	if (type) {
-		return { kind: 'type', type };
-	}
+  const type = params.get('type');
+  if (type) {
+    return { kind: 'type', type };
+  }
 
-	const date = params.get('date');
-	if (date !== null && date !== '') {
-		const value = Number(date);
-		if (!Number.isNaN(value)) {
-			return { kind: 'date', date: value };
-		}
-	}
+  const date = params.get('date');
+  if (date !== null && date !== '') {
+    const value = Number(date);
+    if (!Number.isNaN(value)) {
+      return { kind: 'date', date: value };
+    }
+  }
 
-	return { kind: 'overview' };
+  return { kind: 'overview' };
 }
 
 /**
@@ -56,20 +56,20 @@ export function parseGraphState(input: string | URLSearchParams): GraphState {
  * for overview). Round-trips with `parseGraphState`.
  */
 export function serializeGraphState(state: GraphState): string {
-	const params = new URLSearchParams();
-	switch (state.kind) {
-		case 'area':
-			params.set('area', state.area);
-			if (state.hover) params.set('hover', state.hover);
-			break;
-		case 'type':
-			params.set('type', state.type);
-			break;
-		case 'date':
-			params.set('date', String(state.date));
-			break;
-		case 'overview':
-			break;
-	}
-	return params.toString();
+  const params = new URLSearchParams();
+  switch (state.kind) {
+    case 'area':
+      params.set('area', state.area);
+      if (state.hover) params.set('hover', state.hover);
+      break;
+    case 'type':
+      params.set('type', state.type);
+      break;
+    case 'date':
+      params.set('date', String(state.date));
+      break;
+    case 'overview':
+      break;
+  }
+  return params.toString();
 }

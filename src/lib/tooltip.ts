@@ -14,16 +14,16 @@ const bisectDate = bisector<{ date: number }, number>((d) => d.date).right;
  * numeric `date` (line `DataPoint`s and stacked `AreaPoint`s alike).
  */
 export function findNearestPoint<P extends { date: number }>(
-	values: P[],
-	x0: number,
+  values: P[],
+  x0: number,
 ): P | undefined {
-	if (values.length === 0) return undefined;
-	const i = bisectDate(values, x0);
-	const d0 = values[i - 1];
-	const d1 = values[i];
-	if (!d0) return d1;
-	if (!d1) return d0;
-	return x0 - d0.date > d1.date - x0 ? d1 : d0;
+  if (values.length === 0) return undefined;
+  const i = bisectDate(values, x0);
+  const d0 = values[i - 1];
+  const d1 = values[i];
+  if (!d0) return d1;
+  if (!d1) return d0;
+  return x0 - d0.date > d1.date - x0 ? d1 : d0;
 }
 
 /**
@@ -34,8 +34,8 @@ export function findNearestPoint<P extends { date: number }>(
  * - otherwise → `null` (no tooltip)
  */
 export function formatOutput(value: number, suffix = ' %'): string | null {
-	if (value > 100) return Number(value.toFixed(0)).toLocaleString();
-	if (value > 1) return Number(value.toFixed(2)).toLocaleString();
-	if (value > 0) return `${(value * 100).toFixed(2)}${suffix}`;
-	return null;
+  if (value > 100) return Number(value.toFixed(0)).toLocaleString();
+  if (value > 1) return Number(value.toFixed(2)).toLocaleString();
+  if (value > 0) return `${(value * 100).toFixed(2)}${suffix}`;
+  return null;
 }
