@@ -8,6 +8,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './__tests__/setup.ts',
+    exclude: ['**/node_modules/**', '**/e2e/**', '**/*.spec.ts'],
     css: true,
     coverage: {
       provider: 'istanbul',

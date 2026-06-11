@@ -1,19 +1,82 @@
 ---
 /**
- * Home page (placeholder).
+ * Home page — featured projects list.
  *
- * The shared layout (header/intro/footer + site nav) is exercised here so the
- * scaffold builds and renders. Full home content and the four visualization
- * pages are migrated in Phase 2.2 — this stub only validates the layout.
+ * Ports apps/home/templates/index.jade. The VISLET title, subtitle, and nav
+ * are already rendered by BaseLayout's vislet-intro header, so this page only
+ * outputs the "Featured Projects" section.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const projects = [
+  {
+    href: '/brooklyn',
+    name: 'Brooklyn Property Sales',
+    description: 'A look at 322,056 property sales in Brooklyn from 2003 to 2014.',
+  },
+  {
+    href: '/311',
+    name: 'NYC 311 Calls',
+    description: 'Compare how 7.7 million 311 calls are distributed across NYC from 2010 to 2014.',
+  },
+  {
+    href: '/chicago',
+    name: 'Chicago Crime',
+    description: '5,712,201 crimes in shown across the city of Chicago from 2003 to 2014.',
+  },
+];
 ---
 
 <BaseLayout>
-  <section class="prose">
-    <p>
-      Vislet is being migrated to a modern Astro + React + D3 v7 stack. The shared layout is live;
-      the interactive visualizations are ported one at a time.
-    </p>
+  <section class="featured-projects">
+    <h2 class="section-title">Featured Projects</h2>
+    <ul class="project-list">
+      {
+        projects.map((project) => (
+          <li class="project-item">
+            <a class="project-link faux-underline-hover" href={project.href}>
+              {project.name}
+            </a>
+            <p class="project-description">{project.description}</p>
+          </li>
+        ))
+      }
+    </ul>
   </section>
 </BaseLayout>
+
+<style>
+  .featured-projects {
+    margin-top: 2rem;
+  }
+
+  .section-title {
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 0.25rem;
+    margin-bottom: 1.25rem;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .project-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .project-link {
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+  }
+
+  .project-description {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+  }
+</style>

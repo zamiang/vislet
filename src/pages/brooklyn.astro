@@ -1,0 +1,22 @@
+---
+/**
+ * Brooklyn page — /brooklyn
+ *
+ * URL contract (must keep resolving — see MIGRATION.md §3):
+ *   /brooklyn              → overview (default neighborhood BK60)
+ *   /brooklyn?area=<id>   → selected neighborhood
+ *   /brooklyn?area=<id>&hover=<id2> → selected + hovered
+ *   /brooklyn?date=<ms>   → selected date
+ *
+ * Data is fetched lazily by the Brooklyn island on the client from /data/brooklyn/.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { Brooklyn } from '@/components/pages/Brooklyn';
+---
+
+<BaseLayout
+  title="Brooklyn Property Sales — Vislet"
+  description="A look at 322,056 property sales in Brooklyn from 2003 to 2014."
+>
+  <Brooklyn client:only="react" />
+</BaseLayout>
