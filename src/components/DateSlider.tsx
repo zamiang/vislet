@@ -18,80 +18,80 @@ import type { Margin } from '@/types';
 const DEFAULT_MARGIN: Margin = { top: 0, left: 15, right: 15, bottom: 0 };
 
 export interface DateSliderProps {
-  /** Sorted selectable dates (epoch ms). */
-  dates: number[];
-  /** Currently selected date (epoch ms). */
-  value: number;
-  /** Called with the snapped date as the handle moves. */
-  onChange: (date: number) => void;
-  width: number;
-  height?: number;
-  margin?: Margin;
-  id?: string;
+	/** Sorted selectable dates (epoch ms). */
+	dates: number[];
+	/** Currently selected date (epoch ms). */
+	value: number;
+	/** Called with the snapped date as the handle moves. */
+	onChange: (date: number) => void;
+	width: number;
+	height?: number;
+	margin?: Margin;
+	id?: string;
 }
 
 export function DateSlider({
-  dates,
-  value,
-  onChange,
-  width,
-  height = 38,
-  margin = DEFAULT_MARGIN,
-  id,
+	dates,
+	value,
+	onChange,
+	width,
+	height = 38,
+	margin = DEFAULT_MARGIN,
+	id,
 }: DateSliderProps) {
-  const trackRef = useRef<SVGGElement>(null);
-  const [dragging, setDragging] = useState(false);
+	const trackRef = useRef<SVGGElement>(null);
+	const [dragging, setDragging] = useState(false);
 
-  const x = scaleTime()
-    .range([0, width])
-    .clamp(true)
-    .domain([dates[0], dates[dates.length - 1]]);
+	const x = scaleTime()
+		.range([0, width])
+		.clamp(true)
+		.domain([dates[0], dates[dates.length - 1]]);
 
-  const updateFromClientX = (clientX: number) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const px = clientX - track.getBoundingClientRect().left;
-    const snapped = snapToNearest(dates, Number(x.invert(px)));
-    onChange(snapped);
-  };
+	const updateFromClientX = (clientX: number) => {
+		const track = trackRef.current;
+		if (!track) return;
+		const px = clientX - track.getBoundingClientRect().left;
+		const snapped = snapToNearest(dates, Number(x.invert(px)));
+		onChange(snapped);
+	};
 
-  return (
-    <svg
-      id={id}
-      width={width + margin.left + margin.right}
-      height={height + margin.top + margin.bottom}
-    >
-      <g ref={trackRef} transform={`translate(${margin.left},${margin.top})`}>
-        <Axis
-          scale={x}
-          orientation="bottom"
-          tickCount={getYearTickCount(dates)}
-          transform={`translate(0,${height / 2})`}
-        />
-        <rect
-          y={height / 2 - 10}
-          width={width}
-          height={20}
-          style={{ fill: 'none', pointerEvents: 'all', cursor: 'pointer' }}
-          onPointerDown={(e) => {
-            e.currentTarget.setPointerCapture(e.pointerId);
-            setDragging(true);
-            updateFromClientX(e.clientX);
-          }}
-          onPointerMove={(e) => dragging && updateFromClientX(e.clientX)}
-          onPointerUp={(e) => {
-            e.currentTarget.releasePointerCapture(e.pointerId);
-            setDragging(false);
-          }}
-        />
-        <circle
-          className="handle"
-          r={10}
-          cx={x(value)}
-          transform={`translate(0,${height / 2})`}
-          style={{ pointerEvents: 'none' }}
-        />
-      </g>
-    </svg>
-  );
+	return (
+		<svg
+			id={id}
+			width={width + margin.left + margin.right}
+			height={height + margin.top + margin.bottom}
+		>
+			<g ref={trackRef} transform={`translate(${margin.left},${margin.top})`}>
+				<Axis
+					scale={x}
+					orientation="bottom"
+					tickCount={getYearTickCount(dates)}
+					transform={`translate(0,${height / 2})`}
+				/>
+				<rect
+					y={height / 2 - 10}
+					width={width}
+					height={20}
+					style={{ fill: 'none', pointerEvents: 'all', cursor: 'pointer' }}
+					onPointerDown={(e) => {
+						e.currentTarget.setPointerCapture(e.pointerId);
+						setDragging(true);
+						updateFromClientX(e.clientX);
+					}}
+					onPointerMove={(e) => dragging && updateFromClientX(e.clientX)}
+					onPointerUp={(e) => {
+						e.currentTarget.releasePointerCapture(e.pointerId);
+						setDragging(false);
+					}}
+				/>
+				<circle
+					className="handle"
+					r={10}
+					cx={x(value)}
+					transform={`translate(0,${height / 2})`}
+					style={{ pointerEvents: 'none' }}
+				/>
+			</g>
+		</svg>
+	);
 }

@@ -19,21 +19,21 @@ const MEAN_SUFFIX = '-mean';
  * everything else comes from `startingDataset`. Mirrors `getFlattenedData`.
  */
 export function getFlattenedData(
-  data: LineGraphData,
-  keys: string[],
-  startingDataset: string,
+	data: LineGraphData,
+	keys: string[],
+	startingDataset: string,
 ): Record<string, DataPoint[]> {
-  const flattened: Record<string, DataPoint[]> = {};
-  for (const key of keys) {
-    if (key.includes(MEAN_SUFFIX)) {
-      const points = data['ALL']?.[key];
-      if (points) flattened[key] = points;
-    } else if (data[startingDataset]) {
-      const points = data[startingDataset][key];
-      if (points) flattened[key] = points;
-    }
-  }
-  return flattened;
+	const flattened: Record<string, DataPoint[]> = {};
+	for (const key of keys) {
+		if (key.includes(MEAN_SUFFIX)) {
+			const points = data['ALL']?.[key];
+			if (points) flattened[key] = points;
+		} else if (data[startingDataset]) {
+			const points = data[startingDataset][key];
+			if (points) flattened[key] = points;
+		}
+	}
+	return flattened;
 }
 
 /**
@@ -42,36 +42,40 @@ export function getFlattenedData(
  * "Borough Average"; others carry the active dataset id.
  */
 export function getLines(
-  flattened: Record<string, DataPoint[]>,
-  startingDataset: string,
-  options: { compareDataset?: string; compareData?: Record<string, DataPoint[]>; keys?: string[] } = {},
+	flattened: Record<string, DataPoint[]>,
+	startingDataset: string,
+	options: {
+		compareDataset?: string;
+		compareData?: Record<string, DataPoint[]>;
+		keys?: string[];
+	} = {},
 ): Series[] {
-  const names = Object.keys(flattened);
-  const lines: Series[] = names.map((name) => ({
-    id: name.includes(MEAN_SUFFIX) ? 'Borough Average' : startingDataset,
-    name,
-    values: flattened[name],
-  }));
+	const names = Object.keys(flattened);
+	const lines: Series[] = names.map((name) => ({
+		id: name.includes(MEAN_SUFFIX) ? 'Borough Average' : startingDataset,
+		name,
+		values: flattened[name],
+	}));
 
-  const { compareDataset, compareData, keys } = options;
-  if (compareDataset && compareData && keys?.length) {
-    lines.push({ name: 'compare-dataset', id: compareDataset, values: compareData[keys[0]] ?? [] });
-  } else {
-    lines.push({ name: 'compare-dataset', values: [] });
-  }
-  return lines;
+	const { compareDataset, compareData, keys } = options;
+	if (compareDataset && compareData && keys?.length) {
+		lines.push({ name: 'compare-dataset', id: compareDataset, values: compareData[keys[0]] ?? [] });
+	} else {
+		lines.push({ name: 'compare-dataset', values: [] });
+	}
+	return lines;
 }
 
 /** Series stroke color by name. Mirrors `line-graph/index.coffee` `color`. */
 export function lineColor(name: string): string {
-  if (name.includes(MEAN_SUFFIX)) return 'lightgray';
-  if (name.includes('compare-')) return '#D53F50';
-  return 'steelblue';
+	if (name.includes(MEAN_SUFFIX)) return 'lightgray';
+	if (name.includes('compare-')) return '#D53F50';
+	return 'steelblue';
 }
 
 /** `[min, max]` value extent across all series (skips empty series). Mirrors the y-domain. */
 export function yDomain(lines: Series[]): [number, number] {
-  const lo = min(lines, (line) => min(line.values, (point) => point.value));
-  const hi = max(lines, (line) => max(line.values, (point) => point.value));
-  return [lo ?? 0, hi ?? 0];
+	const lo = min(lines, (line) => min(line.values, (point) => point.value));
+	const hi = max(lines, (line) => max(line.values, (point) => point.value));
+	return [lo ?? 0, hi ?? 0];
 }

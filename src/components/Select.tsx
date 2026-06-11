@@ -9,39 +9,34 @@
  */
 
 export interface SelectProps {
-  /** Map of option value → display label. */
-  options: Record<string, string>;
-  /** Currently selected value (`"ALL"` when `includeAll` and nothing chosen). */
-  value: string;
-  /** Called with the newly selected value. */
-  onChange: (value: string) => void;
-  /** Prepend an `ALL` option (legacy default: true). */
-  includeAll?: boolean;
-  id?: string;
-  className?: string;
+	/** Map of option value → display label. */
+	options: Record<string, string>;
+	/** Currently selected value (`"ALL"` when `includeAll` and nothing chosen). */
+	value: string;
+	/** Called with the newly selected value. */
+	onChange: (value: string) => void;
+	/** Prepend an `ALL` option (legacy default: true). */
+	includeAll?: boolean;
+	id?: string;
+	className?: string;
 }
 
 export function Select({
-  options,
-  value,
-  onChange,
-  includeAll = true,
-  id,
-  className,
+	options,
+	value,
+	onChange,
+	includeAll = true,
+	id,
+	className,
 }: SelectProps) {
-  return (
-    <select
-      id={id}
-      className={className}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      {includeAll && <option value="ALL">ALL</option>}
-      {Object.keys(options).map((key) => (
-        <option value={key} key={key}>
-          {options[key]}
-        </option>
-      ))}
-    </select>
-  );
+	return (
+		<select id={id} className={className} value={value} onChange={(e) => onChange(e.target.value)}>
+			{includeAll && <option value="ALL">ALL</option>}
+			{Object.keys(options).map((key) => (
+				<option value={key} key={key}>
+					{options[key]}
+				</option>
+			))}
+		</select>
+	);
 }

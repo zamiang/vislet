@@ -16,13 +16,13 @@ const bisect = bisector<number, number>((d) => d).right;
  * date, matching its `>` comparison).
  */
 export function snapToNearest(dates: number[], x0: number): number {
-  if (dates.length === 0) return x0;
-  const i = bisect(dates, x0);
-  const d0 = dates[i - 1];
-  const d1 = dates[i];
-  if (d0 == null) return d1;
-  if (d1 == null) return d0;
-  return x0 - d0 > d1 - x0 ? d1 : d0;
+	if (dates.length === 0) return x0;
+	const i = bisect(dates, x0);
+	const d0 = dates[i - 1];
+	const d1 = dates[i];
+	if (d0 == null) return d1;
+	if (d1 == null) return d0;
+	return x0 - d0 > d1 - x0 ? d1 : d0;
 }
 
 /**
@@ -31,8 +31,8 @@ export function snapToNearest(dates: number[], x0: number): number {
  * effectively used the current year).
  */
 export function getYearTickCount(dates: number[], ticksPerYear = 4): number {
-  if (dates.length === 0) return 0;
-  const firstYear = new Date(dates[0]).getFullYear();
-  const lastYear = new Date(dates[dates.length - 1]).getFullYear();
-  return (lastYear - firstYear) * ticksPerYear;
+	if (dates.length === 0) return 0;
+	const firstYear = new Date(dates[0]).getFullYear();
+	const lastYear = new Date(dates[dates.length - 1]).getFullYear();
+	return (lastYear - firstYear) * ticksPerYear;
 }
