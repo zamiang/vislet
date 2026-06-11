@@ -18,7 +18,10 @@
     "test:watch": "vitest --watch",
     "typecheck": "tsc --noEmit",
     "data:build": "tsx scripts/etl/build.ts",
-    "data:build:brooklyn": "tsx scripts/etl/brooklyn/build.ts"
+    "data:build:brooklyn": "tsx scripts/etl/brooklyn/build.ts",
+    "data:build:311": "tsx scripts/etl/311/build.ts",
+    "data:build:chicago": "tsx scripts/etl/chicago/build.ts",
+    "data:build:north-carolina": "tsx scripts/etl/north-carolina/build.ts"
   },
   "dependencies": {
     "@astrojs/react": "5.0.7",

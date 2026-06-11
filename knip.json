@@ -1,12 +1,10 @@
 {
   "$schema": "https://unpkg.com/knip@latest/schema.json",
-  "entry": ["src/pages/**/*.{ts,astro}", "src/layouts/**/*.astro"],
-  "project": ["src/**/*.{ts,tsx,astro}", "__tests__/**/*.{ts,tsx}"],
+  "entry": ["src/pages/**/*.{ts,astro}", "src/layouts/**/*.astro", "scripts/etl/**/build.ts"],
+  "project": ["src/**/*.{ts,tsx,astro}", "scripts/**/*.ts", "__tests__/**/*.{ts,tsx}"],
   "ignore": ["src/types/index.ts"],
   "ignoreDependencies": [
     "tailwindcss",
-    "d3",
-    "@types/d3",
     "topojson-client",
     "@types/topojson-client",
     "@testing-library/dom",

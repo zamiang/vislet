@@ -63,6 +63,34 @@ export function quarterKeyToEpoch(key: string): number {
   return nyWallClockToEpoch(year, (quarter - 1) * 3, 1);
 }
 
+/**
+ * Convert a legacy `"<month>-<year>"` key (e.g. "1-2010") to epoch ms at NY-local
+ * midnight on the 1st of that month (311 / chicago monthly axis).
+ */
+export function monthKeyToEpoch(key: string): number {
+  const [monthStr, yearStr] = key.split('-');
+  const month = Number(monthStr);
+  const year = Number(yearStr);
+  if (!(month >= 1 && month <= 12) || !Number.isFinite(year)) {
+    throw new Error(`Invalid month key: ${key}`);
+  }
+  return nyWallClockToEpoch(year, month - 1, 1);
+}
+
+/**
+ * Epoch ms for "today at <hour>:00:00 NY-local", mirroring the legacy
+ * `moment(new Date()).hours(h).minutes(0).seconds(0)` used for the 311/chicago
+ * hour-of-day axis. This was **non-deterministic** in the legacy build (depends
+ * on the run date) — `nowMs` is injectable so the output is reproducible and
+ * testable. Pass a fixed reference date when regenerating.
+ */
+export function hourEpoch(hour: number, nowMs: number): number {
+  // moment kept the local calendar day of `now`, set H:M:S. Use NY-local Y/M/D.
+  const offset = nyOffsetMs(nowMs);
+  const local = new Date(nowMs + offset);
+  return nyWallClockToEpoch(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate(), hour);
+}
+
 /** Convert a legacy `"<year>"` key (e.g. "2003") to epoch ms at NY-local start of year. */
 export function yearKeyToEpoch(key: string | number): number {
   const year = Number(key);

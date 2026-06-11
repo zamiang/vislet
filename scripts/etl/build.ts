@@ -10,7 +10,12 @@
  */
 import { execFileSync } from 'node:child_process';
 
-const steps = ['scripts/etl/brooklyn/build.ts'];
+const steps = [
+  'scripts/etl/brooklyn/build.ts',
+  'scripts/etl/311/build.ts',
+  'scripts/etl/chicago/build.ts',
+  'scripts/etl/north-carolina/build.ts',
+];
 
 let failed = false;
 for (const step of steps) {
