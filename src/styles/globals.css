@@ -168,12 +168,12 @@ body::after {
      ignores margin-block) while staying centered by the parent's text-align. */
   display: inline-block;
   color: var(--foreground);
-  font-weight: normal;
-  letter-spacing: 1px;
-  line-height: 141%;
-  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  font-size: 2rem;
   margin-bottom: 0.875rem;
-  font-family: var(--font-heading);
+  font-family: var(--font-serif);
 }
 .vislet-intro .about {
   /* Constrained measure so the tagline reads as a centered editorial subtitle
