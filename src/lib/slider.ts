@@ -26,13 +26,15 @@ export function snapToNearest(dates: number[], x0: number): number {
 }
 
 /**
- * Number of axis ticks: 4 per year across the date span. Mirrors the *intent*
- * of legacy `getNumberTicks` (whose `getFullYear(arg)` call was a no-op bug that
- * effectively used the current year).
+ * Number of axis ticks across the date span. The `Axis` component renders a
+ * label on every tick (no auto-thinning), so this must stay sparse enough to
+ * read: ~one tick per year. The legacy `getNumberTicks` asked for 4/year, but
+ * that produced ~44 ticks over a 11-year span and an unreadable smear of
+ * overlapping labels. One per year lets D3 snap to clean yearly gridlines.
  */
-export function getYearTickCount(dates: number[], ticksPerYear = 4): number {
+export function getYearTickCount(dates: number[], ticksPerYear = 1): number {
   if (dates.length === 0) return 0;
   const firstYear = new Date(dates[0]).getFullYear();
   const lastYear = new Date(dates[dates.length - 1]).getFullYear();
-  return (lastYear - firstYear) * ticksPerYear;
+  return Math.max((lastYear - firstYear) * ticksPerYear, 2);
 }

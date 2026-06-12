@@ -67,7 +67,7 @@ describe('lineColor', () => {
   it('maps mean / compare / default series to their colors', () => {
     expect(lineColor('price-mean')).toBe('lightgray');
     expect(lineColor('compare-dataset')).toBe('#D53F50');
-    expect(lineColor('park-slope')).toBe('steelblue');
+    expect(lineColor('park-slope')).toBe('#5a7684'); // Steel Blue (--primary)
   });
 });
 

@@ -70,7 +70,7 @@ export function getLines(
 export function lineColor(name: string): string {
   if (name.includes(MEAN_SUFFIX)) return 'lightgray';
   if (name.includes('compare-')) return '#D53F50';
-  return 'steelblue';
+  return '#5a7684'; // Steel Blue (--primary) — shared Slate Executive palette
 }
 
 /** `[min, max]` value extent across all series (skips empty series). Mirrors the y-domain. */
