@@ -251,9 +251,12 @@ export function NorthCarolina() {
   }
 
   return (
-    <div className="nc-page">
-      {/* Page header */}
-      <h1 className="nc-title">Gerrymandering in North Carolina</h1>
+    <div className="map-app nc-page">
+      {/* Shared page header (centered serif heading + rule), matching the other map pages */}
+      <header>
+        <div className="heading">Gerrymandering in North Carolina</div>
+        <div className="border" />
+      </header>
 
       {/* Map type selector */}
       <nav className="nc-map-type">
