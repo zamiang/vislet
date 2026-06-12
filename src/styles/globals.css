@@ -173,8 +173,12 @@ body {
   cursor: pointer;
 }
 .tract.selected {
+  fill: steelblue;
   stroke: #333;
   stroke-width: 1.5px;
+}
+.tract.dimmed {
+  opacity: 0.25;
 }
 .tract.park {
   fill: url(#hatch);
@@ -208,6 +212,36 @@ body {
 }
 .tract.color8 {
   fill: #40000a;
+}
+
+/* Spectral palette (blue-green) for price-per-sqft maps (Brooklyn).
+   color0=cheapest (blue) → color8=most expensive (red), matching legacy d3 Spectral scale. */
+.spectral-map .tract.color0 {
+  fill: #3288bd;
+}
+.spectral-map .tract.color1 {
+  fill: #66c2a5;
+}
+.spectral-map .tract.color2 {
+  fill: #abdda4;
+}
+.spectral-map .tract.color3 {
+  fill: #e6f598;
+}
+.spectral-map .tract.color4 {
+  fill: #ffffbf;
+}
+.spectral-map .tract.color5 {
+  fill: #fee08b;
+}
+.spectral-map .tract.color6 {
+  fill: #fdae61;
+}
+.spectral-map .tract.color7 {
+  fill: #f46d43;
+}
+.spectral-map .tract.color8 {
+  fill: #d53e4f;
 }
 
 /* Date slider handle */

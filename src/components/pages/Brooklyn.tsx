@@ -19,7 +19,6 @@ import type { LineGraphData } from '@/lib/line-chart';
 import { parseGraphState, serializeGraphState } from '@/lib/url-state';
 import type { BrooklynData, ColorDatum, DataPoint } from '@/types';
 
-const DEFAULT_SELECTED_ID = 'BK60';
 const MAP_WIDTH = 500;
 const MAP_HEIGHT = 400;
 const CHART_WIDTH = 490;
@@ -34,7 +33,7 @@ export function Brooklyn() {
   const [buildingClasses, setBuildingClasses] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
-  const [selectedId, setSelectedId] = useState(DEFAULT_SELECTED_ID);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<number>(0);
 
@@ -52,17 +51,17 @@ export function Brooklyn() {
       setBuildingClasses(classes as Record<string, string>);
 
       const prices = typedSales['ALL']?.residentialPrices ?? [];
-      const lastDate = prices[prices.length - 1]?.date ?? 0;
+      const firstDate = prices[0]?.date ?? 0;
 
       const graphState = parseGraphState(window.location.search);
       if (graphState.kind === 'area') {
         setSelectedId(graphState.area);
         if (graphState.hover) setHoveredId(graphState.hover);
-        setSelectedDate(lastDate);
+        setSelectedDate(firstDate);
       } else if (graphState.kind === 'date') {
         setSelectedDate(graphState.date);
       } else {
-        setSelectedDate(lastDate);
+        setSelectedDate(firstDate);
       }
 
       setLoading(false);
@@ -72,6 +71,10 @@ export function Brooklyn() {
   // URL sync
   useEffect(() => {
     if (!salesData) return;
+    if (!selectedId) {
+      window.history.replaceState(null, '', window.location.pathname);
+      return;
+    }
     const qs = serializeGraphState({
       kind: 'area',
       area: selectedId,
@@ -127,7 +130,7 @@ export function Brooklyn() {
   }, [salesData]);
 
   const lineData: LineGraphData = useMemo(() => {
-    if (!salesData) return {};
+    if (!salesData || !selectedId) return {};
     const result: Record<string, Record<string, DataPoint[]>> = {
       ALL: { 'residentialPrices-mean': salesData['ALL']?.['residentialPrices-mean'] ?? [] },
     };
@@ -137,9 +140,11 @@ export function Brooklyn() {
 
   const areaData = useMemo(
     () =>
-      (salesData?.[selectedId]?.buildingClass ??
-        salesData?.['ALL']?.buildingClass ??
-        {}) as unknown as AreaData,
+      selectedId
+        ? ((salesData?.[selectedId]?.buildingClass ??
+            salesData?.['ALL']?.buildingClass ??
+            {}) as unknown as AreaData)
+        : null,
     [salesData, selectedId],
   );
 
@@ -152,7 +157,9 @@ export function Brooklyn() {
     [neighborhoodNames, colorData],
   );
 
-  const selectedName = formatName(neighborhoodNames[selectedId]) ?? selectedId;
+  const selectedName = selectedId
+    ? (formatName(neighborhoodNames[selectedId]) ?? selectedId)
+    : null;
 
   if (loading || !topology || !salesData) {
     return (
@@ -185,10 +192,11 @@ export function Brooklyn() {
             colorMax={mapColorMax}
             selectedId={selectedId}
             hoveredId={hoveredId ?? undefined}
-            onSelect={(id) => setSelectedId(id ?? DEFAULT_SELECTED_ID)}
+            onSelect={setSelectedId}
             onHover={setHoveredId}
             title="Avg Price per SQFT"
             formatHoverText={formatHoverText}
+            colorPalette="spectral"
           />
 
           <DateSlider
@@ -204,38 +212,43 @@ export function Brooklyn() {
             Click on a neighborhood like &ldquo;Williamsburg&rdquo; to see how the housing market
             has changed since 2003.
           </p>
-          <div className="svg-graphs-content">
-            <div className="graph-heading-container">
-              <div className="selected-neighborhood-name">
-                <span className="circle-key blue" />
-                <span className="graph-heading">{selectedName}</span>
+          {selectedId && selectedName && areaData && (
+            <div className="svg-graphs-content">
+              <a className="back" onClick={() => setSelectedId(null)} style={{ cursor: 'pointer' }}>
+                ← BACK TO OVERVIEW
+              </a>
+              <div className="graph-heading-container">
+                <div className="selected-neighborhood-name">
+                  <span className="circle-key blue" />
+                  <span className="graph-heading">{selectedName}</span>
+                </div>
+                <div className="avg-neighborhood-name">
+                  <span className="circle-key gray" />
+                  <span className="graph-heading">Borough Average</span>
+                </div>
               </div>
-              <div className="avg-neighborhood-name">
-                <span className="circle-key gray" />
-                <span className="graph-heading">Borough Average</span>
-              </div>
+
+              <LineGraph
+                data={lineData}
+                keys={['residentialPrices', 'residentialPrices-mean']}
+                startingDataset={selectedId}
+                width={CHART_WIDTH}
+                height={CHART_HEIGHT}
+                label="Avg Price per Sqft"
+                yAxisFormat={(v) => `$${v}`}
+                showTooltips
+              />
+
+              <AreaChart
+                data={areaData}
+                width={CHART_WIDTH}
+                height={CHART_HEIGHT}
+                label="Building Class as % of sales"
+                keyLabel={(abbrev) => buildingClasses[abbrev] ?? abbrev}
+                showTooltips
+              />
             </div>
-
-            <LineGraph
-              data={lineData}
-              keys={['residentialPrices', 'residentialPrices-mean']}
-              startingDataset={selectedId}
-              width={CHART_WIDTH}
-              height={CHART_HEIGHT}
-              label="Avg Price per Sqft"
-              yAxisFormat={(v) => `$${v}`}
-              showTooltips
-            />
-
-            <AreaChart
-              data={areaData}
-              width={CHART_WIDTH}
-              height={CHART_HEIGHT}
-              label="Building Class as % of sales"
-              keyLabel={(abbrev) => buildingClasses[abbrev] ?? abbrev}
-              showTooltips
-            />
-          </div>
+          )}
         </div>
       </div>
       {/* end .map-row */}

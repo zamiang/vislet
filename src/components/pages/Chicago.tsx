@@ -20,7 +20,6 @@ import type { ChicagoData, ColorDatum } from '@/types';
 
 // ─── constants ───────────────────────────────────────────────────────────────
 
-const DEFAULT_SELECTED_ID = '68';
 const MAP_WIDTH = 500;
 const MAP_HEIGHT = 400;
 const GRAPH_WIDTH = 450;
@@ -130,7 +129,7 @@ export function Chicago() {
   const [neighborhoodNames, setNeighborhoodNames] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
-  const [selectedId, setSelectedId] = useState<string | null>(DEFAULT_SELECTED_ID);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string>('ALL');
   const [selectedDate, setSelectedDate] = useState<number>(0);
