@@ -157,7 +157,9 @@ export function Brooklyn() {
     [neighborhoodNames, colorData],
   );
 
-  const selectedName = selectedId ? (formatName(neighborhoodNames[selectedId]) ?? selectedId) : null;
+  const selectedName = selectedId
+    ? (formatName(neighborhoodNames[selectedId]) ?? selectedId)
+    : null;
 
   if (loading || !topology || !salesData) {
     return (
