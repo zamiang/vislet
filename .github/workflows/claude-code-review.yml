@@ -1,0 +1,68 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    # Optional: Only run on specific file changes
+    # paths:
+    #   - "src/**/*.ts"
+    #   - "src/**/*.tsx"
+    #   - "src/**/*.astro"
+
+jobs:
+  claude-review:
+    # Only review PRs from collaborators. A fork PR from a random user must not
+    # be able to spin up Claude on our account.
+    if: |
+      github.event.pull_request.author_association == 'OWNER' ||
+      github.event.pull_request.author_association == 'MEMBER' ||
+      github.event.pull_request.author_association == 'COLLABORATOR'
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Review this pull request against the guidance in CLAUDE.md,
+            docs/MIGRATION.md, and docs/ARCHITECTURE.md. This repo is mid-migration
+            from a 2015-era Ezel/Backbone/CoffeeScript/D3-v3 stack to Astro 6 +
+            React 19 islands + TypeScript + D3 v7. Prioritize, in order:
+            1. Correctness bugs (D3 v3→v7 symbol mapping, Astro island hydration,
+               TypeScript errors, dropped promises). Flag any new features added to
+               the legacy stack — only migration is allowed.
+            2. The "D3 owns the math, React owns the DOM" rule: never let
+               `d3.select(...).append(...)` mutate nodes React also manages.
+            3. URL/compatibility contract — `/`, `/brooklyn`, `/311`, `/chicago`,
+               `/north-carolina` and legacy graph-key deep-link/query states must
+               keep resolving (CLAUDE.md §3, MIGRATION.md §3).
+            4. Security: secrets handling (never re-add the leaked AWS keys), env
+               var leaks, deploy-key scope.
+            5. Data handling — data is fetched from `public/data/<app>/`, not
+               bundled; the 12 MB `bbl-to-lat-long.json` must stay pre-joined.
+            6. Test coverage for new behavior (Vitest for pure math, Playwright smoke).
+
+            Skip stylistic nits already covered by ESLint, Prettier, or Tailwind.
+            Prefix preferential feedback with "(nit)". Post one consolidated review.
+
+            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
+
+          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
+          # or https://code.claude.com/docs/en/cli-reference for available options
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
