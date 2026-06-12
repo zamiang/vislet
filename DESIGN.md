@@ -44,34 +44,45 @@ from shadows or gradients.
 
 ### Consistency status
 
-Done (palette + fonts now match the sibling):
+Done — palette, fonts, type scale, and layout chrome now match the sibling:
 
-- `--background` → `#f0f2f5`, `--foreground` → `#2c333a`,
-  `--muted-foreground` → `#4a5560`, `--accent` → `#749ca8`; added
-  `--primary #5a7684`, `--accent-bold #c17f59`, `--muted`, `--border`, motion tokens.
-- Nav/label sans switched Libre Franklin → **Lato**; JetBrains Mono loaded.
-- Viz `steelblue` literals (`.tract.selected`, `.handle`, `.trend-area`,
-  `.circle-key.blue`, faux-underline hover, `lineColor()` stroke) → `--primary`.
+- Palette: `--background #f0f2f5`, `--foreground #2c333a`, `--muted-foreground
+#4a5560`, `--accent #749ca8`, `--primary #5a7684`, `--accent-bold #c17f59`,
+  plus `--secondary`, `--primary-foreground`, `--accent-foreground`, `--card`,
+  `--border`, `--muted`, motion tokens.
+- **Reading voice flipped to match the sibling:** body/prose is **Lato (sans)**;
+  **EB Garamond (serif)** is reserved for headings + editorial titles (`h1–h6`,
+  `.project .title`, `#home .heading`, `.author .name`, `.map-app .heading`,
+  `.markdown-text` headings). JetBrains Mono loaded for chrome.
+- Fluid `clamp()` type scale (`--font-size-sm … 4xl`) adopted verbatim; body
+  base `20px → 18px` (`--font-size`), line-height aligned (1.5 body / 1.7 prose).
+- Signature **paper-grain noise overlay** (`body::after`, opacity 0.025) added.
+- Dark `.border` bars (`30px × 2px #333`) → **4rem hairline rules** (`1px
+--border`), matching the sibling's `.center-divider`.
+- Uppercase section labels ("Featured Projects", "Created By") → **teal
+  `--accent`** with `--tracking-caps`, echoing `.section-label`.
+- Link hover color `--primary → --accent` (teal), matching the sibling.
+- Intro/author chrome grays (`#333/#555/#666/#f2f2f2/black`) reconciled to tokens.
+- Viz `steelblue` literals → `--primary` (prior pass).
 
 Remaining:
 
-- Generic grays (`#333`, `#555`, `#999`, `#f2f2f2`, `color: black`) in the intro/
-  author chrome → reconcile to `--foreground` / `--muted-foreground` / `--border`.
-- Body `font-size` is still `20px` → move to the sibling's 18px fluid scale.
-- Fixed-width map apps (`1054px`) need a responsive strategy for mobile.
-- Optional: adopt the sibling's `.bm-noise` paper-grain overlay.
+- Fixed-width map apps (`1054px`) still need a responsive strategy for mobile.
+- Optional: section-tint full-bleed wrappers.
+
+Intentionally **not** adopted from the sibling: the `FloatingParticles` background
+(decorative; would compete with the data visualizations).
 
 ## Typography
 
-- **Serif — EB Garamond** (already in use): every heading, editorial body, post
-  titles, blockquotes, map headings. The editorial voice.
-- **Sans — Lato 400/700**: nav, meta, labels, buttons, axis/legend chrome.
-  **Vislet currently uses Libre Franklin here — switch to Lato** to match the
-  sibling. (`--font-heading` / `--font-sans` should resolve to Lato.)
-- **Mono — JetBrains Mono** (Consolas/Monaco fallback): technical chrome, telemetry,
-  code. Not currently loaded in vislet — add it.
-- **Base size:** 18px (`1.125rem`). Vislet's body is currently `20px` — bring to the
-  sibling's fluid scale.
+- **Serif — EB Garamond**: headings and editorial titles only (`h1–h6`, project
+  titles, the author name, map headings, blockquote-adjacent headings). The
+  editorial voice. Opt in via `--font-serif`.
+- **Sans — Lato 400/700**: the default — body/prose, nav, meta, labels, buttons,
+  axis/legend chrome. `--font-sans` is the document default; `--font-body` /
+  `--font-heading` are aliases that resolve to it.
+- **Mono — JetBrains Mono** (Consolas/Monaco fallback): technical chrome, code.
+- **Base size:** 18px (`--font-size`), on the fluid `clamp()` scale.
 - **Fluid scale:** `clamp()`-based `--font-size-sm … --font-size-4xl` (see sibling
   `colors_and_type.css`). Adopt verbatim so type scales without media queries.
 - **Line height:** 1.7 body, 1.8 long-form, 1.3 headings.
