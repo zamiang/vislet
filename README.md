@@ -88,9 +88,6 @@ is Workers-mode).
 - [`docs/MIGRATION.md`](./docs/MIGRATION.md) — the phased modernization plan and
   the D3 v3→v7 mapping.
 
-> ⚠️ **Security:** an `airflow/.env` file (now deleted) previously contained live
-> AWS keys. They are being revoked — see the security note in `CLAUDE.md`.
-
 ## Legacy workflow (being retired)
 
 The original Gulp/Ezel toolchain still lives in the repo and stays deployable

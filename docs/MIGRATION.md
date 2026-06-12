@@ -12,19 +12,15 @@ Read [`ARCHITECTURE.md`](./ARCHITECTURE.md) first for the current state.
 
 These are independent of the framework choice and reduce risk immediately:
 
-1. **Rotate the leaked AWS credentials** that were in `airflow/.env`. The
-   directory was deleted on 2026-06-11, but deleting the file does not un-expose
-   the keys — **rotate/revoke them in the AWS console** and scope any replacement
-   to only the deploy bucket. ✅ `airflow/` removed.
-2. **Delete dead weight**: ✅ `airflow/` and `.next/` removed. Still to do:
+1. **Delete dead weight**: ✅ the ETL scaffold and `.next/` removed. Still to do:
    `pages/` (vestigial) and committed `.DS_Store` files. Add `.DS_Store` to
    `.gitignore` globally.
-3. **Run `npm audit`** to see the blast radius of the old dependency tree
+2. **Run `npm audit`** to see the blast radius of the old dependency tree
    (informational — you'll be replacing it anyway).
-4. **Capture a baseline**: screenshot or record each of the 5 pages (home,
+3. **Capture a baseline**: screenshot or record each of the 5 pages (home,
    brooklyn, 311, chicago, north-carolina) in their current working state. This
    is your visual regression reference for the migration.
-5. **Inventory the URLs** that must keep working (`/`, `/brooklyn`, `/311`,
+4. **Inventory the URLs** that must keep working (`/`, `/brooklyn`, `/311`,
    `/chicago`, `/north-carolina`, plus any deep-link query/hash states the
    `graph-key` router produces).
 
@@ -130,8 +126,8 @@ The `format-data.coffee` / `script/*.coffee` files are offline ETL. Rewrite them
 as **TypeScript build scripts** (run via `tsx`/Node) or a small `scripts/`
 pipeline that emits the `public/data/*.json`. For a hand-run, occasional refresh
 you do **not** need a workflow engine — a plain script + a documented command is
-enough. (The removed `airflow/` directory was an abandoned attempt at this;
-revisit a scheduler only if data genuinely needs to refresh on a cadence.)
+enough. (The removed ETL scaffold was an abandoned attempt at this; revisit a
+scheduler only if data genuinely needs to refresh on a cadence.)
 
 ### Phase 2.4 — Cut over deploy & DNS
 - Connect the repo to **Cloudflare Pages** (build command `astro build`, output
@@ -139,8 +135,7 @@ revisit a scheduler only if data genuinely needs to refresh on a cadence.)
   deploys automatically; `master` deploys to production.
 - Verify every legacy URL serves the new page; add `redirects` in `astro.config.mjs`
   for any path that changes.
-- Point the `vislet.com` DNS at Cloudflare Pages. **Decommission the S3 bucket**
-  (and confirm the rotated AWS keys are no longer referenced anywhere).
+- Point the `vislet.com` DNS at Cloudflare Pages. **Decommission the S3 bucket.**
 - Once green, retire the Gulp pipeline and the old `apps/`, `components/`, `assets/`.
 
 ---
@@ -229,7 +224,7 @@ mechanical once the chart pattern, the layout, and the copied-over tooling from
 
 ## 5. Definition of done
 
-- [ ] AWS keys rotated (`airflow/`, `.next/` already removed; `pages/`, `.DS_Store` still to go).
+- [ ] Dead weight removed (ETL scaffold + `.next/` done; `pages/`, `.DS_Store` still to go).
 - [ ] All source is TypeScript; `tsc --noEmit` clean; ESLint/Prettier enforced in CI.
 - [ ] All 5 pages render identically to the Phase 0 baseline.
 - [ ] Data fetched lazily from `/public` or CDN — not bundled into JS.

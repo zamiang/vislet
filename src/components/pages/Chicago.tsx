@@ -26,6 +26,7 @@ const GRAPH_WIDTH = 450;
 const GRAPH_HEIGHT = 120;
 const CHICAGO_ROTATE: [number, number] = [74 + 800 / 60, -38 - 50 / 60]; // [87.333, -39.833]
 const IGNORED_IDS = ['33', '20'];
+const DEFAULT_AREA = '7'; // Lincoln Park — pre-selected on load
 
 // ─── types ───────────────────────────────────────────────────────────────────
 
@@ -129,7 +130,7 @@ export function Chicago() {
   const [neighborhoodNames, setNeighborhoodNames] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(DEFAULT_AREA);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string>('ALL');
   const [selectedDate, setSelectedDate] = useState<number>(0);
@@ -321,7 +322,6 @@ export function Chicago() {
             title="Crime Rate per 1,000 Residents"
             formatHoverText={formatHoverText}
             reverseColorKey
-            zoomOnClick
           />
 
           {selectedType === 'ALL' && sliderDates.length > 0 && (

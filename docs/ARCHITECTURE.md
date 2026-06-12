@@ -48,9 +48,8 @@ vislet/
 ```
 
 > Two abandoned migration/experiment directories — `.next/` (a 2022 Next.js
-> build artifact) and `airflow/` (an empty ETL scaffold) — were removed on
-> 2026-06-11. They were never tracked in git. **See the Security note below: the
-> deleted `airflow/.env` contained live AWS credentials that must still be rotated.**
+> build artifact) and an empty ETL scaffold — were removed on 2026-06-11. They
+> were never tracked in git.
 
 ### `apps/<name>/` anatomy
 
@@ -144,24 +143,18 @@ work. A recent commit stopped pushing UI events into browser history.
 
 ## Known cruft / dead weight
 
-- **`airflow/`** and **`.next/`** — abandoned experiment directories (an empty ETL
-  scaffold and a stray 2022 Next.js build artifact). **Removed 2026-06-11.** The
-  deleted `airflow/.env` held live AWS credentials — still rotate them (see below).
+- **An empty ETL scaffold** and **`.next/`** — abandoned experiment directories (a
+  stray 2022 Next.js build artifact). **Removed 2026-06-11.**
 - **`pages/`** — nearly empty (`.DS_Store` + `api/.DS_Store`); vestigial, safe to remove.
 - **`package.json`** pins every dependency to `"*"` and declares Node `0.12.x`.
 - **`.DS_Store`** files are committed throughout.
 
 ## ⚠ Security findings (address before anything else)
 
-1. **Live AWS keys that were in `airflow/.env`** — the now-deleted file held
-   `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in plaintext. `.env` was gitignored
-   (so not in git history), and the directory was removed on 2026-06-11 — but
-   **deleting the file does not un-expose the keys**. Treat them as compromised and
-   **rotate/revoke them in the AWS console** if not already done.
-2. **`engines.node: "0.12.x"`** — a Node version from 2015 that is EOL and has
+1. **`engines.node: "0.12.x"`** — a Node version from 2015 that is EOL and has
    known CVEs. Nothing actually enforces it (you're on Node 24), but it signals
    the dependency tree is ancient and unaudited.
-3. The pinned-`"*"` deps + 2015-era shrinkwrap almost certainly contain many
+2. The pinned-`"*"` deps + 2015-era shrinkwrap almost certainly contain many
    packages with published vulnerabilities (`gulp` 3, `browserify`, old `jade`,
    etc.). `npm audit` will be loud.
 
@@ -173,5 +166,5 @@ work. A recent commit stopped pushing UI events into browser history.
 - No types, no tests, no CI → every change is a manual-verify gamble.
 - Data is coupled into the JS bundle, inflating bundle size and rebuild time.
 - Shared logic is wired with brittle relative `require` paths.
-- The two abandoned migration attempts (`.next/`, `airflow/`) show this has been
-  a pain point before.
+- The two abandoned migration attempts (`.next/` and an ETL scaffold) show this
+  has been a pain point before.

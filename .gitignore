@@ -50,3 +50,4 @@ apps/north-carolina/data/vote-tally.json
 # see outbox query). The 12 MB apps/brooklyn/data/bbl-to-lat-long.json is
 # intentionally NOT under public/ — it must not ship to the client and is
 # pre-joined at build time in Phase 2.3.
+.gstack/

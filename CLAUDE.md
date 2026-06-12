@@ -69,10 +69,8 @@ for content already on `main` — fetch first and diff (`git diff <yourcommit> o
 to avoid duplicates.
 
 ## Security ⚠️
-A deleted `airflow/.env` previously held **live AWS keys**. Deleting the file did not
-un-expose them — they must be rotated in the AWS console (tracked by the hive). **Never
-commit secrets**; never re-add the leaked keys. Verify the rotated deploy key is scoped
-to the deploy bucket only.
+**Never commit secrets.** Legacy deploys read a gitignored `aws.json`; keep credentials
+out of git and scope any deploy key to the deploy bucket only.
 
 ## Verifying a migrated page
 Diff the new page against the **Phase-0 baseline screenshots** of the legacy site;
