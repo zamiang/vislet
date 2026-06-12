@@ -68,7 +68,10 @@ Done — palette, fonts, type scale, and layout chrome now match the sibling:
 Remaining:
 
 - Fixed-width map apps (`1054px`) still need a responsive strategy for mobile.
-- Optional: section-tint full-bleed wrappers + the sibling's `FloatingParticles`.
+- Optional: section-tint full-bleed wrappers.
+
+Intentionally **not** adopted from the sibling: the `FloatingParticles` background
+(decorative; would compete with the data visualizations).
 
 ## Typography
 
