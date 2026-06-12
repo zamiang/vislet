@@ -132,6 +132,7 @@ function aggregateByDistrict(tracts: NCCensusTract[]): Map<string, Record<string
 type Topology = object;
 
 const NC_ROTATE: [number, number] = [80, 0];
+const DEFAULT_DISTRICT = '12'; // NC-12 — historically the most-gerrymandered district; pre-selected on load
 
 export function NorthCarolina() {
   const [topoOfficial, setTopoOfficial] = useState<Topology | null>(null);
@@ -140,7 +141,7 @@ export function NorthCarolina() {
   const [cpvi, setCpvi] = useState<Record<string, string>>({});
   const [mapType, setMapType] = useState<MapType>('official-2012');
   const [metric, setMetric] = useState<MetricKey>('white');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(DEFAULT_DISTRICT);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -250,9 +251,12 @@ export function NorthCarolina() {
   }
 
   return (
-    <div className="nc-page">
-      {/* Page header */}
-      <h1 className="nc-title">Gerrymandering in North Carolina</h1>
+    <div className="map-app nc-page">
+      {/* Shared page header (centered serif heading + rule), matching the other map pages */}
+      <header>
+        <div className="heading">Gerrymandering in North Carolina</div>
+        <div className="border" />
+      </header>
 
       {/* Map type selector */}
       <nav className="nc-map-type">

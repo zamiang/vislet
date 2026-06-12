@@ -67,7 +67,10 @@ export interface SvgMapProps {
   reverseColorKey?: boolean;
   /** Color-key total width (defaults to map width). */
   colorKeyWidth?: number;
-  /** Animate a zoom-to-feature on selection (legacy default true). */
+  /**
+   * Animate a zoom-to-feature on selection. Default `false`: maps stay fully
+   * zoomed out and selection only highlights/dims (no camera move).
+   */
   zoomOnClick?: boolean;
   /**
    * Color palette class applied to the wrapper div.
@@ -106,7 +109,7 @@ export function SvgMap({
   formatHoverText,
   reverseColorKey = true,
   colorKeyWidth,
-  zoomOnClick = true,
+  zoomOnClick = false,
   colorPalette = 'reds',
   children,
 }: SvgMapProps) {

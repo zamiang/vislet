@@ -25,6 +25,7 @@ const CHART_WIDTH = 490;
 const CHART_HEIGHT = 230;
 const SLIDER_WIDTH = 502;
 const IGNORED_IDS = ['99', '98'];
+const DEFAULT_AREA = 'BK73'; // Williamsburg — pre-selected on load
 
 export function Brooklyn() {
   const [salesData, setSalesData] = useState<BrooklynData | null>(null);
@@ -33,7 +34,7 @@ export function Brooklyn() {
   const [buildingClasses, setBuildingClasses] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(DEFAULT_AREA);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<number>(0);
 

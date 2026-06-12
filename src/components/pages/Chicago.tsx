@@ -22,10 +22,12 @@ import type { ChicagoData, ColorDatum } from '@/types';
 
 const MAP_WIDTH = 500;
 const MAP_HEIGHT = 400;
-const GRAPH_WIDTH = 450;
-const GRAPH_HEIGHT = 120;
+const CHART_WIDTH = 490;
+const CHART_HEIGHT = 230;
+const SLIDER_WIDTH = 502;
 const CHICAGO_ROTATE: [number, number] = [74 + 800 / 60, -38 - 50 / 60]; // [87.333, -39.833]
 const IGNORED_IDS = ['33', '20'];
+const DEFAULT_AREA = '7'; // Lincoln Park — pre-selected on load
 
 // ─── types ───────────────────────────────────────────────────────────────────
 
@@ -129,7 +131,7 @@ export function Chicago() {
   const [neighborhoodNames, setNeighborhoodNames] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(DEFAULT_AREA);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string>('ALL');
   const [selectedDate, setSelectedDate] = useState<number>(0);
@@ -278,29 +280,33 @@ export function Chicago() {
   const activeNeighborhoodName = selectedId ? (neighborhoodNames[selectedId] ?? selectedId) : null;
 
   if (loading || !topology || !crimeData) {
-    return <div className="map-app">Loading...</div>;
+    return (
+      <div id="chicago" className="map-app">
+        <p style={{ padding: '2rem' }}>Loading Chicago data…</p>
+      </div>
+    );
   }
 
   return (
-    <div className="map-app">
-      <header className="map-header">
-        <h1 className="map-title">Chicago Crime 2003–2014</h1>
-        <p className="map-description">
-          5,712,201 crimes shown across Chicago neighborhoods from 2003 to 2014.
-        </p>
-        <div className="map-controls">
-          <Select
-            id="crime-type-select"
-            options={crimeTypeOptions}
-            value={selectedType}
-            onChange={handleTypeChange}
-            includeAll
-          />
-        </div>
+    <div id="chicago" className="map-app">
+      <header>
+        <div className="heading">Chicago Crime 2003–2014</div>
+        <div className="border" />
       </header>
 
       <div className="map-row">
         <div className="map-svg-container">
+          <div className="select-container visible" style={{ marginBottom: '8px' }}>
+            <label htmlFor="crime-type-select">Filter crime reports: </label>
+            <Select
+              id="crime-type-select"
+              options={crimeTypeOptions}
+              value={selectedType}
+              onChange={handleTypeChange}
+              includeAll
+            />
+          </div>
+
           <SvgMap
             topology={topology as unknown as Parameters<typeof SvgMap>[0]['topology']}
             objectKey="neighborhoods"
@@ -321,7 +327,6 @@ export function Chicago() {
             title="Crime Rate per 1,000 Residents"
             formatHoverText={formatHoverText}
             reverseColorKey
-            zoomOnClick
           />
 
           {selectedType === 'ALL' && sliderDates.length > 0 && (
@@ -330,49 +335,81 @@ export function Chicago() {
               dates={sliderDates}
               value={selectedDate}
               onChange={handleDateChange}
-              width={MAP_WIDTH}
+              width={SLIDER_WIDTH}
             />
           )}
         </div>
 
-        {selectedId && lineData && (
-          <div className="svg-graphs">
-            <div className="graph-header">
-              <h2 className="graph-title">{activeNeighborhoodName}</h2>
-              <button className="graph-back" onClick={() => handleSelect(null)} type="button">
-                Back to overview
-              </button>
-            </div>
+        <div className="svg-graphs">
+          <p className="graph-help-text">
+            Click a neighborhood to see how crime has changed since 2003. Hover over an area to
+            compare it.
+          </p>
+          {selectedId && activeNeighborhoodName && lineData && (
+            <div className="svg-graphs-content">
+              <a className="back" onClick={() => handleSelect(null)} style={{ cursor: 'pointer' }}>
+                ← BACK TO OVERVIEW
+              </a>
+              <div className="graph-heading-container">
+                <div className="selected-neighborhood-name">
+                  <span className="circle-key blue" />
+                  <span className="graph-heading">{activeNeighborhoodName}</span>
+                </div>
+                {hoveredId && hoveredId !== selectedId && (
+                  <div className="hover-neighborhood-name">
+                    <span className="circle-key red" />
+                    <span className="graph-heading">
+                      {neighborhoodNames[hoveredId] ?? hoveredId}
+                    </span>
+                  </div>
+                )}
+                <div className="avg-neighborhood-name">
+                  <span className="circle-key gray" />
+                  <span className="graph-heading">City Average</span>
+                </div>
+              </div>
 
-            <div className="graph-row">
               <LineGraph
                 data={lineData}
                 keys={['crimeTally', 'crimeTally-mean']}
                 startingDataset={selectedId}
-                width={GRAPH_WIDTH}
-                height={GRAPH_HEIGHT}
+                width={CHART_WIDTH}
+                height={CHART_HEIGHT}
                 label="Crime Tally"
                 keyLabel={lineKeyLabel}
                 showTooltips
               />
-            </div>
 
-            {areaData && (
-              <div className="graph-row">
+              {areaData && (
                 <AreaChart
                   data={areaData}
-                  width={GRAPH_WIDTH}
-                  height={GRAPH_HEIGHT}
+                  width={CHART_WIDTH}
+                  height={CHART_HEIGHT}
                   label="Crime Type Breakdown"
                   keyLabel={areaKeyLabel}
                   showTooltips
                 />
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
+        </div>
       </div>
       {/* end .map-row */}
+
+      <div className="markdown-text">
+        <time dateTime="2015-02-06">February 6, 2015</time>
+        <h1>A look at Crime in Chicago by Neighborhood</h1>
+        <p>
+          Chicago publishes every reported crime as open data. This visualization maps 5,712,201
+          incidents from 2003 to 2014 across the city&rsquo;s neighborhoods, normalized per 1,000
+          residents so dense and sparse areas can be compared fairly.
+        </p>
+        <p>
+          Click any neighborhood to see how its crime tally changed over time against the city
+          average, and how the mix of crime types breaks down. Use the filter above to focus on a
+          single category.
+        </p>
+      </div>
     </div>
   );
 }
