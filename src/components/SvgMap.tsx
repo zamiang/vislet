@@ -70,6 +70,11 @@ export interface SvgMapProps {
   /** Animate a zoom-to-feature on selection (legacy default true). */
   zoomOnClick?: boolean;
   /**
+   * Color palette class applied to the wrapper div.
+   * 'reds' (default) = Reds scale (crime/311); 'spectral' = blue-green Spectral (price data).
+   */
+  colorPalette?: 'reds' | 'spectral';
+  /**
    * Optional overlay render-prop. Receives the live `GeoProjection` (already
    * fit to the viewport) so the consumer can project `[lng, lat]` → `[x, y]`
    * and return SVG (e.g. `<circle>` tract markers) drawn on top of the
@@ -102,6 +107,7 @@ export function SvgMap({
   reverseColorKey = true,
   colorKeyWidth,
   zoomOnClick = true,
+  colorPalette = 'reds',
   children,
 }: SvgMapProps) {
   const isIgnored = (id: string) => ignoredIds.some((ignored) => id.includes(ignored));
@@ -152,6 +158,7 @@ export function SvgMap({
     if (isIgnored(id)) return 'park';
     const parts = ['tract'];
     if (id === selectedId) parts.push('selected');
+    else if (selectedId != null) parts.push('dimmed');
     const colorClass = colorInfo?.classes.get(id);
     if (colorClass) parts.push(colorClass);
     return parts.join(' ');
@@ -165,8 +172,10 @@ export function SvgMap({
     keyValues = [...keyValues].reverse();
   }
 
+  const wrapperClass = colorPalette === 'spectral' ? 'spectral-map' : undefined;
+
   return (
-    <>
+    <div className={wrapperClass}>
       <svg width={width} height={height}>
         <g
           transform={zoomTransform}
@@ -209,6 +218,6 @@ export function SvgMap({
           width={Math.floor((colorKeyWidth ?? width) / Math.max(keyClasses.length, 1))}
         />
       )}
-    </>
+    </div>
   );
 }
