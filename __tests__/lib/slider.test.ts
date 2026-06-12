@@ -22,9 +22,13 @@ describe('snapToNearest', () => {
 });
 
 describe('getYearTickCount', () => {
-  it('returns 4 ticks per year of span', () => {
-    expect(getYearTickCount(dates)).toBe(12); // 2013 - 2010 = 3 years * 4
+  it('returns ~1 tick per year of span by default (readable labels)', () => {
+    expect(getYearTickCount(dates)).toBe(3); // 2013 - 2010 = 3 years * 1
     expect(getYearTickCount(dates, 2)).toBe(6);
+  });
+
+  it('floors at 2 ticks so short spans still render an axis', () => {
+    expect(getYearTickCount([Y(2012), Y(2013)])).toBe(2); // 1-year span -> max(1, 2)
   });
 
   it('returns 0 for empty input', () => {

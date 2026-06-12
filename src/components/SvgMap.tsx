@@ -177,6 +177,21 @@ export function SvgMap({
   return (
     <div className={wrapperClass}>
       <svg width={width} height={height}>
+        {/* Hatch fill for inert "park" areas — referenced by `.tract.park`
+            (`fill: url(#hatch)` in globals.css). Without this defs the paint
+            reference fails and parks render as solid black. */}
+        <defs>
+          <pattern
+            id="hatch"
+            patternUnits="userSpaceOnUse"
+            width={6}
+            height={6}
+            patternTransform="rotate(45)"
+          >
+            <rect width={6} height={6} fill="var(--muted, #e8eaed)" />
+            <line x1={0} y1={0} x2={0} y2={6} stroke="#c2c9d1" strokeWidth={1.5} />
+          </pattern>
+        </defs>
         <g
           transform={zoomTransform}
           style={{ transition: 'transform 0.5s', strokeWidth: zoomTransform ? 0.5 : 1 }}

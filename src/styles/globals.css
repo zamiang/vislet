@@ -8,20 +8,37 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
   --color-accent: var(--accent);
-  /* EB Garamond ≈ Adobe Garamond Pro (legacy body); Libre Franklin ≈ Franklin Gothic URW (legacy nav/labels) */
-  --font-body: 'EB Garamond', Georgia, Cambria, 'Times New Roman', Times, serif;
-  --font-heading: 'Libre Franklin', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  --color-accent-bold: var(--accent-bold);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  /* Shared "Slate Executive" voice with zamiang-dot-com-v2: EB Garamond (serif,
+     editorial body + titles), Lato (sans, nav/labels/meta), JetBrains Mono (chrome). */
+  --font-body: 'EB Garamond', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-heading: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
   --font-sans: var(--font-heading);
   --font-serif: var(--font-body);
 }
 
 :root {
   color-scheme: light;
-  --background: #ffffff;
-  --foreground: #1a1a1a;
-  --muted-foreground: #6b6b6b;
-  --accent: #2b6cb0;
+  /* Slate Executive palette — kept in sync with zamiang-dot-com-v2 (DESIGN.md). */
+  --background: #f0f2f5; /* Cool Mist — never pure white */
+  --foreground: #2c333a; /* Deep Charcoal Blue */
+  --primary: #5a7684; /* Steel Blue — chrome, viz selection/handle */
+  --accent: #749ca8; /* Dusty Teal — links, labels, accents */
+  --accent-bold: #c17f59; /* Warm Copper — the only warm color */
+  --muted: #e8eaed;
+  --muted-foreground: #4a5560; /* AA on Cool Mist */
+  --border: #d1d5db;
+
+  /* Motion — quart-out, the only curve (shared system). */
+  --transition-fast: 150ms;
+  --transition-normal: 200ms;
+  --transition-slow: 300ms;
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 html {
@@ -36,7 +53,7 @@ body {
   line-height: 1.6em;
   letter-spacing: 0.01rem;
   font-weight: 400;
-  color: rgba(0, 0, 0, 0.8);
+  color: var(--foreground);
 }
 
 /* Faux-underline affordance — ported from components/layout/stylesheets */
@@ -64,7 +81,7 @@ body {
 .faux-underline-large:hover::before,
 .faux-underline-hover:hover::before,
 .faux-underline-hover.active::before {
-  border-color: steelblue;
+  border-color: var(--primary);
 }
 
 /* ---- vislet-intro header ---- */
@@ -173,14 +190,16 @@ body {
   cursor: pointer;
 }
 .tract.selected {
-  fill: steelblue;
-  stroke: #333;
+  fill: var(--primary);
+  stroke: var(--foreground);
   stroke-width: 1.5px;
 }
 .tract.dimmed {
   opacity: 0.25;
 }
-.tract.park {
+/* Parks/inert areas carry only the `park` class (SvgMap `shapeClass`), not
+   `tract park` — target `.park` directly so the hatch fill actually applies. */
+.park {
   fill: url(#hatch);
   cursor: default;
 }
@@ -244,9 +263,104 @@ body {
   fill: #d53e4f;
 }
 
+/* ==========================================================================
+   Linear choropleth color key (ColorKey.tsx → `.linear-graph-key`).
+   The legacy Stylus rules were never ported, so the swatch row had no styles
+   and the `.color0–8` classes only set SVG `fill` (not `background`): the key
+   rendered as bare numbers stacked at the left edge with no color. Restore the
+   horizontal swatch strip + breakpoint values here.
+   ========================================================================== */
+.linear-graph-key {
+  margin-top: 10px;
+}
+.key-bars {
+  display: flex;
+  flex-direction: row;
+}
+.key-bar {
+  height: 10px;
+}
+.key-bar-values {
+  display: flex;
+  flex-direction: row;
+  margin-top: 4px;
+}
+.key-bar-value {
+  font-size: 11px;
+  font-family: var(--font-heading);
+  color: var(--muted-foreground);
+  text-align: center;
+}
+.key-label {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted-foreground);
+}
+
+/* Swatch backgrounds — Reds ramp (default: crime/311). Mirrors `.tract.colorN`. */
+.key-bar.color0 {
+  background: #fee5d9;
+}
+.key-bar.color1 {
+  background: #fcbba1;
+}
+.key-bar.color2 {
+  background: #fc9272;
+}
+.key-bar.color3 {
+  background: #fb6a4a;
+}
+.key-bar.color4 {
+  background: #ef3b2c;
+}
+.key-bar.color5 {
+  background: #cb181d;
+}
+.key-bar.color6 {
+  background: #a50f15;
+}
+.key-bar.color7 {
+  background: #67000d;
+}
+.key-bar.color8 {
+  background: #40000a;
+}
+
+/* Swatch backgrounds — Spectral ramp (Brooklyn price/sqft). */
+.spectral-map .key-bar.color0 {
+  background: #3288bd;
+}
+.spectral-map .key-bar.color1 {
+  background: #66c2a5;
+}
+.spectral-map .key-bar.color2 {
+  background: #abdda4;
+}
+.spectral-map .key-bar.color3 {
+  background: #e6f598;
+}
+.spectral-map .key-bar.color4 {
+  background: #ffffbf;
+}
+.spectral-map .key-bar.color5 {
+  background: #fee08b;
+}
+.spectral-map .key-bar.color6 {
+  background: #fdae61;
+}
+.spectral-map .key-bar.color7 {
+  background: #f46d43;
+}
+.spectral-map .key-bar.color8 {
+  background: #d53e4f;
+}
+
 /* Date slider handle */
 .handle {
-  fill: steelblue;
+  fill: var(--primary);
   stroke: #fff;
   stroke-width: 1.5px;
   cursor: ew-resize;
@@ -267,7 +381,7 @@ body {
   stroke-width: 1.5px;
 }
 .trend-area {
-  fill: steelblue;
+  fill: var(--primary);
   opacity: 0.15;
 }
 
@@ -369,7 +483,7 @@ body {
   margin-right: 4px;
 }
 .circle-key.blue {
-  background: steelblue;
+  background: var(--primary);
 }
 .circle-key.red {
   background: #d53f50;
