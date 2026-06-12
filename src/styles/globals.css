@@ -130,38 +130,33 @@ body::after {
   }
 }
 
-/* Faux-underline affordance — ported from components/layout/stylesheets */
+/* Underline affordance — ported from components/layout/stylesheets. Uses native
+   text-decoration (not a pseudo-element box) so the rule follows wrapped lines,
+   keeps a consistent offset across every heading size, skips descenders, and
+   animates on the shared motion tokens. `-large` is underlined at rest and shifts
+   to teal on hover; `-hover` reveals teal from transparent on hover/active. */
 .faux-underline-large,
 .faux-underline-hover {
-  display: inline-block;
-  position: relative;
-  text-decoration: none;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
+  text-decoration-skip-ink: auto;
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--transition-normal) var(--ease-out);
 }
-.faux-underline-large::before,
-.faux-underline-hover::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  display: inline-block;
-  height: 1em;
-  width: 100%;
-  margin-top: 0.4em;
-  border-bottom: 2px solid transparent;
-  transition: border-color 0.3s;
+.faux-underline-large {
+  text-decoration-color: var(--foreground);
 }
-.faux-underline-large::before {
-  border-color: var(--foreground);
-}
-.faux-underline-large:hover::before,
-.faux-underline-hover:hover::before,
-.faux-underline-hover.active::before {
-  border-color: var(--accent);
+.faux-underline-large:hover,
+.faux-underline-hover:hover,
+.faux-underline-hover.active {
+  text-decoration-color: var(--accent);
 }
 
 /* ---- vislet-intro header ---- */
 .vislet-intro {
   font-size: 15px;
-  padding: 11px 0 0;
+  padding: 3rem 0 0;
   margin-bottom: 80px;
   text-align: center;
 }
@@ -169,20 +164,26 @@ body::after {
   color: var(--muted-foreground);
 }
 .vislet-intro .title {
+  /* inline-block so the wordmark's vertical margin applies (a plain inline <a>
+     ignores margin-block) while staying centered by the parent's text-align. */
+  display: inline-block;
   color: var(--foreground);
-  font-weight: normal;
-  letter-spacing: 1px;
-  line-height: 141%;
-  font-size: 20px;
-  margin-bottom: 10px;
-  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  font-size: 2rem;
+  margin-bottom: 0.875rem;
+  font-family: var(--font-serif);
 }
 .vislet-intro .about {
-  margin: 0 auto 3px;
+  /* Constrained measure so the tagline reads as a centered editorial subtitle
+     rather than stretching the full header width. */
+  max-width: 34rem;
+  margin: 0 auto;
   color: var(--muted-foreground);
 }
 .vislet-intro .items {
-  margin-top: 6px;
+  margin-top: 1.5rem;
 }
 .vislet-intro .items a {
   display: inline-block;
@@ -214,6 +215,7 @@ body::after {
   margin-bottom: 10px;
 }
 .author .portrait {
+  display: block;
   border-radius: 50%;
   border: 3px solid #fff;
   background: #fff;
@@ -221,6 +223,10 @@ body::after {
   width: 200px;
   overflow: hidden;
   margin: 0 auto;
+  transition: opacity var(--transition-normal) var(--ease-out);
+}
+.author .portrait:hover {
+  opacity: 0.85;
 }
 .author .portrait img {
   width: 100%;
@@ -603,9 +609,11 @@ body::after {
   margin: 2em 0;
 }
 
-/* Home page — centered column, legacy: max-width 800px, margin: 0 auto */
+/* Home page — centered column, legacy: max-width 800px, margin: 0 auto.
+   No top margin: the header (.vislet-intro) owns the gap above the content via
+   its margin-bottom, so the spacing here is intentional, not a margin-collapse
+   accident between three competing values. */
 #home {
-  margin-top: 50px;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
@@ -636,7 +644,7 @@ body::after {
   margin: 0 auto 80px;
 }
 .project-title {
-  margin: 80px 0 0;
+  margin: 0;
   font-family: var(--font-heading);
   text-transform: uppercase;
   text-align: center;
@@ -665,7 +673,7 @@ body::after {
   font-family: var(--font-serif);
 }
 .project .description {
-  margin-top: 4px;
+  margin-top: 0.5rem;
   font-size: var(--font-size-base);
   line-height: var(--line-height-body);
   color: var(--muted-foreground);
