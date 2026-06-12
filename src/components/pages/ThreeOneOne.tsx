@@ -206,86 +206,91 @@ export function ThreeOneOne() {
         <div className="border" />
       </header>
 
-      <div className="map-svg-container">
-        <div className="select-container visible" style={{ marginBottom: '8px' }}>
-          <label htmlFor="three-select">Filter 311 reports: </label>
-          <Select
-            id="three-select"
-            options={selectOptions}
-            value={selectedType}
-            onChange={handleTypeChange}
-            includeAll
-          />
-        </div>
-
-        <SvgMap
-          topology={topology as Parameters<typeof SvgMap>[0]['topology']}
-          objectKey="neighborhoods"
-          width={MAP_WIDTH}
-          height={MAP_HEIGHT}
-          scale={1.3}
-          translateX={-50}
-          translateY={20}
-          ignoredIds={IGNORED_IDS}
-          colorData={colorData}
-          colorMin={0}
-          colorMax={50}
-          selectedId={selectedId}
-          hoveredId={hoveredId ?? undefined}
-          onSelect={handleSelect}
-          onHover={handleHover}
-          title="311 Reports per 1,000 residents"
-          formatHoverText={formatHoverText}
-        />
-
-        {allDates.length > 0 && (
-          <DateSlider
-            id="three-date-slider"
-            dates={allDates}
-            value={activeDate}
-            onChange={handleDateChange}
-            width={SLIDER_WIDTH}
-          />
-        )}
-      </div>
-
-      <div className="svg-graphs">
-        <p className="graph-help-text">Click on a neighborhood to see how the residents use 311.</p>
-        <div className="svg-graphs-content">
-          <div className="graph-heading-container">
-            <div className="selected-neighborhood-name">
-              <span className="circle-key blue" />
-              <span className="graph-heading">{activeNeighborhoodName}</span>
-            </div>
-            <div className="avg-neighborhood-name">
-              <span className="circle-key gray" />
-              <span className="graph-heading">Borough Average</span>
-            </div>
+      <div className="map-row">
+        <div className="map-svg-container">
+          <div className="select-container visible" style={{ marginBottom: '8px' }}>
+            <label htmlFor="three-select">Filter 311 reports: </label>
+            <Select
+              id="three-select"
+              options={selectOptions}
+              value={selectedType}
+              onChange={handleTypeChange}
+              includeAll
+            />
           </div>
 
-          <LineGraph
-            data={lineGraphData}
-            keys={['complaintTally', 'complaintTally-mean']}
-            startingDataset={selectedId in (data ?? {}) ? selectedId : DEFAULT_AREA}
-            width={CHART_WIDTH}
-            height={CHART_HEIGHT}
-            label={`311 Calls: ${activeNeighborhoodName}`}
-            keyLabel={(key) =>
-              key === 'complaintTally-mean' ? 'Borough Average' : activeNeighborhoodName
-            }
-            showTooltips
+          <SvgMap
+            topology={topology as Parameters<typeof SvgMap>[0]['topology']}
+            objectKey="neighborhoods"
+            width={MAP_WIDTH}
+            height={MAP_HEIGHT}
+            scale={1.3}
+            translateX={-50}
+            translateY={20}
+            ignoredIds={IGNORED_IDS}
+            colorData={colorData}
+            colorMin={0}
+            colorMax={50}
+            selectedId={selectedId}
+            hoveredId={hoveredId ?? undefined}
+            onSelect={handleSelect}
+            onHover={handleHover}
+            title="311 Reports per 1,000 residents"
+            formatHoverText={formatHoverText}
           />
 
-          <AreaChart
-            data={areaData}
-            width={CHART_WIDTH}
-            height={CHART_HEIGHT}
-            label="Complaint Type Breakdown"
-            keyLabel={keyLabel}
-            showTooltips
-          />
+          {allDates.length > 0 && (
+            <DateSlider
+              id="three-date-slider"
+              dates={allDates}
+              value={activeDate}
+              onChange={handleDateChange}
+              width={SLIDER_WIDTH}
+            />
+          )}
+        </div>
+
+        <div className="svg-graphs">
+          <p className="graph-help-text">
+            Click on a neighborhood to see how the residents use 311.
+          </p>
+          <div className="svg-graphs-content">
+            <div className="graph-heading-container">
+              <div className="selected-neighborhood-name">
+                <span className="circle-key blue" />
+                <span className="graph-heading">{activeNeighborhoodName}</span>
+              </div>
+              <div className="avg-neighborhood-name">
+                <span className="circle-key gray" />
+                <span className="graph-heading">Borough Average</span>
+              </div>
+            </div>
+
+            <LineGraph
+              data={lineGraphData}
+              keys={['complaintTally', 'complaintTally-mean']}
+              startingDataset={selectedId in (data ?? {}) ? selectedId : DEFAULT_AREA}
+              width={CHART_WIDTH}
+              height={CHART_HEIGHT}
+              label={`311 Calls: ${activeNeighborhoodName}`}
+              keyLabel={(key) =>
+                key === 'complaintTally-mean' ? 'Borough Average' : activeNeighborhoodName
+              }
+              showTooltips
+            />
+
+            <AreaChart
+              data={areaData}
+              width={CHART_WIDTH}
+              height={CHART_HEIGHT}
+              label="Complaint Type Breakdown"
+              keyLabel={keyLabel}
+              showTooltips
+            />
+          </div>
         </div>
       </div>
+      {/* end .map-row */}
 
       <div className="markdown-text">
         <time dateTime="2015-01-22">January 22, 2015</time>

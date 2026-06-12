@@ -45,7 +45,7 @@ const canonical = Astro.url.href;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:wght@400;700&display=swap"
       rel="stylesheet"
     />
 
@@ -76,12 +76,25 @@ const canonical = Astro.url.href;
 
       {/* Shared footer — ported from footer/bio.jade */}
       <footer class="author">
-        <span class="written-by-note">Created by</span>
-        <a class="name faux-underline-large" href="https://www.zamiang.com">Brennan Moore</a>
-        <p class="call-to-action">
-          Follow me on Twitter
-          <a class="faux-underline-hover" href="https://twitter.com/zamiang">here</a>.
-        </p>
+        <div class="written-by-note">Created By</div>
+        <div class="portrait">
+          <img
+            src="https://secure.gravatar.com/avatar/ed442a2cfbe84d5bf40e09c58ba80b5f?size=250"
+            alt="Brennan Moore"
+            width="200"
+            height="200"
+          />
+        </div>
+        <div class="info">
+          <a class="name faux-underline-large" href="https://www.zamiang.com">Brennan Moore</a>
+          <p class="call-to-action">
+            Follow me on Twitter&nbsp;<a
+              class="faux-underline-hover"
+              href="https://twitter.com/zamiang">here</a
+            >.
+          </p>
+        </div>
+        <div class="border"></div>
         <a class="faux-underline-hover" href="https://github.com/zamiang/vislet">Source</a>
       </footer>
     </div>
