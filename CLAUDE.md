@@ -48,6 +48,26 @@ moved to a **modern one**. Do not add new features to the old stack — only mig
    (Astro config, tsconfig, eslint flat config, prettier, vitest, knip, wrangler) rather
    than scaffolding from scratch. Use the `@` → `/src` Vite alias.
 
+## Git & PR workflow — never commit to `main`
+`main` is protected by a **GitHub ruleset** (not classic branch protection, so it won't
+show under branch-protection settings — check `gh api repos/zamiang/vislet/rules/branches/main`).
+The ruleset enforces:
+- **PRs only.** Direct pushes to `main` are rejected — even a "quick" commit. Always branch
+  first (`git switch -c <topic>`), push the branch, and open a PR with `gh pr create`. Never
+  `git commit` while on `main`. If you find yourself ahead of `origin/main`, you committed to
+  the wrong place: move the commit to a branch and `git reset --hard origin/main`.
+- **Signed commits required.** Every commit that lands must be signed, or the merge is
+  **BLOCKED** regardless of merge method. Ensure signing is on (`git config commit.gpgsign true`
+  with an SSH/GPG signing key). An unsigned commit already on a branch must be re-signed
+  (e.g. `git rebase <base> -S`) before the PR can merge — CI passing is not enough.
+- **Squash-merge** to match repo history (every prior PR landed as `… (#NN)`); the squash
+  commit is signed by GitHub, satisfying the rule. Use `gh pr merge <n> --squash --delete-branch`.
+
+Before merging, confirm the PR is actually green AND mergeable: `gh pr view <n> --json
+mergeable,mergeStateStatus,statusCheckRollup`. `BLOCKED`/`DIRTY` ≠ ready. Don't open a PR
+for content already on `main` — fetch first and diff (`git diff <yourcommit> origin/main`)
+to avoid duplicates.
+
 ## Security ⚠️
 A deleted `airflow/.env` previously held **live AWS keys**. Deleting the file did not
 un-expose them — they must be rotated in the AWS console (tracked by the hive). **Never
