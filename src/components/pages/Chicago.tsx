@@ -28,6 +28,8 @@ const SLIDER_WIDTH = 502;
 const CHICAGO_ROTATE: [number, number] = [74 + 800 / 60, -38 - 50 / 60]; // [87.333, -39.833]
 const IGNORED_IDS = ['33', '20'];
 const DEFAULT_AREA = '7'; // Lincoln Park — pre-selected on load
+// Breakdown series excluded from the stacked chart (legacy chicago `ignoredIds`).
+const AREA_IGNORED_IDS = ['RIT', 'heat'];
 
 // ─── types ───────────────────────────────────────────────────────────────────
 
@@ -387,6 +389,10 @@ export function Chicago() {
                   height={CHART_HEIGHT}
                   label="Crime Type Breakdown"
                   keyLabel={areaKeyLabel}
+                  ignoredIds={AREA_IGNORED_IDS}
+                  computeYDomain
+                  yAxisFormat={(v) => String(v)}
+                  tooltipFormat=""
                   showTooltips
                 />
               )}
