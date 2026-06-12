@@ -380,6 +380,42 @@ body::after {
   color: var(--muted-foreground);
 }
 
+/* ==========================================================================
+   Categorical legend (Legend.tsx → `.graph-keys`), used by AreaChart for the
+   building-class / complaint-type / crime-type keys. Ported from the legacy
+   `components/graph-key/key.styl`, which was never migrated — so the
+   `.key-circle` swatches collapsed to 0×0 and the key rendered as a bare
+   vertical list of labels with no color. Flow into balanced columns with an
+   inline color swatch per entry.
+   ========================================================================== */
+.graph-keys {
+  font-size: 12px;
+  columns: 3 150px;
+  column-gap: 12px;
+  margin-top: 12px;
+}
+.graph-key {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  max-height: 29px;
+  margin-bottom: 4px;
+  break-inside: avoid;
+}
+.key-circle {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  margin-top: 1px;
+}
+.key-text {
+  text-transform: capitalize;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Swatch backgrounds — Reds ramp (default: crime/311). Mirrors `.tract.colorN`. */
 .key-bar.color0 {
   background: #fee5d9;

@@ -6,8 +6,8 @@
  * was removed in v7). React renders the `<path>`s; D3 owns scales/shape/axes.
  */
 import {
-  curveCardinal,
   curveLinear,
+  curveMonotoneX,
   area as d3area,
   extent,
   format,
@@ -81,7 +81,11 @@ export function AreaChart({
     .range([height, 0])
     .domain(computeYDomain ? [0, areaYMax(series) * 1.3] : [0, 1]);
 
-  const curve = interpolate === 'cardinal' ? curveCardinal : curveLinear;
+  // `curveMonotoneX` for the smooth option, NOT `curveCardinal`: cardinal splines
+  // overshoot between points, which on a stacked area chart pushes a layer's
+  // boundary below its baseline (and below 0), rendering as phantom "negative"
+  // wedges. MonotoneX keeps the smooth look but never overshoots the data range.
+  const curve = interpolate === 'cardinal' ? curveMonotoneX : curveLinear;
   const areaPath = d3area<AreaPoint>()
     .curve(curve)
     .x((d) => x(d.date))
