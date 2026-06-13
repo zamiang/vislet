@@ -35,17 +35,24 @@ const projects = [
 
 <BaseLayout>
   <div id="home">
+    <h1 class="visually-hidden">
+      Vislet — small interactive visualizations of the cities we live in
+    </h1>
     <div class="projects">
-      <div class="project-title">Featured Projects</div>
+      <h2 class="project-title">Featured Projects</h2>
       <div class="border"></div>
-      {
-        projects.map((project) => (
-          <a class="project faux-underline-hover" href={project.href}>
-            <div class="title faux-underline-large">{project.name}</div>
-            <div class="description">{project.description}</div>
-          </a>
-        ))
-      }
+      <ul class="project-list">
+        {
+          projects.map((project) => (
+            <li>
+              <a class="project faux-underline-hover" href={project.href}>
+                <h3 class="title faux-underline-large">{project.name}</h3>
+                <p class="description">{project.description}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
     </div>
   </div>
 </BaseLayout>

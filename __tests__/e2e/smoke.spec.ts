@@ -20,10 +20,19 @@ test.describe('Home page (/)', () => {
     const response = await page.goto('/', { waitUntil: 'networkidle' });
 
     expect(response?.status()).toBe(200);
-    await expect(page.getByText('VISLET')).toBeVisible();
-    await expect(page.getByRole('link', { name: /Brooklyn Property Sales/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /NYC 311/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Chicago Crime/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'VISLET' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+
+    // Header nav and the featured-projects list link to the same pages, so
+    // scope each assertion to its landmark to avoid strict-mode ambiguity.
+    const nav = page.getByRole('navigation', { name: 'Visualizations' });
+    await expect(nav.getByRole('link', { name: /NYC 311/i })).toBeVisible();
+    await expect(nav.getByRole('link', { name: /Chicago Crime/i })).toBeVisible();
+
+    const projects = page.locator('.project-list');
+    await expect(projects.getByRole('link', { name: /Brooklyn Property Sales/i })).toBeVisible();
+    await expect(projects.getByRole('link', { name: /NYC 311/i })).toBeVisible();
+    await expect(projects.getByRole('link', { name: /Chicago Crime/i })).toBeVisible();
 
     expect(getErrors()).toHaveLength(0);
   });

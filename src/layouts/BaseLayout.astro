@@ -52,6 +52,7 @@ const canonical = Astro.url.href;
     <slot name="head" />
   </head>
   <body class="font-sans bg-background text-foreground">
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <div id="main-layout-container">
       {/* Shared intro/header — ported from header/intro.jade */}
       <header class="vislet-intro">
@@ -59,7 +60,7 @@ const canonical = Astro.url.href;
         <p class="about">
           Small interactive visualizations to help us understand the cities we live in.
         </p>
-        <nav class="items">
+        <nav class="items" aria-label="Visualizations">
           {
             config.nav.map((item) => (
               <a class="faux-underline-hover" href={item.href}>
@@ -70,7 +71,7 @@ const canonical = Astro.url.href;
         </nav>
       </header>
 
-      <main>
+      <main id="main-content">
         <slot />
       </main>
 
