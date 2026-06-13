@@ -19,8 +19,18 @@
  * rate (per 1,000 residents) + the ALL (-mean) series, and a per-type
  * hour-of-day rate series.
  */
-import { hourEpoch, monthKeyToEpoch } from '../lib/dates';
+import { hourEpoch, monthKeyToEpoch, naiveDateMinusDays } from '../lib/dates';
 import { getInitials } from '../lib/initials';
+
+/**
+ * How far below the cache watermark (`maxDate`) the incremental refresh re-reads
+ * rows, to catch records whose `created_date` predates the watermark but that
+ * were loaded into the dataset after the last run (311 is batch-loaded daily, so
+ * a strict `created_date > maxDate` query silently drops these). The re-read is
+ * made idempotent by `recentKeys` (the `unique_key`s already folded in this
+ * window), so the same row is never double-counted. Sized for a monthly cadence.
+ */
+export const LOOKBACK_DAYS = 14;
 
 export interface DateValue {
   date: number;
@@ -88,23 +98,44 @@ export function normalizeComplaintType(raw: string): string {
 }
 
 interface CacheShape {
-  version: 1;
+  version: 1 | 2;
   /** Max `created_date` ingested, ISO — the incremental refresh resumes here. */
   maxDate: string;
   /** Per-NTA monthly totals: { nta: { "YYYY-MM": count } }. */
   monthly: Record<string, Record<string, number>>;
   /** Per-NTA per-type hour-of-day histograms: { nta: { type: number[24] } }. */
   hourly: Record<string, Record<string, number[]>>;
+  /**
+   * `unique_key` -> `created_date` for every folded record within `LOOKBACK_DAYS`
+   * of `maxDate`. The incremental refresh re-reads this window and skips keys
+   * already here, so late-loaded rows are folded exactly once. Absent in v1
+   * caches (treated as empty; the first incremental run reseeds it).
+   */
+  recentKeys?: Record<string, string>;
 }
 
 /** Streaming, serializable accumulator for 311 counts. */
 export class ComplaintAccumulator {
   private monthly: Record<string, Record<string, number>> = {};
   private hourly: Record<string, Record<string, number[]>> = {};
+  /** `unique_key` -> `created_date` for folded rows within the lookback window. */
+  private recent = new Map<string, string>();
   maxDate = '';
 
-  /** Ingest one geocoded complaint. `month` is 1-based; `typeCode` is normalized. */
-  add(nta: string, year: number, month: number, hour: number, typeCode: string): void {
+  /**
+   * Ingest one geocoded complaint. `month` is 1-based; `typeCode` is normalized.
+   * When `key`/`createdDate` are supplied the record is registered for dedup so a
+   * later incremental re-read of the lookback window won't count it twice.
+   */
+  add(
+    nta: string,
+    year: number,
+    month: number,
+    hour: number,
+    typeCode: string,
+    key?: string,
+    createdDate?: string,
+  ): void {
     const monthKey = `${year}-${String(month).padStart(2, '0')}`;
     this.monthly[nta] ??= {};
     this.monthly[nta][monthKey] = (this.monthly[nta][monthKey] ?? 0) + 1;
@@ -114,6 +145,13 @@ export class ComplaintAccumulator {
       const hist = (types[typeCode] ??= new Array(24).fill(0));
       hist[hour] += 1;
     }
+
+    if (key && createdDate) this.recent.set(key, createdDate);
+  }
+
+  /** True if this `unique_key` has already been folded into the counts. */
+  hasSeen(key: string): boolean {
+    return this.recent.has(key);
   }
 
   /** Track the latest raw `created_date` seen (for incremental resume). */
@@ -121,8 +159,33 @@ export class ComplaintAccumulator {
     if (isoDate > this.maxDate) this.maxDate = isoDate;
   }
 
+  /** Total folded (geocoded) complaints across all neighborhoods and months. */
+  totalComplaints(): number {
+    let total = 0;
+    for (const months of Object.values(this.monthly)) {
+      for (const count of Object.values(months)) total += count;
+    }
+    return total;
+  }
+
+  /** Drop dedup keys older than `LOOKBACK_DAYS` before `maxDate` (bounds size). */
+  private pruneRecent(): void {
+    if (!this.maxDate) return;
+    const cutoff = naiveDateMinusDays(this.maxDate, LOOKBACK_DAYS);
+    for (const [key, date] of this.recent) {
+      if (date <= cutoff) this.recent.delete(key);
+    }
+  }
+
   toJSON(): CacheShape {
-    return { version: 1, maxDate: this.maxDate, monthly: this.monthly, hourly: this.hourly };
+    this.pruneRecent();
+    return {
+      version: 2,
+      maxDate: this.maxDate,
+      monthly: this.monthly,
+      hourly: this.hourly,
+      recentKeys: Object.fromEntries(this.recent),
+    };
   }
 
   static fromJSON(cache: CacheShape): ComplaintAccumulator {
@@ -130,6 +193,7 @@ export class ComplaintAccumulator {
     acc.monthly = cache.monthly;
     acc.hourly = cache.hourly;
     acc.maxDate = cache.maxDate;
+    acc.recent = new Map(Object.entries(cache.recentKeys ?? {}));
     return acc;
   }
 

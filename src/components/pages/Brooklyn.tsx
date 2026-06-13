@@ -162,6 +162,17 @@ export function Brooklyn() {
     ? (formatName(neighborhoodNames[selectedId]) ?? selectedId)
     : null;
 
+  // First/last year of the quarterly axis, derived from the data so the page
+  // copy tracks the dataset instead of hardcoding a range that drifts on refresh.
+  const coverage = useMemo(() => {
+    const prices = salesData?.['ALL']?.residentialPrices ?? [];
+    if (prices.length === 0) return { firstYear: 2016, lastYear: 2016 };
+    return {
+      firstYear: new Date(prices[0].date).getFullYear(),
+      lastYear: new Date(prices[prices.length - 1].date).getFullYear(),
+    };
+  }, [salesData]);
+
   if (loading || !topology || !salesData) {
     return (
       <div id="brooklyn" className="map-app">
@@ -211,7 +222,7 @@ export function Brooklyn() {
         <div className="svg-graphs">
           <p className="graph-help-text">
             Click on a neighborhood like &ldquo;Williamsburg&rdquo; to see how the housing market
-            has changed since 2003.
+            has changed since {coverage.firstYear}.
           </p>
           {selectedId && selectedName && areaData && (
             <div className="svg-graphs-content">
@@ -258,8 +269,8 @@ export function Brooklyn() {
         <h1>How Residential Property Sales can help us better understand changes in Brooklyn</h1>
         <p>
           Brooklyn has seen dramatic changes in its housing market. This visualization explores
-          property sales from 2016 to 2025, charting shifts in price per square foot across all
-          neighborhoods.
+          property sales from {coverage.firstYear} to {coverage.lastYear}, charting shifts in price
+          per square foot across all neighborhoods.
         </p>
         <p>
           Click any neighborhood on the map to see its price history compared to the borough

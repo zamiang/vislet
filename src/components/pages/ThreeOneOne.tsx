@@ -36,6 +36,7 @@ export function ThreeOneOne() {
   const [complaintTypes, setComplaintTypes] = useState<Record<string, string>>({});
   const [topology, setTopology] = useState<unknown>(null);
   const [neighborhoodNames, setNeighborhoodNames] = useState<Record<string, string>>({});
+  const [meta, setMeta] = useState<{ totalComplaints: number } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [selectedId, setSelectedId] = useState<string>(DEFAULT_AREA);
@@ -49,7 +50,11 @@ export function ThreeOneOne() {
       fetch('/data/311/complaint-types.json').then((r) => r.json()),
       fetch('/data/311/nyc.json').then((r) => r.json()),
       fetch('/data/311/nyc-neighborhood-names.json').then((r) => r.json()),
-    ]).then(([displayData, typesRaw, topo, names]) => {
+      // Coverage sidecar (absolute count for the copy); tolerate its absence.
+      fetch('/data/311/meta.json')
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+    ]).then(([displayData, typesRaw, topo, names, metaRaw]) => {
       const typedData = displayData as ThreeOneOneData;
       // complaint-types.json = { label: abbrev } — invert to { abbrev: label }
       const typesInverted = Object.fromEntries(
@@ -62,6 +67,7 @@ export function ThreeOneOne() {
       setComplaintTypes(typesInverted);
       setTopology(topo);
       setNeighborhoodNames(names as Record<string, string>);
+      setMeta(metaRaw as { totalComplaints: number } | null);
 
       const tally = typedData['ALL']?.complaintTally ?? [];
       const lastDate = tally[tally.length - 1]?.date ?? 0;
@@ -195,6 +201,17 @@ export function ThreeOneOne() {
     return name ? (formatName(name) ?? name) : selectedId;
   }, [neighborhoodNames, selectedId]);
 
+  // Coverage span derived from the data so the page copy never goes stale on a
+  // refresh: first/last year of the citywide monthly axis.
+  const coverage = useMemo(() => {
+    const tally = data?.['ALL']?.complaintTally ?? [];
+    if (tally.length === 0) return { firstYear: 2010, lastYear: 2010 };
+    return {
+      firstYear: new Date(tally[0].date).getFullYear(),
+      lastYear: new Date(tally[tally.length - 1].date).getFullYear(),
+    };
+  }, [data]);
+
   if (loading || !topology || !data) {
     return (
       <div id="three" className="map-app">
@@ -206,7 +223,9 @@ export function ThreeOneOne() {
   return (
     <div id="three" className="map-app">
       <header>
-        <div className="heading">311 Calls in NYC from 2010–2014</div>
+        <div className="heading">
+          311 Calls in NYC from {coverage.firstYear}–{coverage.lastYear}
+        </div>
         <div className="border" />
       </header>
 
@@ -305,8 +324,10 @@ export function ThreeOneOne() {
         <h1>How 311 Data can help us understand NYC</h1>
         <p>
           311 is New York City&rsquo;s non-emergency government services hotline. From noise
-          complaints to pothole reports, the 7.7 million calls made from 2010 to 2014 reveal how
-          residents interact with city services across every neighborhood.
+          complaints to pothole reports, the{' '}
+          {meta ? `${(meta.totalComplaints / 1e6).toFixed(1)} million` : 'millions of'} geocoded
+          calls from {coverage.firstYear} to {coverage.lastYear} reveal how residents interact with
+          city services across every neighborhood.
         </p>
         <p>
           Click any neighborhood on the map to see its complaint history and breakdown by type,

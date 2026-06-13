@@ -6,9 +6,10 @@
  *                source datasets (2010–2019 `76ig-c548` + 2020→present
  *                `erm2-nwe9`). ~44 M rows — minutes to tens of minutes. Run
  *                locally, not in CI.
- *   (default)    incremental: load the committed cache, fetch only rows with
- *                created_date > cache.maxDate from `erm2-nwe9`, fold them in.
- *                ~one month of rows — fast enough for the monthly CI refresh.
+ *   (default)    incremental: load the committed cache, re-read rows from
+ *                `LOOKBACK_DAYS` before cache.maxDate from `erm2-nwe9` (so rows
+ *                loaded late aren't missed) and fold in any not already counted
+ *                — fast enough for the monthly CI refresh.
  *
  * Both modes spatially join each record to a 2020 NTA (point-in-polygon over
  * the DCP boundaries) and then write:
@@ -18,20 +19,23 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
+import { naiveDateMinusDays } from '../lib/dates';
 import { NtaIndex, loadNtaBoundaries } from '../lib/nta';
 import { soqlPaged } from '../lib/socrata';
-import { ComplaintAccumulator, normalizeComplaintType } from './aggregate';
+import { ComplaintAccumulator, LOOKBACK_DAYS, normalizeComplaintType } from './aggregate';
 
 const HISTORICAL = '76ig-c548'; // 311 Service Requests 2010–2019 (frozen)
 const CURRENT = 'erm2-nwe9'; // 311 Service Requests 2020–present (daily)
 const ROOT = process.cwd();
 const D = join(ROOT, 'public/data/311');
 const OUT = join(D, 'display-data.json');
+const META = join(D, 'meta.json');
 const CACHE = join(ROOT, 'scripts/etl/311/cache/311-aggregates.json');
 // Fixed reference instant for the hour-of-day axis (reproducible builds).
 const HOUR_AXIS_REF = Date.parse('2025-01-01T00:00:00-05:00');
 
 interface RawRow {
+  unique_key?: string;
   created_date?: string;
   complaint_type?: string;
   latitude?: string;
@@ -44,12 +48,23 @@ function ingest(acc: ComplaintAccumulator, index: NtaIndex, rows: RawRow[]): num
     const created = row.created_date;
     if (!created || !row.complaint_type || !row.latitude || !row.longitude) continue;
     acc.observeDate(created);
+    // Incremental re-reads the lookback window; skip rows already folded so the
+    // overlap isn't double-counted. (Backfill starts with an empty dedup set.)
+    if (row.unique_key && acc.hasSeen(row.unique_key)) continue;
     const nta = index.lookup(Number(row.longitude), Number(row.latitude));
     if (!nta) continue;
     const year = Number(created.slice(0, 4));
     const month = Number(created.slice(5, 7));
     const hour = Number(created.slice(11, 13));
-    acc.add(nta, year, month, hour, normalizeComplaintType(row.complaint_type));
+    acc.add(
+      nta,
+      year,
+      month,
+      hour,
+      normalizeComplaintType(row.complaint_type),
+      row.unique_key,
+      created,
+    );
     kept++;
   }
   return kept;
@@ -68,7 +83,7 @@ function monthBoundaries(startYM: [number, number], endYM: [number, number]): st
   return out;
 }
 
-const SELECT = 'created_date,complaint_type,latitude,longitude';
+const SELECT = 'unique_key,created_date,complaint_type,latitude,longitude';
 
 /**
  * Stream a dataset windowed by month, with bounded concurrency. Windowing keeps
@@ -128,24 +143,29 @@ async function streamWindowed(
   console.log(`  ${dataset}: ${total} scanned, ${kept} geocoded`);
 }
 
-/** Incremental tail: pull rows strictly after `since` (small, sequential). */
+/**
+ * Incremental tail: re-read from `LOOKBACK_DAYS` *before* the watermark so rows
+ * loaded late (created_date below the watermark, ingested after the last run)
+ * are still picked up; `acc.hasSeen` keeps the overlap from double-counting.
+ */
 async function streamSince(
   dataset: string,
   acc: ComplaintAccumulator,
   index: NtaIndex,
   since: string,
 ): Promise<void> {
+  const from = naiveDateMinusDays(since, LOOKBACK_DAYS);
   let total = 0;
   let kept = 0;
   await soqlPaged<RawRow>(
     dataset,
-    { $select: SELECT, $order: ':id', $where: `created_date > '${since}'` },
+    { $select: SELECT, $order: ':id', $where: `created_date > '${from}'` },
     (page) => {
       total += page.length;
       kept += ingest(acc, index, page);
     },
   );
-  console.log(`  ${dataset}: ${total} scanned, ${kept} geocoded (since ${since})`);
+  console.log(`  ${dataset}: ${total} scanned, ${kept} folded (since ${from}, watermark ${since})`);
 }
 
 function writeCache(acc: ComplaintAccumulator): void {
@@ -172,6 +192,10 @@ function writeDisplay(acc: ComplaintAccumulator): void {
   const population = JSON.parse(readFileSync(join(D, 'population.json'), 'utf8'));
   const display = acc.finalize(names, population, HOUR_AXIS_REF);
   writeFileSync(OUT, JSON.stringify(display));
+  // Sidecar the page copy reads to state coverage (the display series are rates,
+  // so the absolute complaint count isn't recoverable from display-data.json).
+  const meta = { totalComplaints: acc.totalComplaints(), maxDate: acc.maxDate };
+  writeFileSync(META, JSON.stringify(meta));
   console.log(
     `Wrote ${OUT} (${Object.keys(display).length} neighborhoods, through ${acc.maxDate})`,
   );

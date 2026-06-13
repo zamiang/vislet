@@ -86,4 +86,36 @@ describe('ComplaintAccumulator', () => {
     acc.observeDate('2024-01-01T00:00:00.000');
     expect(acc.maxDate).toBe('2026-03-15T12:00:00.000');
   });
+
+  it('registers and round-trips dedup keys for the lookback window', () => {
+    const acc = new ComplaintAccumulator();
+    acc.observeDate('2026-03-15T00:00:00.000');
+    acc.add('BK0101', 2026, 3, 10, 'heat', 'key-1', '2026-03-15T00:00:00.000');
+    expect(acc.hasSeen('key-1')).toBe(true);
+    expect(acc.hasSeen('key-2')).toBe(false);
+    const restored = ComplaintAccumulator.fromJSON(JSON.parse(JSON.stringify(acc.toJSON())));
+    expect(restored.hasSeen('key-1')).toBe(true);
+  });
+
+  it('does not double-count a row whose unique_key was already folded', () => {
+    const acc = new ComplaintAccumulator();
+    acc.observeDate('2026-03-10T00:00:00.000');
+    acc.add('BK0101', 2026, 3, 1, 'nois', 'dup', '2026-03-10T00:00:00.000');
+    // Simulating the incremental re-read: caller skips keys hasSeen() reports.
+    if (!acc.hasSeen('dup'))
+      acc.add('BK0101', 2026, 3, 1, 'nois', 'dup', '2026-03-10T00:00:00.000');
+    const total = acc.totalComplaints();
+    expect(total).toBe(1);
+  });
+
+  it('prunes dedup keys older than the lookback window on serialize', () => {
+    const acc = new ComplaintAccumulator();
+    // An old key far below the watermark should not persist in the cache.
+    acc.add('BK0101', 2025, 1, 1, 'nois', 'old', '2025-01-01T00:00:00.000');
+    acc.observeDate('2026-03-15T00:00:00.000');
+    acc.add('BK0101', 2026, 3, 1, 'nois', 'fresh', '2026-03-15T00:00:00.000');
+    const cache = acc.toJSON();
+    expect(cache.recentKeys?.old).toBeUndefined();
+    expect(cache.recentKeys?.fresh).toBe('2026-03-15T00:00:00.000');
+  });
 });

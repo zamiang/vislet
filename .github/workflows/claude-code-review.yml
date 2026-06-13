@@ -54,8 +54,10 @@ jobs:
                keep resolving (CLAUDE.md §3, MIGRATION.md §3).
             4. Security: secrets handling (never re-add the leaked AWS keys), env
                var leaks, deploy-key scope.
-            5. Data handling — data is fetched from `public/data/<app>/`, not
-               bundled; the 12 MB `bbl-to-lat-long.json` must stay pre-joined.
+            5. Data handling — display JSON is fetched from `public/data/<app>/`,
+               not bundled, and is regenerated from the live NYC Open Data APIs by
+               `scripts/etl/` (the legacy 12 MB `bbl-to-lat-long.json` geocode join
+               is retired — sales arrive pre-geocoded to 2020 NTAs). See docs/etl.md.
             6. Test coverage for new behavior (Vitest for pure math, Playwright smoke).
 
             Skip stylistic nits already covered by ESLint, Prettier, or Tailwind.

@@ -52,7 +52,6 @@ apps/north-carolina/data/vote-tally.json
 # pre-joined at build time in Phase 2.3.
 .gstack/
 scripts/etl/.cache/
-scripts/etl/.cache/
 scripts/etl/311/cache/.backfill-progress.json
 test-results/
 .impeccable/

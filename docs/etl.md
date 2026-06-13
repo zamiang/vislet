@@ -35,9 +35,19 @@ Key facts:
   datasets once and writes a compact committed cache
   (`scripts/etl/311/cache/311-aggregates.json`: per-NTA monthly totals +
   per-NTA/type hour-of-day histograms). The default `npm run data:build:311`
-  loads that cache and folds in only rows newer than `cache.maxDate`.
-  `-- --from-cache` re-finalizes the display JSON from the cache with no network
-  I/O (use after the reference/population files change).
+  loads that cache and folds in recent rows. Because 311 is batch-loaded daily,
+  a record's `created_date` can predate the cache watermark yet only appear in
+  the API after the last run, so the incremental refresh re-reads a
+  `LOOKBACK_DAYS` (14) window *below* `cache.maxDate` and dedupes by `unique_key`
+  via the cache's `recentKeys` map (the keys folded within that window) so the
+  overlap is never double-counted. `recentKeys` is pruned to the lookback window
+  on every write, so it stays bounded (and adds a modest, churning slice to the
+  committed cache — tune `LOOKBACK_DAYS` in `scripts/etl/311/aggregate.ts` if
+  that trade-off needs adjusting). The build also writes `public/data/311/meta.json`
+  (`{ totalComplaints, maxDate }`) — the page copy reads the absolute count from
+  it since the display series are rates, not counts. `-- --from-cache`
+  re-finalizes the display JSON + meta from the cache with no network I/O (use
+  after the reference/population files change).
 - **Reference data.** `npm run data:reference` regenerates the 2020-NTA
   TopoJSON maps, neighborhood-name lookups, the `[pop2010, pop2020]` population
   file (from a committed DCP decennial-census extract), and the 2010→2020
