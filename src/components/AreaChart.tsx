@@ -45,6 +45,10 @@ export interface AreaChartProps {
    * Fixed series order for the stack, legend, and ordinal color scale. Keeps a
    * series in the same slot/color across datasets; series absent from `data`
    * render as a zero band. Defaults to the sorted keys of `data`.
+   *
+   * Pre-filter `ignoredIds` out of this list yourself: a name present in both
+   * `domain` and `ignoredIds` is dropped from the stack but still consumes its
+   * slot in the color scale (line 80), shifting every later series by one color.
    */
   domain?: string[];
   /** y-axis tick formatter (default: percent). */
