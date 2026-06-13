@@ -19,7 +19,7 @@ import type { LineGraphData } from '@/lib/line-chart';
 import { parseGraphState, serializeGraphState } from '@/lib/url-state';
 import type { ColorDatum, DataPoint, ThreeOneOneData } from '@/types';
 
-const DEFAULT_AREA = 'BK0902'; // Crown Heights North (2020 NTA)
+const DEFAULT_AREA = 'BK0802'; // Crown Heights (North) (2020 NTA)
 // Breakdown series excluded from the stacked chart (legacy 311 `ignoredIds`).
 // `heat` (heating) is a massive outlier (peaks ~330 vs ~22 for the rest) that
 // would otherwise dominate the whole stack; `rode` (rodent) is also dropped.
@@ -183,6 +183,16 @@ export function ThreeOneOne() {
     return (data[activeId]?.complaintType ?? {}) as unknown as AreaData;
   }, [data, selectedId]);
 
+  // Fixed complaint-type order (citywide `ALL` keys) so each type keeps the same
+  // legend slot and color across neighborhoods; types a neighborhood lacks just
+  // render as a zero band instead of shifting everything below them.
+  const areaDomain = useMemo(() => {
+    const allTypes = data?.['ALL']?.complaintType ?? {};
+    return Object.keys(allTypes)
+      .sort()
+      .filter((name) => !AREA_IGNORED_IDS.includes(name));
+  }, [data]);
+
   const formatHoverText = useCallback(
     (id: string) => {
       const name = neighborhoodNames[id];
@@ -304,11 +314,11 @@ export function ThreeOneOne() {
 
             <AreaChart
               data={areaData}
+              domain={areaDomain}
               width={CHART_WIDTH}
               height={CHART_HEIGHT}
               label="Complaint Type Breakdown"
               keyLabel={keyLabel}
-              ignoredIds={AREA_IGNORED_IDS}
               computeYDomain
               yAxisFormat={(v) => String(v)}
               tooltipFormat=""

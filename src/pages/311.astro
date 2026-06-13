@@ -3,7 +3,7 @@
  * NYC 311 page — /311
  *
  * URL contract (must keep resolving — see MIGRATION.md §3):
- *   /311                      → overview (default area BK60)
+ *   /311                      → overview (default area BK0802, Crown Heights North)
  *   /311?area=<id>            → selected neighborhood
  *   /311?area=<id>&hover=<id> → selected + hovered
  *   /311?type=<abbrev>        → complaint-type filter
@@ -17,7 +17,7 @@ import { ThreeOneOne } from '@/components/pages/ThreeOneOne';
 
 <BaseLayout
   title="NYC 311 Calls — Vislet"
-  description="Compare how 7.7 million 311 calls are distributed across NYC neighborhoods from 2010 to 2014."
+  description="Compare how 41 million 311 calls are distributed across NYC neighborhoods from 2010 to present."
 >
   <ThreeOneOne client:only="react" />
 </BaseLayout>

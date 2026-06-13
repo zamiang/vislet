@@ -66,16 +66,39 @@ export function areaDomain(data: AreaData, ignoredIds: string[] = []): string[] 
  * Build stacked series in domain order. Each series' points are sorted by date
  * and assigned a `y0` baseline = the sum of the preceding series' `y` at the
  * same index. Mirrors `getLines` + `d3.layout.stack`.
+ *
+ * Pass an explicit `domain` to fix the series order (and therefore the legend
+ * order + ordinal color assignment) across datasets. Series named in `domain`
+ * but absent from `data` render as a flat zero band rather than collapsing the
+ * layout — so e.g. a neighborhood missing a complaint type keeps every other
+ * type in its usual slot/color instead of shifting them.
  */
-export function stackAreaSeries(data: AreaData, ignoredIds: string[] = []): AreaSeries[] {
-  const domain = areaDomain(data, ignoredIds);
+export function stackAreaSeries(
+  data: AreaData,
+  ignoredIds: string[] = [],
+  domain?: string[],
+): AreaSeries[] {
+  const names = (domain ?? Object.keys(data).sort()).filter((name) => !ignoredIds.includes(name));
 
-  const series: AreaSeries[] = domain.map((name) => ({
-    name,
-    values: Object.values(data[name])
-      .map((d) => ({ date: Number(d.date), y: d.value, y0: 0 }))
-      .sort((a, b) => a.date - b.date),
-  }));
+  // Union of dates across all present series, sorted — gives every series a
+  // common x axis so missing series can be zero-filled and stacking lines up.
+  const dateSet = new Set<number>();
+  for (const name of names) {
+    const points = data[name];
+    if (!points) continue;
+    for (const d of Object.values(points)) dateSet.add(Number(d.date));
+  }
+  const dates = [...dateSet].sort((a, b) => a - b);
+
+  const series: AreaSeries[] = names.map((name) => {
+    const byDate = new Map<number, number>(
+      Object.values(data[name] ?? {}).map((d) => [Number(d.date), d.value]),
+    );
+    return {
+      name,
+      values: dates.map((date) => ({ date, y: byDate.get(date) ?? 0, y0: 0 })),
+    };
+  });
 
   // Stack: y0 of series i at index n = running total of series 0..i-1 at n.
   const baselines: number[] = [];

@@ -43,6 +43,18 @@ describe('stackAreaSeries', () => {
     };
     expect(stackAreaSeries(unsorted)[0].values.map((v) => v.date)).toEqual([1, 2]);
   });
+
+  it('honors an explicit domain for series order, even when data omits keys', () => {
+    // `tourism` is in the domain but absent from `data` → zero band, kept in slot.
+    const series = stackAreaSeries(data, ['Park'], ['residential', 'tourism', 'commercial']);
+    expect(series.map((s) => s.name)).toEqual(['residential', 'tourism', 'commercial']);
+    const tourism = series.find((s) => s.name === 'tourism')!;
+    expect(tourism.values.map((v) => v.y)).toEqual([0, 0]);
+    // Stacking follows domain order: residential (bottom) → tourism (0) → commercial.
+    expect(series.find((s) => s.name === 'commercial')!.values.map((v) => v.y0)).toEqual([
+      0.5, 0.4,
+    ]);
+  });
 });
 
 describe('areaYMax', () => {
