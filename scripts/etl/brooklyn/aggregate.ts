@@ -9,10 +9,10 @@
  * derived from the data instead of the legacy hardcoded 2003–2014.
  *
  * Output is the `brooklyn-sales-display-data.json` shape the brooklyn page
- * consumes: per-NTA quarterly residential price means + per-year
+ * consumes: per-NTA quarterly residential price medians + per-year
  * building-class percentages, plus the "ALL" borough series.
  */
-import { ascending, mean } from 'd3';
+import { median } from 'd3';
 
 import { quarterKeyToEpoch, yearKeyToEpoch } from '../lib/dates';
 
@@ -48,7 +48,7 @@ export interface DateValue {
 export interface NeighborhoodDisplayData {
   residentialPrices: DateValue[];
   buildingClass: Record<string, DateValue[]>;
-  'residentialPrices-mean'?: DateValue[];
+  'residentialPrices-median'?: DateValue[];
 }
 
 export type BrooklynDisplayData = Record<string, NeighborhoodDisplayData>;
@@ -70,12 +70,20 @@ const VALID_RESIDENTIAL_BUILDING_CLASSES = [
   '28',
 ];
 
-// Legacy $/sqft sanity bounds (apps/brooklyn/models/sale.coffee): excludes
-// nominal-consideration transfers, garage-sized lots, and data-entry outliers.
+// $/sqft sanity bounds. The lower bounds (legacy, from
+// apps/brooklyn/models/sale.coffee) exclude nominal-consideration transfers and
+// garage-sized lots. MAX_PRICE_PER_SQFT is the symmetric upper guard: the DOF
+// Rolling Sales feed records the full aggregate price of a bulk/portfolio deal
+// on each constituent unit (e.g. a $105M condo sponsor sale stamped onto a
+// single 1,170 sqft unit) and carries the occasional data-entry error (an $80M
+// sale of one 1,487 sqft condo). Both yield impossible $/sqft figures —
+// borough-wide real sales sit at a p99 of ~$1,600/sqft — so a $3,000 ceiling
+// drops the invalid rows while leaving every legitimate sale untouched.
 const MIN_SQFT = 300;
 const MAX_SQFT = 10000;
 const MIN_PRICE = 10000;
 const MIN_PRICE_PER_SQFT = 30;
+const MAX_PRICE_PER_SQFT = 3000;
 
 /** Socrata serves DOF numerics as text, comma-grouped (e.g. "2,160"). */
 function parseNumber(value: string | undefined): number {
@@ -106,7 +114,8 @@ export function normalizeSale(raw: SaleRow): NormalizedSale | null {
     price >= MIN_PRICE &&
     sqft >= MIN_SQFT &&
     sqft <= MAX_SQFT &&
-    price / sqft >= MIN_PRICE_PER_SQFT
+    price / sqft >= MIN_PRICE_PER_SQFT &&
+    price / sqft <= MAX_PRICE_PER_SQFT
   ) {
     sale.pricePerSqFt = price / sqft;
   }
@@ -202,6 +211,10 @@ function getSalesTotals(
 ): Record<string, number[]> {
   const totals: Record<string, number[]> = {};
   for (const ntaID of ntaCodes) {
+    // Skip the synthetic "ALL" bucket — it carries no sales of its own (no sale
+    // has nta === "ALL"), so this guards intent rather than preventing a real
+    // double-count.
+    if (ntaID === 'ALL') continue;
     const series = data[ntaID].residentialPrices;
     for (const itemKey of Object.keys(series)) {
       (totals[itemKey] ||= []).push(...series[itemKey]);
@@ -220,8 +233,7 @@ function formatSalesDataForDisplay(
     const series = data[ntaID].residentialPrices;
     const flattened: NeighborhoodDisplayData = {
       residentialPrices: Object.keys(series).map((itemKey) => {
-        const arr = series[itemKey].slice().sort(ascending);
-        const m = mean(arr);
+        const m = median(series[itemKey]);
         return { date: quarterKeyToEpoch(itemKey), value: m ? Number(m.toFixed(2)) : 0 };
       }),
       buildingClass: formatBuildingClassData(data[ntaID].buildingClass),
@@ -229,9 +241,9 @@ function formatSalesDataForDisplay(
 
     if (ntaID === 'ALL') {
       const totals = getSalesTotals(data, ntaCodes);
-      flattened['residentialPrices-mean'] = Object.keys(totals).map((totalKey) => ({
+      flattened['residentialPrices-median'] = Object.keys(totals).map((totalKey) => ({
         date: quarterKeyToEpoch(totalKey),
-        value: Number((mean(totals[totalKey]) ?? 0).toFixed(2)),
+        value: Number((median(totals[totalKey]) ?? 0).toFixed(2)),
       }));
     }
 

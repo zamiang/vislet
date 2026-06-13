@@ -35,7 +35,7 @@ describe('normalizeSale', () => {
     expect(normalizeSale({ sale_price: '400000' })).toBeNull();
   });
 
-  it('excludes pricePerSqFt for implausible sqft/price (legacy rules)', () => {
+  it('excludes pricePerSqFt for implausible sqft/price (sanity bounds)', () => {
     const base = { nta: 'BK0101', sale_date: '2016-02-15T00:00:00.000' };
     expect(
       normalizeSale({ ...base, sale_price: '5000', gross_square_feet: '1,000' })?.pricePerSqFt,
@@ -46,6 +46,11 @@ describe('normalizeSale', () => {
     // $10/sqft is below the $30 sanity floor (nominal-consideration transfer).
     expect(
       normalizeSale({ ...base, sale_price: '10000', gross_square_feet: '1,000' })?.pricePerSqFt,
+    ).toBeUndefined();
+    // $53,799/sqft ($80M / 1,487 sqft) is above the $3,000 ceiling: a bulk-sale
+    // price stamped onto a single unit, or a data-entry error.
+    expect(
+      normalizeSale({ ...base, sale_price: '80000000', gross_square_feet: '1,487' })?.pricePerSqFt,
     ).toBeUndefined();
   });
 });
@@ -101,15 +106,15 @@ describe('aggregateSales', () => {
     expect(out.BK0101.residentialPrices).toHaveLength(YEARS.length * 4);
   });
 
-  it('means residential pricePerSqFt within a quarter, excluding commercial', () => {
-    // The $900/sqft commercial-unit sale would shift the mean if counted.
+  it('medians residential pricePerSqFt within a quarter, excluding commercial', () => {
+    // The $900/sqft commercial-unit sale would shift the result if counted.
     const q1 = out.BK0101.residentialPrices.find((d) => d.date === quarterKeyToEpoch('1-2016'));
     expect(q1?.value).toBe(500);
   });
 
-  it('emits the ALL (-mean) series only on ALL', () => {
-    expect(out.ALL['residentialPrices-mean']).toBeDefined();
-    expect(out.BK0101['residentialPrices-mean']).toBeUndefined();
+  it('emits the ALL (-median) series only on ALL', () => {
+    expect(out.ALL['residentialPrices-median']).toBeDefined();
+    expect(out.BK0101['residentialPrices-median']).toBeUndefined();
   });
 
   it('ignores sales in NTAs outside the lookup (parks, other boroughs)', () => {

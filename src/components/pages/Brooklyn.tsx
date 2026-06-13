@@ -133,7 +133,7 @@ export function Brooklyn() {
   const lineData: LineGraphData = useMemo(() => {
     if (!salesData || !selectedId) return {};
     const result: Record<string, Record<string, DataPoint[]>> = {
-      ALL: { 'residentialPrices-mean': salesData['ALL']?.['residentialPrices-mean'] ?? [] },
+      ALL: { 'residentialPrices-median': salesData['ALL']?.['residentialPrices-median'] ?? [] },
     };
     result[selectedId] = { residentialPrices: salesData[selectedId]?.residentialPrices ?? [] };
     return result;
@@ -206,7 +206,7 @@ export function Brooklyn() {
             hoveredId={hoveredId ?? undefined}
             onSelect={setSelectedId}
             onHover={setHoveredId}
-            title="Avg Price per SQFT"
+            title="Median Price per SQFT"
             formatHoverText={formatHoverText}
             colorPalette="spectral"
           />
@@ -236,17 +236,17 @@ export function Brooklyn() {
                 </div>
                 <div className="avg-neighborhood-name">
                   <span className="circle-key gray" />
-                  <span className="graph-heading">Borough Average</span>
+                  <span className="graph-heading">Borough Median</span>
                 </div>
               </div>
 
               <LineGraph
                 data={lineData}
-                keys={['residentialPrices', 'residentialPrices-mean']}
+                keys={['residentialPrices', 'residentialPrices-median']}
                 startingDataset={selectedId}
                 width={CHART_WIDTH}
                 height={CHART_HEIGHT}
-                label="Avg Price per Sqft"
+                label="Median Price per Sqft"
                 yAxisFormat={(v) => `$${v}`}
                 showTooltips
               />
@@ -273,9 +273,8 @@ export function Brooklyn() {
           per square foot across all neighborhoods.
         </p>
         <p>
-          Click any neighborhood on the map to see its price history compared to the borough
-          average. The building-class chart below shows the mix of property types as a share of
-          total sales.
+          Click any neighborhood on the map to see its price history compared to the borough median.
+          The building-class chart below shows the mix of property types as a share of total sales.
         </p>
         <p>
           Data comes from the NYC Department of Finance{' '}
