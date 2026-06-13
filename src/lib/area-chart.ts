@@ -78,9 +78,7 @@ export function stackAreaSeries(
   ignoredIds: string[] = [],
   domain?: string[],
 ): AreaSeries[] {
-  const names = (domain ?? Object.keys(data).sort()).filter(
-    (name) => !ignoredIds.includes(name),
-  );
+  const names = (domain ?? Object.keys(data).sort()).filter((name) => !ignoredIds.includes(name));
 
   // Union of dates across all present series, sorted — gives every series a
   // common x axis so missing series can be zero-filled and stacking lines up.

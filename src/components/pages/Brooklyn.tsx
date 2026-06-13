@@ -273,9 +273,8 @@ export function Brooklyn() {
           per square foot across all neighborhoods.
         </p>
         <p>
-          Click any neighborhood on the map to see its price history compared to the borough
-          median. The building-class chart below shows the mix of property types as a share of
-          total sales.
+          Click any neighborhood on the map to see its price history compared to the borough median.
+          The building-class chart below shows the mix of property types as a share of total sales.
         </p>
         <p>
           Data comes from the NYC Department of Finance{' '}
