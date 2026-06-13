@@ -319,7 +319,6 @@ export function ThreeOneOne() {
               height={CHART_HEIGHT}
               label="Complaint Type Breakdown"
               keyLabel={keyLabel}
-              ignoredIds={AREA_IGNORED_IDS}
               computeYDomain
               yAxisFormat={(v) => String(v)}
               tooltipFormat=""
