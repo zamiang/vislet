@@ -19,7 +19,7 @@ import type { LineGraphData } from '@/lib/line-chart';
 import { parseGraphState, serializeGraphState } from '@/lib/url-state';
 import type { ColorDatum, DataPoint, ThreeOneOneData } from '@/types';
 
-const DEFAULT_AREA = 'BK60';
+const DEFAULT_AREA = 'BK0902'; // Crown Heights North (2020 NTA)
 // Breakdown series excluded from the stacked chart (legacy 311 `ignoredIds`).
 // `heat` (heating) is a massive outlier (peaks ~330 vs ~22 for the rest) that
 // would otherwise dominate the whole stack; `rode` (rodent) is also dropped.

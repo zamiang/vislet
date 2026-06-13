@@ -25,7 +25,7 @@ const CHART_WIDTH = 490;
 const CHART_HEIGHT = 230;
 const SLIDER_WIDTH = 502;
 const IGNORED_IDS = ['99', '98'];
-const DEFAULT_AREA = 'BK73'; // Williamsburg — pre-selected on load
+const DEFAULT_AREA = 'BK0102'; // Williamsburg (2020 NTA) — pre-selected on load
 
 export function Brooklyn() {
   const [salesData, setSalesData] = useState<BrooklynData | null>(null);
@@ -173,7 +173,7 @@ export function Brooklyn() {
   return (
     <div id="brooklyn" className="map-app">
       <header>
-        <div className="heading">Brooklyn Residential Sales 2003–2014</div>
+        <div className="heading">Brooklyn Residential Sales 2016–2025</div>
         <div className="border" />
       </header>
 
@@ -255,17 +255,28 @@ export function Brooklyn() {
       {/* end .map-row */}
 
       <div className="markdown-text">
-        <time dateTime="2014-01-12">January 12, 2015</time>
         <h1>How Residential Property Sales can help us better understand changes in Brooklyn</h1>
         <p>
-          Brooklyn has seen dramatic changes in its housing market over the last decade. This
-          visualization explores 322,056 residential property sales from 2003 to 2014, charting
-          shifts in price per square foot across all neighborhoods.
+          Brooklyn has seen dramatic changes in its housing market. This visualization explores
+          property sales from 2016 to 2025, charting shifts in price per square foot across all
+          neighborhoods.
         </p>
         <p>
           Click any neighborhood on the map to see its price history compared to the borough
           average. The building-class chart below shows the mix of property types as a share of
           total sales.
+        </p>
+        <p>
+          Data comes from the NYC Department of Finance{' '}
+          <a
+            href="https://data.cityofnewyork.us/City-Government/NYC-Citywide-Annualized-Calendar-Sales-Update/w2pb-icbu"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Citywide Annualized Calendar Sales
+          </a>{' '}
+          dataset on NYC Open Data, refreshed automatically. Neighborhoods use the 2020 Census
+          Neighborhood Tabulation Areas. (The original 2015 edition covered 2003–2014.)
         </p>
       </div>
     </div>

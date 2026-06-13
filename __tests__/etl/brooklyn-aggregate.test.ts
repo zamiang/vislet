@@ -12,30 +12,40 @@ const ntaCodes = Object.keys(
 const buildingClassKeys = Object.keys(
   JSON.parse(readFileSync(join(DATA_DIR, 'building-class.json'), 'utf8')),
 );
+const YEARS = [2016, 2017];
 
 describe('normalizeSale', () => {
-  it('derives quarter/year and pricePerSqFt, trims building class', () => {
+  it('derives quarter/year and pricePerSqFt from API strings', () => {
     const s = normalizeSale({
-      buildingCl: '01  ONE FAMILY DWELLINGS',
-      residentia: 1,
-      commercial: 0,
-      ntacode: 'BK27',
-      price: '$400,000',
-      grossSqFt: '1,000',
-      date: quarterKeyToEpoch('1-2003'),
+      building_class_category: '01 ONE FAMILY DWELLINGS',
+      residential_units: '1',
+      commercial_units: '0',
+      nta: 'BK0101',
+      sale_price: '400000',
+      gross_square_feet: '1,000',
+      sale_date: '2016-02-15T00:00:00.000',
     });
-    expect(s.buildingClass).toBe('01  ONE FAMILY DWELLINGS');
-    expect(s.quarter).toBe(1);
-    expect(s.year).toBe(2003);
-    expect(s.pricePerSqFt).toBe(400);
+    expect(s?.buildingClass).toBe('01');
+    expect(s?.quarter).toBe(1);
+    expect(s?.year).toBe(2016);
+    expect(s?.pricePerSqFt).toBe(400);
+  });
+
+  it('returns null without a parseable sale date', () => {
+    expect(normalizeSale({ sale_price: '400000' })).toBeNull();
   });
 
   it('excludes pricePerSqFt for implausible sqft/price (legacy rules)', () => {
+    const base = { nta: 'BK0101', sale_date: '2016-02-15T00:00:00.000' };
     expect(
-      normalizeSale({ price: '$5,000', grossSqFt: '1,000', date: 0 }).pricePerSqFt,
+      normalizeSale({ ...base, sale_price: '5000', gross_square_feet: '1,000' })?.pricePerSqFt,
     ).toBeUndefined();
     expect(
-      normalizeSale({ price: '$400,000', grossSqFt: '100', date: 0 }).pricePerSqFt,
+      normalizeSale({ ...base, sale_price: '400000', gross_square_feet: '100' })?.pricePerSqFt,
+    ).toBeUndefined();
+    // $10/sqft is below the $30 sanity floor (nominal-consideration transfer).
+    expect(
+      normalizeSale({ ...base, sale_price: '10000', gross_square_feet: '1,000' })?.pricePerSqFt,
     ).toBeUndefined();
   });
 });
@@ -44,49 +54,74 @@ describe('aggregateSales', () => {
   const out = aggregateSales(
     [
       {
-        buildingCl: '01 ONE FAMILY',
-        residentia: 1,
-        commercial: 0,
-        ntacode: 'BK27',
-        price: '$400,000',
-        grossSqFt: '1,000',
-        date: quarterKeyToEpoch('1-2003'),
+        building_class_category: '01 ONE FAMILY DWELLINGS',
+        residential_units: '1',
+        commercial_units: '0',
+        nta: 'BK0101',
+        sale_price: '400000',
+        gross_square_feet: '1,000',
+        sale_date: '2016-02-15T00:00:00.000',
       },
       {
-        buildingCl: '01 ONE FAMILY',
-        residentia: 1,
-        commercial: 0,
-        ntacode: 'BK27',
-        price: '$600,000',
-        grossSqFt: '1,000',
-        date: quarterKeyToEpoch('1-2003'),
+        building_class_category: '01 ONE FAMILY DWELLINGS',
+        residential_units: '1',
+        commercial_units: '0',
+        nta: 'BK0101',
+        sale_price: '600000',
+        gross_square_feet: '1,000',
+        sale_date: '2016-03-20T00:00:00.000',
+      },
+      // commercial-unit sale: counted for building class, not for prices
+      {
+        building_class_category: '05 TAX CLASS 1 VACANT LAND',
+        residential_units: '1',
+        commercial_units: '1',
+        nta: 'BK0101',
+        sale_price: '900000',
+        gross_square_feet: '1,000',
+        sale_date: '2016-01-05T00:00:00.000',
+      },
+      // outside-borough/park NTA: ignored entirely
+      {
+        building_class_category: '01 ONE FAMILY DWELLINGS',
+        residential_units: '1',
+        commercial_units: '0',
+        nta: 'QN0101',
+        sale_price: '500000',
+        gross_square_feet: '1,000',
+        sale_date: '2016-02-01T00:00:00.000',
       },
     ],
     ntaCodes,
     buildingClassKeys,
+    YEARS,
   );
 
-  it('produces a 48-point quarterly axis (2003-2014) per NTA', () => {
-    expect(out.BK27.residentialPrices).toHaveLength(48);
+  it('produces a quarterly axis covering the requested years per NTA', () => {
+    expect(out.BK0101.residentialPrices).toHaveLength(YEARS.length * 4);
   });
 
-  it('means pricePerSqFt within a quarter (mean(400,600)=500)', () => {
-    const q1 = out.BK27.residentialPrices.find((d) => d.date === quarterKeyToEpoch('1-2003'));
+  it('means residential pricePerSqFt within a quarter, excluding commercial', () => {
+    // The $900/sqft commercial-unit sale would shift the mean if counted.
+    const q1 = out.BK0101.residentialPrices.find((d) => d.date === quarterKeyToEpoch('1-2016'));
     expect(q1?.value).toBe(500);
   });
 
-  it('emits the special ALL (-mean) and BK73 (williamsburgTrend) series', () => {
+  it('emits the ALL (-mean) series only on ALL', () => {
     expect(out.ALL['residentialPrices-mean']).toBeDefined();
-    expect(out.BK73.williamsburgTrend).toBeDefined();
-    expect(out.BK27.williamsburgTrend).toBeUndefined();
+    expect(out.BK0101['residentialPrices-mean']).toBeUndefined();
   });
 
-  it('matches the committed display-data date axis exactly', () => {
+  it('ignores sales in NTAs outside the lookup (parks, other boroughs)', () => {
+    expect(out.QN0101).toBeUndefined();
+  });
+
+  it('matches the committed display-data date axis', () => {
     const committed = JSON.parse(
       readFileSync(join(DATA_DIR, 'brooklyn-sales-display-data.json'), 'utf8'),
-    );
-    const expectedDates = committed.ALL.residentialPrices.map((d: { date: number }) => d.date);
-    const actualDates = out.ALL.residentialPrices.map((d) => d.date);
-    expect(actualDates).toEqual(expectedDates);
+    ) as Record<string, { residentialPrices: { date: number }[] }>;
+    const committedDates = committed.ALL.residentialPrices.map((d) => d.date);
+    expect(committedDates[0]).toBe(quarterKeyToEpoch('1-2016'));
+    expect(new Set(committedDates).size).toBe(committedDates.length);
   });
 });

@@ -22,7 +22,8 @@
     "data:build:brooklyn": "tsx scripts/etl/brooklyn/build.ts",
     "data:build:311": "tsx scripts/etl/311/build.ts",
     "data:build:chicago": "tsx scripts/etl/chicago/build.ts",
-    "data:build:north-carolina": "tsx scripts/etl/north-carolina/build.ts"
+    "data:build:north-carolina": "tsx scripts/etl/north-carolina/build.ts",
+    "data:reference": "tsx scripts/etl/reference/build-reference.ts"
   },
   "dependencies": {
     "@astrojs/react": "5.0.7",
@@ -46,10 +47,13 @@
     "@testing-library/react": "16.3.2",
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
     "@types/d3": "7.4.3",
+    "@types/geojson": "7946.0.16",
     "@types/node": "25.9.3",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@types/topojson-client": "3.1.5",
+    "@types/topojson-server": "3.0.4",
+    "@types/topojson-simplify": "3.0.3",
     "@vitejs/plugin-react": "5.2.0",
     "@vitest/coverage-istanbul": "4.1.8",
     "eslint": "10.5.0",
@@ -59,6 +63,8 @@
     "postcss": "8.5.15",
     "prettier": "3.8.4",
     "prettier-plugin-astro": "0.14.1",
+    "topojson-server": "3.0.1",
+    "topojson-simplify": "3.0.3",
     "tsx": "4.22.4",
     "typescript": "6.0.3",
     "typescript-eslint": "8.61.0",

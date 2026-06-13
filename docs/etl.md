@@ -7,17 +7,52 @@ the legacy CoffeeScript ETL (`apps/*/format-data.coffee`,
 `apps/*/script/format-display-data.coffee`, `apps/brooklyn/geocode-sales.coffee`)
 to typed, tsx-runnable TypeScript under `scripts/etl/` (MIGRATION.md §2.3).
 
-## ⚠️ Raw inputs are not in the repo
+## brooklyn + 311 now fetch live from NYC Open Data
 
-Every legacy pipeline consumes a **gitignored raw dataset that is not present in
-this working tree** (they were processed locally years ago and never committed):
+These two pipelines no longer need a local raw file — they pull directly from the
+NYC Open Data Socrata API and re-aggregate, so the data can be refreshed on a
+schedule (see `.github/workflows/data-refresh.yml`).
 
-| App | Raw input (gitignored, absent) | Output (committed) |
-|-----|-------------------------------|--------------------|
-| brooklyn | `apps/brooklyn/data/brooklyn-sales.json` (geocoded sales GeoJSON) | `public/data/brooklyn/brooklyn-sales-display-data.json` |
-| 311 | `apps/311/data/311-by-neighborhood.json` (line-delimited features) | `public/data/311/display-data.json` |
-| chicago | `apps/chicago/data/crimes.csv` | `public/data/chicago/chicago-crimes-display-data.json` |
-| north-carolina | `apps/north-carolina/data/census-block-by-district.json` + `vote-tally.json` | `public/data/north-carolina/display-data.json` |
+| App      | Live source (Socrata)                                               | Cadence | Output (committed)                                      |
+| -------- | ------------------------------------------------------------------- | ------- | ------------------------------------------------------- |
+| brooklyn | `w2pb-icbu` — DOF Citywide Annualized Calendar Sales (2016→present) | annual  | `public/data/brooklyn/brooklyn-sales-display-data.json` |
+| 311      | `76ig-c548` (2010–2019) + `erm2-nwe9` (2020→present)                | daily   | `public/data/311/display-data.json`                     |
+
+Key facts:
+
+- **Geography is 2020 NTAs.** Sales rows carry their NTA natively; 311 rows are
+  point-in-polygon joined to the DCP 2020 NTA boundaries (`9nt8-h7nd`) at build
+  time (`scripts/etl/lib/nta.ts`). This **retired the legacy 12 MB
+  `bbl-to-lat-long.json` geocode join and `block-lot-to-bbl.json`** — sales now
+  arrive geocoded. Old 2010-NTA deep links (`?area=BK73`) resolve through
+  `src/lib/nta-crosswalk.ts` (see MIGRATION.md §3).
+- **App token.** Anonymous Socrata access is rate-limited; set
+  `SOCRATA_APP_TOKEN` (free) to raise the cap. The client
+  (`scripts/etl/lib/socrata.ts`) sends it as `X-App-Token` when present. CI reads
+  it from the `SOCRATA_APP_TOKEN` repo secret.
+- **311 aggregate cache.** The combined 311 source is ~44 M rows, so history is
+  not re-pulled every run. `npm run data:build:311 -- --backfill` streams both
+  datasets once and writes a compact committed cache
+  (`scripts/etl/311/cache/311-aggregates.json`: per-NTA monthly totals +
+  per-NTA/type hour-of-day histograms). The default `npm run data:build:311`
+  loads that cache and folds in only rows newer than `cache.maxDate`.
+  `-- --from-cache` re-finalizes the display JSON from the cache with no network
+  I/O (use after the reference/population files change).
+- **Reference data.** `npm run data:reference` regenerates the 2020-NTA
+  TopoJSON maps, neighborhood-name lookups, the `[pop2010, pop2020]` population
+  file (from a committed DCP decennial-census extract), and the 2010→2020
+  crosswalk. Re-run only when DCP revises the NTA boundaries.
+
+## ⚠️ Other raw inputs are not in the repo
+
+The remaining legacy pipelines still consume a **gitignored raw dataset that is
+not present in this working tree** (they were processed locally years ago and
+never committed):
+
+| App            | Raw input (gitignored, absent)                                               | Output (committed)                                     |
+| -------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
+| chicago        | `apps/chicago/data/crimes.csv`                                               | `public/data/chicago/chicago-crimes-display-data.json` |
+| north-carolina | `apps/north-carolina/data/census-block-by-district.json` + `vote-tally.json` | `public/data/north-carolina/display-data.json`         |
 
 Because the raws are absent, the display JSON **cannot be regenerated
 byte-for-byte here right now**. The committed display JSON is the **canonical

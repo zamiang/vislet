@@ -33,28 +33,28 @@ Locked to match your existing Astro-on-Cloudflare projects
 `kelp-native`) so the toolchain, conventions, and deploy story are identical and
 you can copy config across.
 
-| Concern        | From                     | To |
-|----------------|--------------------------|------------------|
-| Framework      | Ezel + Backbone          | **Astro 6** (static-first; ships zero JS by default) with **React 19 islands** for interactive charts |
-| Language       | CoffeeScript             | **TypeScript 6** |
-| Templates      | Jade/Pug                 | **`.astro` components + JSX** |
-| Styles         | Stylus + nib             | **Tailwind CSS v4** (via `@tailwindcss/vite`), matching your other repos |
-| Bundler/build  | Gulp 3 + Browserify      | **Vite** (built into Astro) |
-| Visualization  | D3 v3 global API, in a Backbone view | **D3 v7 modular packages inside React** — D3 owns math (scales/shapes/axes/projections), React owns the DOM (see the [D3 section](#d3-v3--v7-modernization)) |
-| Routing        | Backbone.Router + history| **Astro file-based routing** + URL search params for chart state |
-| Data           | JSON bundled into JS     | **Static JSON in `/public/data`, fetched lazily** per page |
-| Hosting        | `gulp-s3` → S3           | **Cloudflare Pages** (`wrangler.toml`, `pages_build_output_dir = "dist"`) |
-| CI/CD          | none                     | **GitHub Actions** → Cloudflare Pages on push to `master` (preview deploys on PRs) |
-| Tooling        | none                     | **ESLint (flat) + Prettier (import sort) + knip + `astro check` + Vitest** — same set as your other repos |
-| Tests          | none                     | **Vitest** (unit — esp. data-aggregation logic) + **Playwright** (page smoke) |
-| Runtime        | `engines: 0.12.x`        | **Node 24.x** (`.nvmrc`, `engines.node`) |
+| Concern       | From                                 | To                                                                                                                                                           |
+| ------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Framework     | Ezel + Backbone                      | **Astro 6** (static-first; ships zero JS by default) with **React 19 islands** for interactive charts                                                        |
+| Language      | CoffeeScript                         | **TypeScript 6**                                                                                                                                             |
+| Templates     | Jade/Pug                             | **`.astro` components + JSX**                                                                                                                                |
+| Styles        | Stylus + nib                         | **Tailwind CSS v4** (via `@tailwindcss/vite`), matching your other repos                                                                                     |
+| Bundler/build | Gulp 3 + Browserify                  | **Vite** (built into Astro)                                                                                                                                  |
+| Visualization | D3 v3 global API, in a Backbone view | **D3 v7 modular packages inside React** — D3 owns math (scales/shapes/axes/projections), React owns the DOM (see the [D3 section](#d3-v3--v7-modernization)) |
+| Routing       | Backbone.Router + history            | **Astro file-based routing** + URL search params for chart state                                                                                             |
+| Data          | JSON bundled into JS                 | **Static JSON in `/public/data`, fetched lazily** per page                                                                                                   |
+| Hosting       | `gulp-s3` → S3                       | **Cloudflare Pages** (`wrangler.toml`, `pages_build_output_dir = "dist"`)                                                                                    |
+| CI/CD         | none                                 | **GitHub Actions** → Cloudflare Pages on push to `master` (preview deploys on PRs)                                                                           |
+| Tooling       | none                                 | **ESLint (flat) + Prettier (import sort) + knip + `astro check` + Vitest** — same set as your other repos                                                    |
+| Tests         | none                                 | **Vitest** (unit — esp. data-aggregation logic) + **Playwright** (page smoke)                                                                                |
+| Runtime       | `engines: 0.12.x`                    | **Node 24.x** (`.nvmrc`, `engines.node`)                                                                                                                     |
 
 ### Why Astro
 
 This is a **content-forward static site**: each page is prose wrapped around a few
 interactive D3 widgets. Astro's island model is the ideal fit — pages render as
 static HTML/CSS and only the chart components hydrate as JS, which also fixes the
-current problem of data being shipped *inside* the JS bundle. It's also the stack
+current problem of data being shipped _inside_ the JS bundle. It's also the stack
 you already run on Cloudflare, so there's nothing new to learn or operate.
 
 ### Conventions to copy from `zamiang-dot-com-v2`
@@ -77,6 +77,7 @@ one visualization at a time, keeping the old build deployable until the last pag
 lands.
 
 ### Phase 2.0 — Scaffold the new app
+
 - Fastest path: **clone the structure from `zamiang-dot-com-v2`** (copy
   `astro.config.mjs`, `tsconfig.json`, `eslint.config.mjs`, `.prettierrc`,
   `vitest.config.ts`, `knip.json`, `wrangler.toml`, `.nvmrc`, the `package.json`
@@ -93,7 +94,9 @@ lands.
   the client at all; if it's still needed client-side, fetch it lazily on demand.
 
 ### Phase 2.1 — Port shared components to typed React + D3
+
 Migrate `components/` one at a time. Recommended order (simplest → hardest):
+
 1. `datautil`, `numberutils` (pure functions — trivial, add Vitest tests)
 2. `select`, `slider` (small controls)
 3. `graph-key` / legend + **replace its Backbone router with URL search params**
@@ -108,6 +111,7 @@ DOM mutation fighting React). Type the data shapes explicitly — the existing
 `Sale` model comment block and the `salesData` structure give you the schema.
 
 ### Phase 2.2 — Port pages, simplest first
+
 1. **home** (templates/styles only — no interactivity) → validate layout + deploy.
 2. **north-carolina** → exercises map + bar.
 3. **chicago** → map + time controls.
@@ -122,6 +126,7 @@ For each page: port → diff against the Phase 0 baseline screenshots → confir
 URLs/deep-links still resolve → mark done.
 
 ### Phase 2.3 — Move data prep out of the client
+
 The `format-data.coffee` / `script/*.coffee` files are offline ETL. Rewrite them
 as **TypeScript build scripts** (run via `tsx`/Node) or a small `scripts/`
 pipeline that emits the `public/data/*.json`. For a hand-run, occasional refresh
@@ -130,6 +135,7 @@ enough. (The removed ETL scaffold was an abandoned attempt at this; revisit a
 scheduler only if data genuinely needs to refresh on a cadence.)
 
 ### Phase 2.4 — Cut over deploy & DNS
+
 - Connect the repo to **Cloudflare Pages** (build command `astro build`, output
   `dist/`), driven by the `wrangler.toml` copied in Phase 2.0. PRs get preview
   deploys automatically; `master` deploys to production.
@@ -149,24 +155,24 @@ symbol. Plan to rewrite the rendering layer, not port it line-for-line.
 
 ### What's actually used today (from the old code) and its v7 equivalent
 
-| D3 v3 (current)        | D3 v7 (target)                          | Module |
-|------------------------|-----------------------------------------|--------|
-| `d3.scale.linear()`    | `d3.scaleLinear()`                      | `d3-scale` |
-| `d3.scale.quantile()`  | `d3.scaleQuantile()`                    | `d3-scale` |
-| `d3.scale.category*()` | `d3.scaleOrdinal(d3.schemeCategory10)`  | `d3-scale` / `d3-scale-chromatic` |
-| `d3.time.scale()`      | `d3.scaleTime()`                        | `d3-scale` |
-| `d3.time.years()`      | `d3.timeYears()` / `d3.utcYears()`      | `d3-time` |
-| `d3.svg.axis()`        | `d3.axisBottom()` / `d3.axisLeft()`     | `d3-axis` |
-| `d3.svg.line()`        | `d3.line()`                             | `d3-shape` |
-| `d3.svg.area()`        | `d3.area()`                             | `d3-shape` |
-| `d3.layout.stack()`    | `d3.stack()` (different data shape)     | `d3-shape` |
-| `d3.svg.brush()`       | `d3.brushX()` (new event API)           | `d3-brush` |
-| `d3.geo.path()`        | `d3.geoPath()`                          | `d3-geo` |
-| `d3.geo.mercator()`    | `d3.geoMercator()`                      | `d3-geo` |
-| `d3.mouse(el)`         | `d3.pointer(event)`                     | `d3-selection` |
-| `d3.interpolate`       | `d3.interpolate` (now in `d3-interpolate`) | `d3-interpolate` |
-| `d3.max/min/mean/sum/extent/quantile/bisector/range/ascending` | same names | `d3-array` |
-| `d3.format`            | `d3.format`                             | `d3-format` |
+| D3 v3 (current)                                                | D3 v7 (target)                             | Module                            |
+| -------------------------------------------------------------- | ------------------------------------------ | --------------------------------- |
+| `d3.scale.linear()`                                            | `d3.scaleLinear()`                         | `d3-scale`                        |
+| `d3.scale.quantile()`                                          | `d3.scaleQuantile()`                       | `d3-scale`                        |
+| `d3.scale.category*()`                                         | `d3.scaleOrdinal(d3.schemeCategory10)`     | `d3-scale` / `d3-scale-chromatic` |
+| `d3.time.scale()`                                              | `d3.scaleTime()`                           | `d3-scale`                        |
+| `d3.time.years()`                                              | `d3.timeYears()` / `d3.utcYears()`         | `d3-time`                         |
+| `d3.svg.axis()`                                                | `d3.axisBottom()` / `d3.axisLeft()`        | `d3-axis`                         |
+| `d3.svg.line()`                                                | `d3.line()`                                | `d3-shape`                        |
+| `d3.svg.area()`                                                | `d3.area()`                                | `d3-shape`                        |
+| `d3.layout.stack()`                                            | `d3.stack()` (different data shape)        | `d3-shape`                        |
+| `d3.svg.brush()`                                               | `d3.brushX()` (new event API)              | `d3-brush`                        |
+| `d3.geo.path()`                                                | `d3.geoPath()`                             | `d3-geo`                          |
+| `d3.geo.mercator()`                                            | `d3.geoMercator()`                         | `d3-geo`                          |
+| `d3.mouse(el)`                                                 | `d3.pointer(event)`                        | `d3-selection`                    |
+| `d3.interpolate`                                               | `d3.interpolate` (now in `d3-interpolate`) | `d3-interpolate`                  |
+| `d3.max/min/mean/sum/extent/quantile/bisector/range/ascending` | same names                                 | `d3-array`                        |
+| `d3.format`                                                    | `d3.format`                                | `d3-format`                       |
 
 `d3.scale.category` and `d3.layout.stack` and `d3.svg.brush` are the **breaking
 behavioral changes** — stack's input/output shape and brush's event model both
@@ -197,9 +203,23 @@ These must not break (they may be linked externally / indexed):
 
 - `/`, `/brooklyn`, `/311`, `/chicago`, `/north-carolina`
 - Any deep-link state the current `graph-key/router.coffee` encodes (dataset /
-  neighborhood selection). Re-implement that as `?`-search-params and confirm old
-  links still land on the right view (add a small compat shim if the old format
-  differs).
+  neighborhood selection). Re-implemented as `?`-search-params in
+  `src/lib/url-state.ts`.
+
+### Neighborhood code migration (2010 → 2020 NTAs)
+
+When the brooklyn/311 data was refreshed from live NYC Open Data, neighborhood
+geography moved from the **2010** Neighborhood Tabulation Areas (`BK73`-style,
+2 letters + 2 digits) to the **2020** NTAs (`BK0102`-style, 2 letters + 4
+digits). Old `?area=` / `?hover=` deep links use 2010 codes, so they are
+transparently rewritten to their 2020 equivalent on load:
+
+- `parseGraphState()` runs every `area`/`hover` value through
+  `resolveAreaCode()` → `NTA_2010_TO_2020` (`src/lib/nta-crosswalk.ts`, generated
+  by `npm run data:reference`). The two code vintages don't collide (digit
+  count differs), so 2020 codes pass through unchanged.
+- e.g. `/311?area=BK60` → `BK0902` (Crown Heights North),
+  `/brooklyn?area=BK73` → `BK0102` (Williamsburg).
 
 ---
 
@@ -207,14 +227,14 @@ These must not break (they may be linked externally / indexed):
 
 Rough, solo-dev, part-time:
 
-| Phase | Scope | Rough effort |
-|-------|-------|--------------|
-| 0     | Security + cleanup + baseline | 0.5 day |
-| 2.0   | Scaffold + layout + data move + CI | 1–2 days |
-| 2.1   | Shared components → typed React + **D3 v3→v7 rewrite** | 5–8 days |
-| 2.2   | 5 pages ported | 4–7 days (brooklyn alone ~2) |
-| 2.3   | ETL scripts → TS | 1–2 days |
-| 2.4   | Deploy cutover | 1 day |
+| Phase | Scope                                                  | Rough effort                 |
+| ----- | ------------------------------------------------------ | ---------------------------- |
+| 0     | Security + cleanup + baseline                          | 0.5 day                      |
+| 2.0   | Scaffold + layout + data move + CI                     | 1–2 days                     |
+| 2.1   | Shared components → typed React + **D3 v3→v7 rewrite** | 5–8 days                     |
+| 2.2   | 5 pages ported                                         | 4–7 days (brooklyn alone ~2) |
+| 2.3   | ETL scripts → TS                                       | 1–2 days                     |
+| 2.4   | Deploy cutover                                         | 1 day                        |
 
 The long pole is **2.1 (D3 v3→v7 rewrite) + brooklyn**. Everything else is
 mechanical once the chart pattern, the layout, and the copied-over tooling from
