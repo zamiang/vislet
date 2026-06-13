@@ -92,5 +92,5 @@ export interface BrooklynNeighborhoodData {
 }
 export type BrooklynData = Record<
   string,
-  BrooklynNeighborhoodData & { 'residentialPrices-mean'?: DataPoint[] }
+  BrooklynNeighborhoodData & { 'residentialPrices-median'?: DataPoint[] }
 >;

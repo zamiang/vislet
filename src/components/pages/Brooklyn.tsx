@@ -133,7 +133,7 @@ export function Brooklyn() {
   const lineData: LineGraphData = useMemo(() => {
     if (!salesData || !selectedId) return {};
     const result: Record<string, Record<string, DataPoint[]>> = {
-      ALL: { 'residentialPrices-mean': salesData['ALL']?.['residentialPrices-mean'] ?? [] },
+      ALL: { 'residentialPrices-median': salesData['ALL']?.['residentialPrices-median'] ?? [] },
     };
     result[selectedId] = { residentialPrices: salesData[selectedId]?.residentialPrices ?? [] };
     return result;
@@ -206,7 +206,7 @@ export function Brooklyn() {
             hoveredId={hoveredId ?? undefined}
             onSelect={setSelectedId}
             onHover={setHoveredId}
-            title="Avg Price per SQFT"
+            title="Median Price per SQFT"
             formatHoverText={formatHoverText}
             colorPalette="spectral"
           />
@@ -242,7 +242,7 @@ export function Brooklyn() {
 
               <LineGraph
                 data={lineData}
-                keys={['residentialPrices', 'residentialPrices-mean']}
+                keys={['residentialPrices', 'residentialPrices-median']}
                 startingDataset={selectedId}
                 width={CHART_WIDTH}
                 height={CHART_HEIGHT}

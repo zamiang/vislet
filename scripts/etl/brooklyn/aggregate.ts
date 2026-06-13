@@ -12,7 +12,7 @@
  * consumes: per-NTA quarterly residential price medians + per-year
  * building-class percentages, plus the "ALL" borough series.
  */
-import { ascending, median } from 'd3';
+import { median } from 'd3';
 
 import { quarterKeyToEpoch, yearKeyToEpoch } from '../lib/dates';
 
@@ -48,7 +48,7 @@ export interface DateValue {
 export interface NeighborhoodDisplayData {
   residentialPrices: DateValue[];
   buildingClass: Record<string, DateValue[]>;
-  'residentialPrices-mean'?: DateValue[];
+  'residentialPrices-median'?: DateValue[];
 }
 
 export type BrooklynDisplayData = Record<string, NeighborhoodDisplayData>;
@@ -211,6 +211,10 @@ function getSalesTotals(
 ): Record<string, number[]> {
   const totals: Record<string, number[]> = {};
   for (const ntaID of ntaCodes) {
+    // Skip the synthetic "ALL" bucket — it carries no sales of its own (no sale
+    // has nta === "ALL"), so this guards intent rather than preventing a real
+    // double-count.
+    if (ntaID === 'ALL') continue;
     const series = data[ntaID].residentialPrices;
     for (const itemKey of Object.keys(series)) {
       (totals[itemKey] ||= []).push(...series[itemKey]);
@@ -229,8 +233,7 @@ function formatSalesDataForDisplay(
     const series = data[ntaID].residentialPrices;
     const flattened: NeighborhoodDisplayData = {
       residentialPrices: Object.keys(series).map((itemKey) => {
-        const arr = series[itemKey].slice().sort(ascending);
-        const m = median(arr);
+        const m = median(series[itemKey]);
         return { date: quarterKeyToEpoch(itemKey), value: m ? Number(m.toFixed(2)) : 0 };
       }),
       buildingClass: formatBuildingClassData(data[ntaID].buildingClass),
@@ -238,7 +241,7 @@ function formatSalesDataForDisplay(
 
     if (ntaID === 'ALL') {
       const totals = getSalesTotals(data, ntaCodes);
-      flattened['residentialPrices-mean'] = Object.keys(totals).map((totalKey) => ({
+      flattened['residentialPrices-median'] = Object.keys(totals).map((totalKey) => ({
         date: quarterKeyToEpoch(totalKey),
         value: Number((median(totals[totalKey]) ?? 0).toFixed(2)),
       }));

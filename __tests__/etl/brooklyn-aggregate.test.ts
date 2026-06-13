@@ -112,9 +112,9 @@ describe('aggregateSales', () => {
     expect(q1?.value).toBe(500);
   });
 
-  it('emits the ALL (-mean) series only on ALL', () => {
-    expect(out.ALL['residentialPrices-mean']).toBeDefined();
-    expect(out.BK0101['residentialPrices-mean']).toBeUndefined();
+  it('emits the ALL (-median) series only on ALL', () => {
+    expect(out.ALL['residentialPrices-median']).toBeDefined();
+    expect(out.BK0101['residentialPrices-median']).toBeUndefined();
   });
 
   it('ignores sales in NTAs outside the lookup (parks, other boroughs)', () => {
