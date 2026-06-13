@@ -236,7 +236,7 @@ export function Brooklyn() {
                 </div>
                 <div className="avg-neighborhood-name">
                   <span className="circle-key gray" />
-                  <span className="graph-heading">Borough Average</span>
+                  <span className="graph-heading">Borough Median</span>
                 </div>
               </div>
 
@@ -246,7 +246,7 @@ export function Brooklyn() {
                 startingDataset={selectedId}
                 width={CHART_WIDTH}
                 height={CHART_HEIGHT}
-                label="Avg Price per Sqft"
+                label="Median Price per Sqft"
                 yAxisFormat={(v) => `$${v}`}
                 showTooltips
               />
@@ -274,7 +274,7 @@ export function Brooklyn() {
         </p>
         <p>
           Click any neighborhood on the map to see its price history compared to the borough
-          average. The building-class chart below shows the mix of property types as a share of
+          median. The building-class chart below shows the mix of property types as a share of
           total sales.
         </p>
         <p>
