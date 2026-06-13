@@ -41,6 +41,12 @@ export interface AreaChartProps {
   interpolate?: 'cardinal' | 'linear';
   /** Series names to exclude from the stack/color domain. */
   ignoredIds?: string[];
+  /**
+   * Fixed series order for the stack, legend, and ordinal color scale. Keeps a
+   * series in the same slot/color across datasets; series absent from `data`
+   * render as a zero band. Defaults to the sorted keys of `data`.
+   */
+  domain?: string[];
   /** y-axis tick formatter (default: percent). */
   yAxisFormat?: (value: number) => string;
   /** Compute the y domain as `[0, maxStackedTotal * 1.3]`; otherwise `[0, 1]` (percent). */
@@ -61,6 +67,7 @@ export function AreaChart({
   margin = DEFAULT_MARGIN,
   interpolate = 'cardinal',
   ignoredIds = [],
+  domain,
   yAxisFormat = defaultYFormat,
   computeYDomain = false,
   label,
@@ -68,9 +75,9 @@ export function AreaChart({
   tooltipFormat,
   showTooltips = false,
 }: AreaChartProps) {
-  const series = stackAreaSeries(data, ignoredIds);
+  const series = stackAreaSeries(data, ignoredIds, domain);
   const color = scaleOrdinal<string, string>()
-    .domain(series.map((s) => s.name))
+    .domain(domain ?? series.map((s) => s.name))
     .range(CATEGORY_20C);
 
   const firstDates = series[0]?.values ?? [];
