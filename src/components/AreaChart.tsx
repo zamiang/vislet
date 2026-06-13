@@ -105,7 +105,7 @@ export function AreaChart({
               <path
                 className="area"
                 d={areaPath(s.values) ?? undefined}
-                style={{ fill: color(s.name) }}
+                style={{ fill: color(s.name), transition: 'd 0.5s ease' }}
               />
             </g>
           ))}

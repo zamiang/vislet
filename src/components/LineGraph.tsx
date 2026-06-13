@@ -18,6 +18,7 @@ import {
   scaleTime,
   timeYear,
 } from 'd3';
+import type { CSSProperties } from 'react';
 
 import { Axis } from '@/components/Axis';
 import { Legend, type LegendEntry } from '@/components/Legend';
@@ -32,6 +33,17 @@ import {
 import type { DataPoint, Margin, Series, TrendPoint } from '@/types';
 
 const DEFAULT_MARGIN: Margin = { top: 10, left: 50, right: 0, bottom: 20 };
+
+/**
+ * Animate the path morph when the underlying data changes (e.g. switching
+ * neighborhoods). Series are keyed by name (`getFlattenedData` keys by series,
+ * not by selection) and every neighborhood has the same point count, so the
+ * `<path>` element persists with a stable `d` command structure — the browser
+ * tweens between the old and new `d`. Mirrors SvgMap's CSS-transition approach
+ * (no `d3.select(...).transition()` mutating a React-owned node); legacy used a
+ * 500ms transition. Browsers without CSS `d` animation just snap (no breakage).
+ */
+const PATH_TRANSITION: CSSProperties = { transition: 'd 0.5s ease' };
 
 export interface LineGraphProps {
   data: LineGraphData;
@@ -108,12 +120,16 @@ export function LineGraph({
           {lines.map((line) => (
             <g className="sales" key={line.name}>
               {displayTrend && hasTrend(line.values) && (
-                <path className="trend-area" d={trendArea(line.values) ?? undefined} />
+                <path
+                  className="trend-area"
+                  d={trendArea(line.values) ?? undefined}
+                  style={PATH_TRANSITION}
+                />
               )}
               <path
                 className="line"
                 d={linePath(line.values) ?? undefined}
-                style={{ stroke: lineColor(line.name) }}
+                style={{ stroke: lineColor(line.name), ...PATH_TRANSITION }}
               />
               {displayLineLabels && <LineLabel line={line} x={x} y={y} />}
             </g>
