@@ -51,3 +51,7 @@ apps/north-carolina/data/vote-tally.json
 # intentionally NOT under public/ — it must not ship to the client and is
 # pre-joined at build time in Phase 2.3.
 .gstack/
+scripts/etl/.cache/
+scripts/etl/311/cache/.backfill-progress.json
+test-results/
+.impeccable/

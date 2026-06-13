@@ -91,6 +91,23 @@ export function hourEpoch(hour: number, nowMs: number): number {
   return nyWallClockToEpoch(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate(), hour);
 }
 
+/**
+ * Subtract `days` from a naive `"YYYY-MM-DD…"` timestamp string, returning a
+ * naive `"YYYY-MM-DDT00:00:00.000"` string in the SAME (zoneless) format the
+ * Socrata `created_date` floating timestamps use. Date math is done in UTC so
+ * it never depends on the host timezone; only the calendar date matters here.
+ * Used to widen the incremental 311 lookback window below the cache watermark.
+ */
+export function naiveDateMinusDays(iso: string, days: number): string {
+  const y = Number(iso.slice(0, 4));
+  const mo = Number(iso.slice(5, 7));
+  const d = Number(iso.slice(8, 10));
+  const ms = Date.UTC(y, mo - 1, d) - days * 86400000;
+  const dt = new Date(ms);
+  const p = (n: number): string => String(n).padStart(2, '0');
+  return `${dt.getUTCFullYear()}-${p(dt.getUTCMonth() + 1)}-${p(dt.getUTCDate())}T00:00:00.000`;
+}
+
 /** Convert a legacy `"<year>"` key (e.g. "2003") to epoch ms at NY-local start of year. */
 export function yearKeyToEpoch(key: string | number): number {
   const year = Number(key);

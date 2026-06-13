@@ -9,7 +9,18 @@
  * resolving (see MIGRATION.md §3).
  *
  * Legacy precedence (router.coffee `handleRoute`): area → type → date → overview.
+ *
+ * Neighborhood geography migrated from 2010 NTAs (e.g. `BK73`) to 2020 NTAs
+ * (e.g. `BK0102`) when the data was refreshed. Legacy `?area=`/`?hover=` codes
+ * are transparently resolved through `NTA_2010_TO_2020` so old deep links keep
+ * working; current 2020 codes pass through unchanged. See MIGRATION.md §3.
  */
+import { NTA_2010_TO_2020 } from '@/lib/nta-crosswalk';
+
+/** Map a legacy 2010 NTA code to its 2020 equivalent; pass others through. */
+export function resolveAreaCode(code: string): string {
+  return NTA_2010_TO_2020[code] ?? code;
+}
 
 /** A decoded deep-link state. Discriminated on `kind`. */
 export type GraphState =
@@ -31,8 +42,11 @@ export function parseGraphState(input: string | URLSearchParams): GraphState {
 
   const area = params.get('area');
   if (area) {
+    const resolved = resolveAreaCode(area);
     const hover = params.get('hover');
-    return hover ? { kind: 'area', area, hover } : { kind: 'area', area };
+    return hover
+      ? { kind: 'area', area: resolved, hover: resolveAreaCode(hover) }
+      : { kind: 'area', area: resolved };
   }
 
   const type = params.get('type');

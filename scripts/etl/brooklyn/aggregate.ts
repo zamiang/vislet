@@ -1,44 +1,40 @@
 /**
- * Brooklyn property-sales aggregation — typed port of the legacy
- * `apps/brooklyn/collections/sales.coffee` (`getSalesData`) and the per-sale
- * normalization in `apps/brooklyn/models/sale.coffee`.
+ * Brooklyn property-sales aggregation over the NYC DOF "Citywide Annualized
+ * Calendar Sales" rows (NYC Open Data `w2pb-icbu`).
  *
- * Pure functions of their inputs (no Backbone, no DOM). The output object is the
- * `brooklyn-sales-display-data.json` consumed by the brooklyn page: per-NTA
- * quarterly residential price means + building-class percentages, plus the
- * special "ALL" (-mean) and "BK73" (williamsburgTrend) series.
+ * Successor to the legacy `apps/brooklyn/collections/sales.coffee` port: the
+ * filtering rules are unchanged (residential building classes, unit-count
+ * tests, $/sqft sanity bounds), but sales now arrive from the live API already
+ * carrying their 2020 NTA code — no geocoding/BBL join — and the year range is
+ * derived from the data instead of the legacy hardcoded 2003–2014.
  *
- * Reproduces the committed display data's structure and date axis; see
- * docs/etl.md for the raw-input situation.
+ * Output is the `brooklyn-sales-display-data.json` shape the brooklyn page
+ * consumes: per-NTA quarterly residential price means + per-year
+ * building-class percentages, plus the "ALL" borough series.
  */
-import { ascending, mean, quantile } from 'd3';
+import { ascending, mean } from 'd3';
 
-import { deriveSaleDateParts, quarterKeyToEpoch, yearKeyToEpoch } from '../lib/dates';
+import { quarterKeyToEpoch, yearKeyToEpoch } from '../lib/dates';
 
-/** Raw sale properties as read by the legacy `Sale` model (shapefile-truncated names). */
-export interface RawSaleProperties {
-  /** Building class category string, e.g. "01  ONE FAMILY DWELLINGS". */
-  buildingCl?: string;
-  /** Residential unit count. */
-  residentia?: number;
-  /** Commercial unit count. */
-  commercial?: number;
-  /** Neighborhood tabulation area code, e.g. "BK27". */
-  ntacode?: string;
-  /** Sale price; may be a "$670,000"-style string or a number. */
-  price?: string | number;
-  /** Gross square feet; may be a "1,492"-style string or a number. */
-  grossSqFt?: string | number;
-  /** Sale date as epoch ms. */
-  date?: number;
+/** A sales row as returned by the Socrata API (all fields arrive as strings). */
+export interface SaleRow {
+  /** 2020 NTA code, e.g. "BK0101". Absent for unmapped lots. */
+  nta?: string;
+  /** ISO date, e.g. "2019-10-17T00:00:00.000". */
+  sale_date?: string;
+  sale_price?: string;
+  gross_square_feet?: string;
+  residential_units?: string;
+  commercial_units?: string;
+  /** e.g. "01 ONE FAMILY DWELLINGS" — first two digits are the class code. */
+  building_class_category?: string;
 }
 
-/** A sale after normalization (mirrors `Sale` post-`initialize`). */
 interface NormalizedSale {
   buildingClass: string;
-  residentia: number;
-  commercial: number;
-  ntacode?: string;
+  residentialUnits: number;
+  commercialUnits: number;
+  nta?: string;
   pricePerSqFt?: number;
   quarter: number;
   year: number;
@@ -48,26 +44,16 @@ export interface DateValue {
   date: number;
   value: number;
 }
-export interface TrendPoint {
-  date: number;
-  pct25: number;
-  value: number;
-  pct75: number;
-}
 
-/** Per-NTA display series. Extra keys ("…-mean", "williamsburgTrend") are conditional. */
 export interface NeighborhoodDisplayData {
   residentialPrices: DateValue[];
   buildingClass: Record<string, DateValue[]>;
   'residentialPrices-mean'?: DateValue[];
-  williamsburgTrend?: TrendPoint[];
 }
 
 export type BrooklynDisplayData = Record<string, NeighborhoodDisplayData>;
 
 const QUARTERS = [1, 2, 3, 4];
-const YEARS = Array.from({ length: 2014 - 2003 + 1 }, (_, i) => 2003 + i);
-const SALES_DATA_KEYS = ['residentialPrices'] as const;
 // Excludes "16", "17", "23" (very uncommon in Brooklyn), per the legacy comment.
 const VALID_RESIDENTIAL_BUILDING_CLASSES = [
   '01',
@@ -84,114 +70,104 @@ const VALID_RESIDENTIAL_BUILDING_CLASSES = [
   '28',
 ];
 
-/** Insertion order matches `createQuarterlyHash`: year-major, quarter-minor. */
-function quarterKeys(): string[] {
-  const keys: string[] = [];
-  for (const year of YEARS) for (const quarter of QUARTERS) keys.push(`${quarter}-${year}`);
-  return keys;
+// Legacy $/sqft sanity bounds (apps/brooklyn/models/sale.coffee): excludes
+// nominal-consideration transfers, garage-sized lots, and data-entry outliers.
+const MIN_SQFT = 300;
+const MAX_SQFT = 10000;
+const MIN_PRICE = 10000;
+const MIN_PRICE_PER_SQFT = 30;
+
+/** Socrata serves DOF numerics as text, comma-grouped (e.g. "2,160"). */
+function parseNumber(value: string | undefined): number {
+  if (!value) return 0;
+  const n = Number(value.replace(/[$,]/g, ''));
+  return Number.isFinite(n) ? n : 0;
 }
 
-interface NtaAccumulator {
-  residentialSaleTally: Record<string, number>;
-  residentialPrices: Record<string, number[]>;
-  commercialSaleTally: Record<string, number>;
-  commercialPrices: Record<string, number[]>;
-  buildingClass: Record<string, Record<string, number>>;
-}
-
-/** Normalize a raw sale (port of `Sale.initialize` + `setupDate`/`setupPricePerSqFt`). */
-export function normalizeSale(raw: RawSaleProperties): NormalizedSale {
-  const buildingClass = (raw.buildingCl ?? '').trim();
-  const { quarter, year } = deriveSaleDateParts(raw.date ?? 0);
+/** Normalize an API row; returns null for rows without a parseable sale date. */
+export function normalizeSale(raw: SaleRow): NormalizedSale | null {
+  const dateMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(raw.sale_date ?? '');
+  if (!dateMatch) return null;
+  const year = Number(dateMatch[1]);
+  const quarter = Math.floor((Number(dateMatch[2]) - 1) / 3) + 1;
 
   const sale: NormalizedSale = {
-    buildingClass,
-    residentia: Number(raw.residentia ?? 0),
-    commercial: Number(raw.commercial ?? 0),
-    ntacode: raw.ntacode,
+    buildingClass: (raw.building_class_category ?? '').trim().slice(0, 2),
+    residentialUnits: parseNumber(raw.residential_units),
+    commercialUnits: parseNumber(raw.commercial_units),
+    nta: raw.nta,
     quarter,
     year,
   };
 
-  // setupPricePerSqFt with the legacy exclusion rules.
-  if (raw.price && raw.grossSqFt) {
-    const price = Number(String(raw.price).replace(/[$,]/g, ''));
-    const sqft = Number(String(raw.grossSqFt).replace(/,/g, ''));
-    const MIN_SQFT = 300;
-    const MAX_SQFT = 10000;
-    const MIN_PRICE = 10000;
-    if (!(sqft > MAX_SQFT || sqft < MIN_SQFT || price < MIN_PRICE) && price / sqft >= 30) {
-      sale.pricePerSqFt = price / sqft;
-    }
+  const price = parseNumber(raw.sale_price);
+  const sqft = parseNumber(raw.gross_square_feet);
+  if (
+    price >= MIN_PRICE &&
+    sqft >= MIN_SQFT &&
+    sqft <= MAX_SQFT &&
+    price / sqft >= MIN_PRICE_PER_SQFT
+  ) {
+    sale.pricePerSqFt = price / sqft;
   }
   return sale;
 }
 
-function createQuarterlyHash<T extends number | number[]>(empty: () => T): Record<string, T> {
-  const hash: Record<string, T> = {};
-  for (const key of quarterKeys()) hash[key] = empty();
-  return hash;
+interface NtaAccumulator {
+  residentialPrices: Record<string, number[]>;
+  buildingClass: Record<string, Record<string, number>>;
 }
 
-function createYearlyBuildingClassHash(
-  buildingClassKeys: string[],
-): Record<string, Record<string, number>> {
-  const hash: Record<string, Record<string, number>> = {};
-  for (const year of YEARS) {
-    hash[String(year)] = {};
-    for (const bc of buildingClassKeys) hash[String(year)][bc] = 0;
-  }
-  return hash;
+function quarterKeys(years: number[]): string[] {
+  const keys: string[] = [];
+  for (const year of years) for (const quarter of QUARTERS) keys.push(`${quarter}-${year}`);
+  return keys;
 }
 
 /**
- * Aggregate normalized sales into the brooklyn display-data structure.
+ * Aggregate API sales rows into the brooklyn display-data structure.
  *
- * @param sales      raw sale properties (as the legacy `Sale` model reads them)
- * @param ntaCodes   neighborhood codes incl. "ALL" (from nyc-neighborhood-names.json)
- * @param buildingClassKeys  all building-class keys (from building-class.json)
+ * @param rows       Socrata `w2pb-icbu` rows (Brooklyn)
+ * @param ntaCodes   neighborhood codes incl. "ALL" (nyc-neighborhood-names.json)
+ * @param buildingClassKeys  all building-class keys (building-class.json)
+ * @param years      contiguous year range of the display axis, e.g. [2016…2025]
  */
 export function aggregateSales(
-  sales: RawSaleProperties[],
+  rows: SaleRow[],
   ntaCodes: string[],
   buildingClassKeys: string[],
+  years: number[],
 ): BrooklynDisplayData {
-  // createNeighborhoodDataHash
   const data: Record<string, NtaAccumulator> = {};
   for (const key of ntaCodes) {
-    data[key] = {
-      residentialSaleTally: createQuarterlyHash<number>(() => 0),
-      residentialPrices: createQuarterlyHash<number[]>(() => []),
-      commercialSaleTally: createQuarterlyHash<number>(() => 0),
-      commercialPrices: createQuarterlyHash<number[]>(() => []),
-      buildingClass: createYearlyBuildingClassHash(buildingClassKeys),
-    };
+    const residentialPrices: Record<string, number[]> = {};
+    for (const qk of quarterKeys(years)) residentialPrices[qk] = [];
+    const buildingClass: Record<string, Record<string, number>> = {};
+    for (const year of years) {
+      buildingClass[String(year)] = {};
+      for (const bc of buildingClassKeys) buildingClass[String(year)][bc] = 0;
+    }
+    data[key] = { residentialPrices, buildingClass };
   }
 
-  // tallyCounts
-  for (const raw of sales) {
+  for (const raw of rows) {
     const sale = normalizeSale(raw);
-    const bucket = sale.ntacode ? data[sale.ntacode] : undefined;
+    if (!sale) continue;
+    const bucket = sale.nta ? data[sale.nta] : undefined;
     if (!bucket) continue;
     const dateKey = `${sale.quarter}-${sale.year}`;
 
-    if (sale.residentia > 0 && sale.commercial < 1 && sale.residentia < 10) {
-      if (bucket.residentialSaleTally[dateKey] !== undefined)
-        bucket.residentialSaleTally[dateKey]++;
-      if (sale.pricePerSqFt && bucket.residentialPrices[dateKey]) {
-        bucket.residentialPrices[dateKey].push(Number(sale.pricePerSqFt));
-      }
-    } else if (sale.commercial) {
-      if (bucket.commercialSaleTally[dateKey] !== undefined) bucket.commercialSaleTally[dateKey]++;
-      if (sale.pricePerSqFt && bucket.commercialPrices[dateKey]) {
-        bucket.commercialPrices[dateKey].push(Number(sale.pricePerSqFt));
-      }
+    const isResidential =
+      sale.residentialUnits > 0 && sale.commercialUnits < 1 && sale.residentialUnits < 10;
+    if (isResidential && sale.pricePerSqFt && bucket.residentialPrices[dateKey]) {
+      bucket.residentialPrices[dateKey].push(sale.pricePerSqFt);
     }
 
     if (sale.buildingClass.length > 0) {
       const yearBucket = bucket.buildingClass[String(sale.year)];
-      const bc = sale.buildingClass.substring(0, 2);
-      if (yearBucket && yearBucket[bc] !== undefined) yearBucket[bc]++;
+      if (yearBucket && yearBucket[sale.buildingClass] !== undefined) {
+        yearBucket[sale.buildingClass]++;
+      }
     }
   }
 
@@ -199,7 +175,7 @@ export function aggregateSales(
   return formatSalesDataForDisplay(data, ntaCodes);
 }
 
-/** Convert per-year building-class counts to percentages (port of computeBuildingClassPercent). */
+/** Convert per-year building-class counts to percentages. */
 function computeBuildingClassPercent(
   data: Record<string, NtaAccumulator>,
   ntaCodes: string[],
@@ -219,7 +195,7 @@ function computeBuildingClassPercent(
   }
 }
 
-/** Collect every value across all NTAs per quarter-key (port of getSalesTotals). */
+/** Collect every value across all NTAs per quarter-key (borough-wide pool). */
 function getSalesTotals(
   data: Record<string, NtaAccumulator>,
   ntaCodes: string[],
@@ -241,48 +217,31 @@ function formatSalesDataForDisplay(
   const formatted: BrooklynDisplayData = {};
 
   for (const ntaID of ntaCodes) {
+    const series = data[ntaID].residentialPrices;
     const flattened: NeighborhoodDisplayData = {
-      residentialPrices: [],
-      buildingClass: {},
-    };
-
-    for (const key of SALES_DATA_KEYS) {
-      const series = data[ntaID][key];
-      flattened[key] = Object.keys(series).map((itemKey) => {
+      residentialPrices: Object.keys(series).map((itemKey) => {
         const arr = series[itemKey].slice().sort(ascending);
         const m = mean(arr);
         return { date: quarterKeyToEpoch(itemKey), value: m ? Number(m.toFixed(2)) : 0 };
-      });
+      }),
+      buildingClass: formatBuildingClassData(data[ntaID].buildingClass),
+    };
 
-      if (ntaID === 'ALL') {
-        const totals = getSalesTotals(data, ntaCodes);
-        flattened[`${key}-mean`] = Object.keys(totals).map((totalKey) => ({
-          date: quarterKeyToEpoch(totalKey),
-          value: Number((mean(totals[totalKey]) ?? 0).toFixed(2)),
-        }));
-      }
-
-      if (ntaID === 'BK73') {
-        flattened.williamsburgTrend = Object.keys(series).map((itemKey) => {
-          const arr = series[itemKey].slice().sort(ascending);
-          return {
-            date: quarterKeyToEpoch(itemKey),
-            pct25: Number((quantile(arr, 0.25) ?? 0).toFixed(2)),
-            value: Number((mean(arr) ?? 0).toFixed(2)),
-            pct75: Number((quantile(arr, 0.75) ?? 0).toFixed(2)),
-          };
-        });
-      }
+    if (ntaID === 'ALL') {
+      const totals = getSalesTotals(data, ntaCodes);
+      flattened['residentialPrices-mean'] = Object.keys(totals).map((totalKey) => ({
+        date: quarterKeyToEpoch(totalKey),
+        value: Number((mean(totals[totalKey]) ?? 0).toFixed(2)),
+      }));
     }
 
-    flattened.buildingClass = formatBuildingClassData(data[ntaID].buildingClass);
     formatted[ntaID] = flattened;
   }
 
   return formatted;
 }
 
-/** Port of formatBuildingClassData: per valid class, a per-year fractional series. */
+/** Per valid class, a per-year fractional series. */
 function formatBuildingClassData(
   buildingClass: Record<string, Record<string, number>>,
 ): Record<string, DateValue[]> {

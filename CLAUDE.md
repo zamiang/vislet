@@ -41,7 +41,10 @@ moved to a **modern one**. Do not add new features to the old stack — only mig
    deep-link/query states the old `graph-key` router produced must keep resolving. See
    MIGRATION.md §3 (URL/compatibility contract).
 4. **Data is fetched, not bundled.** Move `apps/*/data/*.json` to `public/data/<app>/`
-   and fetch lazily. Special-case the 12 MB `bbl-to-lat-long.json` (pre-join at build time).
+   and fetch lazily. The brooklyn + 311 display JSON is now regenerated from the live
+   NYC Open Data APIs (`scripts/etl/`, refreshed by `.github/workflows/data-refresh.yml`),
+   so the legacy 12 MB `bbl-to-lat-long.json` geocode join is retired — sales arrive
+   geocoded to 2020 NTAs. See `docs/etl.md`.
 5. **Everything typed + tested.** New code is TypeScript; `tsc --noEmit` must stay clean.
    Unit-test pure math (scales/aggregation) with Vitest; pages get Playwright smoke tests.
 6. **Match the sibling repos.** Clone tooling/config conventions from `zamiang-dot-com-v2`

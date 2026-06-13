@@ -47,7 +47,11 @@
       "Bash(gulp:*)",
       "Bash(wrangler:*)",
       "Bash(aws:*)",
-      "Bash(gh:*)"
+      "Bash(gh pr create:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr close:*)",
+      "Bash(gh release create:*)",
+      "Bash(gh repo delete:*)"
     ],
     "deny": [
       "Read(./airflow/**)",

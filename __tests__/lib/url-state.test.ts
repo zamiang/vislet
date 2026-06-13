@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { type GraphState, parseGraphState, serializeGraphState } from '@/lib/url-state';
+import { NTA_2010_TO_2020 } from '@/lib/nta-crosswalk';
+import {
+  type GraphState,
+  parseGraphState,
+  resolveAreaCode,
+  serializeGraphState,
+} from '@/lib/url-state';
 
 describe('parseGraphState', () => {
   it('decodes the empty query as overview', () => {
@@ -46,6 +52,29 @@ describe('parseGraphState', () => {
       kind: 'area',
       area: 'BK01',
     });
+  });
+
+  it('resolves legacy 2010 NTA codes in area/hover to 2020 codes', () => {
+    // BK73 (2010 Williamsburg) → BK0102 (2020) per the generated crosswalk.
+    expect(NTA_2010_TO_2020.BK73).toBe('BK0102');
+    expect(parseGraphState('?area=BK73')).toEqual({ kind: 'area', area: 'BK0102' });
+    expect(parseGraphState('?area=BK73&hover=BK60')).toEqual({
+      kind: 'area',
+      area: NTA_2010_TO_2020.BK73,
+      hover: NTA_2010_TO_2020.BK60,
+    });
+  });
+
+  it('passes current 2020 codes through unchanged', () => {
+    expect(parseGraphState('?area=BK0102')).toEqual({ kind: 'area', area: 'BK0102' });
+  });
+});
+
+describe('resolveAreaCode', () => {
+  it('maps known legacy codes and passes others through', () => {
+    expect(resolveAreaCode('BK73')).toBe(NTA_2010_TO_2020.BK73);
+    expect(resolveAreaCode('BK0102')).toBe('BK0102'); // already 2020
+    expect(resolveAreaCode('ALL')).toBe('ALL');
   });
 });
 

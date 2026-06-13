@@ -54,14 +54,22 @@ jobs:
                keep resolving (CLAUDE.md §3, MIGRATION.md §3).
             4. Security: secrets handling (never re-add the leaked AWS keys), env
                var leaks, deploy-key scope.
-            5. Data handling — data is fetched from `public/data/<app>/`, not
-               bundled; the 12 MB `bbl-to-lat-long.json` must stay pre-joined.
+            5. Data handling — display JSON is fetched from `public/data/<app>/`,
+               not bundled, and is regenerated from the live NYC Open Data APIs by
+               `scripts/etl/` (the legacy 12 MB `bbl-to-lat-long.json` geocode join
+               is retired — sales arrive pre-geocoded to 2020 NTAs). See docs/etl.md.
             6. Test coverage for new behavior (Vitest for pure math, Playwright smoke).
 
             Skip stylistic nits already covered by ESLint, Prettier, or Tailwind.
             Prefix preferential feedback with "(nit)". Post one consolidated review.
 
-            Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
+          # Let the action manage the review comment itself (via the GitHub API +
+          # GITHUB_TOKEN): it creates/updates a tracking comment and hands Claude
+          # the PR context + comment tool natively. This replaces the previous
+          # `gh pr comment` approach, which silently failed — in the headless run
+          # every `gh` Bash call was denied ("haven't granted it yet"), so Claude
+          # could neither read the diff nor post, while the job still exited green.
+          track_progress: true
 
           # Surface Claude's output in the run log so silent failures (e.g.
           # permission denials) are visible instead of hidden behind a green check.
@@ -71,5 +79,6 @@ jobs:
           # or https://code.claude.com/docs/en/cli-reference for available options
           # Read/Grep/Glob are required: the prompt asks Claude to review against
           # CLAUDE.md and docs/, and without them every file read is denied and
-          # the review dies before posting anything.
-          claude_args: '--allowed-tools "Read,Grep,Glob,Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
+          # the review dies before it can write anything. The comment is posted by
+          # the action (track_progress), so no `gh`/Bash tools are needed here.
+          claude_args: '--allowed-tools "Read,Grep,Glob"'
