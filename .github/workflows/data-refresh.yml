@@ -9,7 +9,10 @@ name: Refresh NYC data
 #   sales (w2pb-icbu) updates ~annually; the full Brooklyn pull is cheap and a
 #        content hash makes runs where nothing changed a no-op.
 #
-# Requires repo secret SOCRATA_APP_TOKEN (free: https://data.cityofnewyork.us/profile/app_tokens).
+# Auth (raises the NYC Open Data rate limit) reads, in order of preference:
+#   - SOCRATA_APP_KEY_ID + SOCRATA_APP_KEY_SECRET (API key, Basic Auth — current)
+#   - SOCRATA_APP_TOKEN (legacy app token — fallback)
+# Set whichever you use as repo secrets. https://support.socrata.com/hc/en-us/articles/360015776014-API-Keys
 
 on:
   schedule:
@@ -38,18 +41,24 @@ jobs:
 
       - name: Refresh Brooklyn sales
         env:
+          SOCRATA_APP_KEY_ID: ${{ secrets.SOCRATA_APP_KEY_ID }}
+          SOCRATA_APP_KEY_SECRET: ${{ secrets.SOCRATA_APP_KEY_SECRET }}
           SOCRATA_APP_TOKEN: ${{ secrets.SOCRATA_APP_TOKEN }}
         run: npm run data:build:brooklyn
 
       - name: Refresh 311 (incremental)
         if: ${{ !inputs.backfill_311 }}
         env:
+          SOCRATA_APP_KEY_ID: ${{ secrets.SOCRATA_APP_KEY_ID }}
+          SOCRATA_APP_KEY_SECRET: ${{ secrets.SOCRATA_APP_KEY_SECRET }}
           SOCRATA_APP_TOKEN: ${{ secrets.SOCRATA_APP_TOKEN }}
         run: npm run data:build:311
 
       - name: Refresh 311 (full backfill)
         if: ${{ inputs.backfill_311 }}
         env:
+          SOCRATA_APP_KEY_ID: ${{ secrets.SOCRATA_APP_KEY_ID }}
+          SOCRATA_APP_KEY_SECRET: ${{ secrets.SOCRATA_APP_KEY_SECRET }}
           SOCRATA_APP_TOKEN: ${{ secrets.SOCRATA_APP_TOKEN }}
         run: npm run data:build:311 -- --backfill
 

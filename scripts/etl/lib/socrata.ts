@@ -3,10 +3,18 @@
  *
  * No SDK dependency — just paginated `fetch` against
  * `https://data.cityofnewyork.us/resource/<dataset>.json` with SoQL params.
- * Anonymous access is rate-limited per IP; set `SOCRATA_APP_TOKEN` (free token,
- * https://data.cityofnewyork.us/profile/app_tokens) to raise the limit. CI
- * provides it as a repo secret (see .github/workflows/data-refresh.yml).
+ *
+ * Anonymous access is rate-limited per IP. Authenticate to raise the limit:
+ * - Preferred: an **API key** (key ID + secret) sent via HTTP Basic Auth, set
+ *   as `SOCRATA_APP_KEY_ID` / `SOCRATA_APP_KEY_SECRET`. This is Socrata's
+ *   current method (app tokens are being deprecated).
+ *   https://support.socrata.com/hc/en-us/articles/360015776014-API-Keys
+ * - Fallback: a legacy `SOCRATA_APP_TOKEN` sent as `X-App-Token`.
+ *
+ * CI provides these as repo secrets (see .github/workflows/data-refresh.yml).
  */
+// Load a local `.env` (no-op in CI) so the credentials below are populated.
+import './env';
 
 const BASE = 'https://data.cityofnewyork.us/resource';
 const MAX_RETRIES = 8;
@@ -21,10 +29,26 @@ function buildUrl(dataset: string, params: SoqlParams): string {
   return url.toString();
 }
 
-async function fetchWithRetry(url: string): Promise<unknown> {
-  const headers: Record<string, string> = { Accept: 'application/json' };
+/**
+ * Auth headers, computed once. Prefer the API key (Basic Auth) and fall back to
+ * a legacy app token. Empty if neither is configured (anonymous, rate-limited).
+ */
+function authHeaders(): Record<string, string> {
+  const keyId = process.env.SOCRATA_APP_KEY_ID;
+  const keySecret = process.env.SOCRATA_APP_KEY_SECRET;
+  if (keyId && keySecret) {
+    const basic = Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+    return { Authorization: `Basic ${basic}` };
+  }
   const token = process.env.SOCRATA_APP_TOKEN;
-  if (token) headers['X-App-Token'] = token;
+  if (token) return { 'X-App-Token': token };
+  return {};
+}
+
+const AUTH_HEADERS = authHeaders();
+
+async function fetchWithRetry(url: string): Promise<unknown> {
+  const headers: Record<string, string> = { Accept: 'application/json', ...AUTH_HEADERS };
 
   let lastError: unknown;
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {

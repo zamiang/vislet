@@ -26,10 +26,14 @@ Key facts:
   `bbl-to-lat-long.json` geocode join and `block-lot-to-bbl.json`** — sales now
   arrive geocoded. Old 2010-NTA deep links (`?area=BK73`) resolve through
   `src/lib/nta-crosswalk.ts` (see MIGRATION.md §3).
-- **App token.** Anonymous Socrata access is rate-limited; set
-  `SOCRATA_APP_TOKEN` (free) to raise the cap. The client
-  (`scripts/etl/lib/socrata.ts`) sends it as `X-App-Token` when present. CI reads
-  it from the `SOCRATA_APP_TOKEN` repo secret.
+- **Auth.** Anonymous Socrata access is rate-limited. The client
+  (`scripts/etl/lib/socrata.ts`) authenticates to raise the cap, preferring an
+  **API key** — `SOCRATA_APP_KEY_ID` + `SOCRATA_APP_KEY_SECRET` sent via HTTP
+  Basic Auth ([Socrata's current method](https://support.socrata.com/hc/en-us/articles/360015776014-API-Keys);
+  app tokens are being deprecated) — and falling back to a legacy
+  `SOCRATA_APP_TOKEN` (`X-App-Token`) if only that is set. Put the credentials in
+  a gitignored `.env` (loaded by `scripts/etl/lib/env.ts` via Node's native
+  `process.loadEnvFile`); CI reads them from the matching repo secrets.
 - **311 aggregate cache.** The combined 311 source is ~44 M rows, so history is
   not re-pulled every run. `npm run data:build:311 -- --backfill` streams both
   datasets once and writes a compact committed cache
