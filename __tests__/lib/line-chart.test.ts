@@ -32,6 +32,16 @@ describe('getFlattenedData', () => {
     });
   });
 
+  it('also routes -median keys to ALL (borough aggregate)', () => {
+    const med: LineGraphData = {
+      ALL: { 'price-median': [{ date: 1, value: 99 }] },
+      'park-slope': { price: [{ date: 1, value: 5 }] },
+    };
+    const flat = getFlattenedData(med, ['price', 'price-median'], 'park-slope');
+    expect(flat['price-median']).toEqual(med['ALL']['price-median']);
+    expect(flat['price']).toEqual(med['park-slope'].price);
+  });
+
   it('skips keys missing from the data', () => {
     expect(getFlattenedData(data, ['missing'], 'park-slope')).toEqual({});
   });
@@ -64,10 +74,21 @@ describe('getLines', () => {
 });
 
 describe('lineColor', () => {
-  it('maps mean / compare / default series to their colors', () => {
+  it('maps mean / median / compare / default series to their colors', () => {
     expect(lineColor('price-mean')).toBe('lightgray');
+    expect(lineColor('price-median')).toBe('lightgray');
     expect(lineColor('compare-dataset')).toBe('#D53F50');
     expect(lineColor('park-slope')).toBe('#5a7684'); // Steel Blue (--primary)
+  });
+});
+
+describe('getLines -median labeling', () => {
+  it('labels -median series as Borough Median', () => {
+    const med: LineGraphData = { ALL: { 'price-median': [{ date: 1, value: 99 }] } };
+    const flat = getFlattenedData(med, ['price-median'], 'park-slope');
+    expect(getLines(flat, 'park-slope').find((l) => l.name === 'price-median')?.id).toBe(
+      'Borough Median',
+    );
   });
 });
 

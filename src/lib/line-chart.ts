@@ -12,11 +12,18 @@ import type { DataPoint, Series } from '@/types';
 export type LineGraphData = Record<string, Record<string, DataPoint[]>>;
 
 const MEAN_SUFFIX = '-mean';
+const MEDIAN_SUFFIX = '-median';
+
+/** True for borough-aggregate keys (`…-mean`/`…-median`) that come from `ALL`. */
+function isBoroughKey(key: string): boolean {
+  return key.includes(MEAN_SUFFIX) || key.includes(MEDIAN_SUFFIX);
+}
 
 /**
  * Pick the points for each requested key out of the dataset.
- * `…-mean` keys always come from the `ALL` dataset (the borough average);
- * everything else comes from `startingDataset`. Mirrors `getFlattenedData`.
+ * `…-mean`/`…-median` keys always come from the `ALL` dataset (the borough
+ * aggregate); everything else comes from `startingDataset`. Mirrors
+ * `getFlattenedData`.
  */
 export function getFlattenedData(
   data: LineGraphData,
@@ -25,7 +32,7 @@ export function getFlattenedData(
 ): Record<string, DataPoint[]> {
   const flattened: Record<string, DataPoint[]> = {};
   for (const key of keys) {
-    if (key.includes(MEAN_SUFFIX)) {
+    if (isBoroughKey(key)) {
       const points = data['ALL']?.[key];
       if (points) flattened[key] = points;
     } else if (data[startingDataset]) {
@@ -39,7 +46,8 @@ export function getFlattenedData(
 /**
  * Build the renderable series from flattened data, appending the optional
  * compare-dataset line. Mirrors `getLines`. `…-mean` series are labeled
- * "Borough Average"; others carry the active dataset id.
+ * "Borough Average", `…-median` "Borough Median"; others carry the active
+ * dataset id.
  */
 export function getLines(
   flattened: Record<string, DataPoint[]>,
@@ -52,7 +60,11 @@ export function getLines(
 ): Series[] {
   const names = Object.keys(flattened);
   const lines: Series[] = names.map((name) => ({
-    id: name.includes(MEAN_SUFFIX) ? 'Borough Average' : startingDataset,
+    id: name.includes(MEDIAN_SUFFIX)
+      ? 'Borough Median'
+      : name.includes(MEAN_SUFFIX)
+        ? 'Borough Average'
+        : startingDataset,
     name,
     values: flattened[name],
   }));
@@ -68,7 +80,7 @@ export function getLines(
 
 /** Series stroke color by name. Mirrors `line-graph/index.coffee` `color`. */
 export function lineColor(name: string): string {
-  if (name.includes(MEAN_SUFFIX)) return 'lightgray';
+  if (isBoroughKey(name)) return 'lightgray';
   if (name.includes('compare-')) return '#D53F50';
   return '#5a7684'; // Steel Blue (--primary) — shared Slate Executive palette
 }

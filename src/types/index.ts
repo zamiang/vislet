@@ -90,7 +90,4 @@ export interface BrooklynNeighborhoodData {
   residentialPrices: DataPoint[];
   buildingClass: Record<string, DataPoint[]>;
 }
-export type BrooklynData = Record<
-  string,
-  BrooklynNeighborhoodData & { 'residentialPrices-median'?: DataPoint[] }
->;
+export type BrooklynData = Record<string, BrooklynNeighborhoodData>;
