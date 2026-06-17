@@ -49,6 +49,16 @@ describe('makeDeflator', () => {
     expect(Number.isFinite(d({ date: 20, value: 150 }).value)).toBe(true);
     expect(Number.isFinite(d({ date: 25, value: 150 }).value)).toBe(true);
   });
+
+  it('passes values through unchanged when the series has no usable months', () => {
+    const empty: CpiData = {
+      source: 'test',
+      latest: { date: 30, value: 0 },
+      series: [{ date: 10, value: 0 }],
+    };
+    const d = makeDeflator(empty);
+    expect(d({ date: 10, value: 123 }).value).toBe(123);
+  });
 });
 
 describe('indexToBase', () => {

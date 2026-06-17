@@ -22,11 +22,11 @@ import { computeGrowthScatter } from '@/lib/neighborhood-scatter';
 import { parseGraphState, serializeGraphState } from '@/lib/url-state';
 import type { BrooklynData, ColorDatum, DataPoint } from '@/types';
 
-/** Line-chart display modes. */
+/** Line-chart display modes. `{year}` is replaced with the CPI base year. */
 type PriceView = 'nominal' | 'real' | 'indexed';
 const PRICE_VIEWS: { id: PriceView; label: string }[] = [
   { id: 'nominal', label: 'Nominal $' },
-  { id: 'real', label: 'Real $ (2025)' },
+  { id: 'real', label: 'Real $ ({year})' },
   { id: 'indexed', label: 'Indexed (start=100)' },
 ];
 
@@ -215,6 +215,10 @@ export function Brooklyn() {
     );
   }
 
+  // The "real" view deflates to the latest CPI month; surface that year in the
+  // labels so they track `data:cpi` refreshes instead of hardcoding 2025.
+  const cpiYear = cpi ? new Date(cpi.latest.date).getUTCFullYear() : new Date().getUTCFullYear();
+
   return (
     <div id="brooklyn" className="map-app">
       <header>
@@ -283,7 +287,7 @@ export function Brooklyn() {
                     aria-pressed={priceView === view.id}
                     onClick={() => setPriceView(view.id)}
                   >
-                    {view.label}
+                    {view.label.replace('{year}', String(cpiYear))}
                   </button>
                 ))}
               </div>
@@ -298,7 +302,7 @@ export function Brooklyn() {
                   priceView === 'indexed'
                     ? 'Median Price per Sqft (start = 100)'
                     : priceView === 'real'
-                      ? 'Median Price per Sqft (constant 2025 $)'
+                      ? `Median Price per Sqft (constant ${cpiYear} $)`
                       : 'Median Price per Sqft'
                 }
                 yAxisFormat={(v) => (priceView === 'indexed' ? `${v}` : `$${v}`)}

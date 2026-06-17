@@ -26,6 +26,8 @@ export function makeDeflator(cpi: CpiData): (point: DataPoint) => DataPoint {
   // Defensive: ignore any non-positive index points so a delayed/missing month
   // can never divide-by-zero (the ETL already filters these out).
   const series = cpi.series.filter((p) => p.value > 0);
+  // No usable index at all → pass values through unchanged rather than throwing.
+  if (series.length === 0) return (point) => ({ ...point });
   const latest = cpi.latest.value > 0 ? cpi.latest : series[series.length - 1];
   const cpiAt = (date: number): number => {
     let chosen = series[0].value;

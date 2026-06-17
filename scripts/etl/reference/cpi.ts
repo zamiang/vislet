@@ -38,14 +38,19 @@ interface BlsPoint {
   value: string;
 }
 
-async function main(): Promise<void> {
-  const endYear = new Date().getUTCFullYear();
+// The keyless BLS public API caps a single request at 10 calendar years, so we
+// fetch in ≤10-year windows and concatenate — this preserves the full history
+// (the Brooklyn sales window starts 2016) instead of dropping the earliest year
+// once the span crosses 10 years.
+const MAX_YEARS_PER_REQUEST = 10;
+
+async function fetchWindow(startYear: number, endYear: number): Promise<BlsPoint[]> {
   const res = await fetch('https://api.bls.gov/publicAPI/v2/timeseries/data/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       seriesid: [SERIES],
-      startyear: String(START_YEAR),
+      startyear: String(startYear),
       endyear: String(endYear),
     }),
   });
@@ -54,10 +59,20 @@ async function main(): Promise<void> {
     Results: { series: { data: BlsPoint[] }[] };
   };
   if (json.status !== 'REQUEST_SUCCEEDED') {
-    throw new Error(`BLS request failed: ${json.status}`);
+    throw new Error(`BLS request failed (${startYear}–${endYear}): ${json.status}`);
+  }
+  return json.Results.series[0].data;
+}
+
+async function main(): Promise<void> {
+  const endYear = new Date().getUTCFullYear();
+  const raw: BlsPoint[] = [];
+  for (let from = START_YEAR; from <= endYear; from += MAX_YEARS_PER_REQUEST) {
+    const to = Math.min(from + MAX_YEARS_PER_REQUEST - 1, endYear);
+    raw.push(...(await fetchWindow(from, to)));
   }
 
-  const series = json.Results.series[0].data
+  const series = raw
     .filter((d) => d.period in MONTHS)
     .map((d) => ({
       date: Date.UTC(Number(d.year), MONTHS[d.period], 1),
