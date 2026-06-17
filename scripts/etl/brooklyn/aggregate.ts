@@ -48,7 +48,6 @@ export interface DateValue {
 export interface NeighborhoodDisplayData {
   residentialPrices: DateValue[];
   buildingClass: Record<string, DateValue[]>;
-  'residentialPrices-median'?: DateValue[];
 }
 
 export type BrooklynDisplayData = Record<string, NeighborhoodDisplayData>;
@@ -229,25 +228,21 @@ function formatSalesDataForDisplay(
 ): BrooklynDisplayData {
   const formatted: BrooklynDisplayData = {};
 
+  // The synthetic "ALL" bucket carries no sales of its own (no row has
+  // nta === "ALL"), so its per-quarter series is empty. Source its
+  // residentialPrices from the borough-wide pool of every NTA's sales instead —
+  // otherwise the borough series would be all zeros.
+  const boroughTotals = getSalesTotals(data, ntaCodes);
+
   for (const ntaID of ntaCodes) {
-    const series = data[ntaID].residentialPrices;
-    const flattened: NeighborhoodDisplayData = {
+    const series = ntaID === 'ALL' ? boroughTotals : data[ntaID].residentialPrices;
+    formatted[ntaID] = {
       residentialPrices: Object.keys(series).map((itemKey) => {
         const m = median(series[itemKey]);
         return { date: quarterKeyToEpoch(itemKey), value: m ? Number(m.toFixed(2)) : 0 };
       }),
       buildingClass: formatBuildingClassData(data[ntaID].buildingClass),
     };
-
-    if (ntaID === 'ALL') {
-      const totals = getSalesTotals(data, ntaCodes);
-      flattened['residentialPrices-median'] = Object.keys(totals).map((totalKey) => ({
-        date: quarterKeyToEpoch(totalKey),
-        value: Number((median(totals[totalKey]) ?? 0).toFixed(2)),
-      }));
-    }
-
-    formatted[ntaID] = flattened;
   }
 
   return formatted;

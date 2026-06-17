@@ -112,9 +112,18 @@ describe('aggregateSales', () => {
     expect(q1?.value).toBe(500);
   });
 
-  it('emits the ALL (-median) series only on ALL', () => {
-    expect(out.ALL['residentialPrices-median']).toBeDefined();
-    expect(out.BK0101['residentialPrices-median']).toBeUndefined();
+  it('fills ALL.residentialPrices from the borough-wide pool (not zeros)', () => {
+    // The only residential sales borough-wide are the two BK0101 Q1 sales
+    // (median 500), so the ALL series mirrors them — never the legacy all-zeros.
+    const allQ1 = out.ALL.residentialPrices.find((d) => d.date === quarterKeyToEpoch('1-2016'));
+    expect(allQ1?.value).toBe(500);
+    expect(out.ALL.residentialPrices.some((d) => d.value > 0)).toBe(true);
+  });
+
+  it('no longer emits a separate residentialPrices-median key', () => {
+    expect(
+      (out.ALL as unknown as Record<string, unknown>)['residentialPrices-median'],
+    ).toBeUndefined();
   });
 
   it('ignores sales in NTAs outside the lookup (parks, other boroughs)', () => {

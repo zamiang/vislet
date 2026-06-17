@@ -12,12 +12,23 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AreaChart } from '@/components/AreaChart';
 import { DateSlider } from '@/components/DateSlider';
 import { LineGraph } from '@/components/LineGraph';
+import { ScatterChart } from '@/components/ScatterChart';
 import { SvgMap } from '@/components/SvgMap';
 import type { AreaData } from '@/lib/area-chart';
+import { type CpiData, indexToBase, makeDeflator } from '@/lib/cpi';
 import { formatName } from '@/lib/format';
 import type { LineGraphData } from '@/lib/line-chart';
+import { computeGrowthScatter } from '@/lib/neighborhood-scatter';
 import { parseGraphState, serializeGraphState } from '@/lib/url-state';
 import type { BrooklynData, ColorDatum, DataPoint } from '@/types';
+
+/** Line-chart display modes. `{year}` is replaced with the CPI base year. */
+type PriceView = 'nominal' | 'real' | 'indexed';
+const PRICE_VIEWS: { id: PriceView; label: string }[] = [
+  { id: 'nominal', label: 'Nominal $' },
+  { id: 'real', label: 'Real $ ({year})' },
+  { id: 'indexed', label: 'Indexed (start=100)' },
+];
 
 const MAP_WIDTH = 500;
 const MAP_HEIGHT = 400;
@@ -32,6 +43,8 @@ export function Brooklyn() {
   const [topology, setTopology] = useState<unknown>(null);
   const [neighborhoodNames, setNeighborhoodNames] = useState<Record<string, string>>({});
   const [buildingClasses, setBuildingClasses] = useState<Record<string, string>>({});
+  const [cpi, setCpi] = useState<CpiData | null>(null);
+  const [priceView, setPriceView] = useState<PriceView>('nominal');
   const [loading, setLoading] = useState(true);
 
   const [selectedId, setSelectedId] = useState<string | null>(DEFAULT_AREA);
@@ -44,12 +57,14 @@ export function Brooklyn() {
       fetch('/data/brooklyn/brooklyn.json').then((r) => r.json()),
       fetch('/data/brooklyn/nyc-neighborhood-names.json').then((r) => r.json()),
       fetch('/data/brooklyn/building-class.json').then((r) => r.json()),
-    ]).then(([sales, topo, names, classes]) => {
+      fetch('/data/cpi-us.json').then((r) => r.json()),
+    ]).then(([sales, topo, names, classes, cpiData]) => {
       const typedSales = sales as BrooklynData;
       setSalesData(typedSales);
       setTopology(topo);
       setNeighborhoodNames(names as Record<string, string>);
       setBuildingClasses(classes as Record<string, string>);
+      setCpi(cpiData as CpiData);
 
       const prices = typedSales['ALL']?.residentialPrices ?? [];
       const firstDate = prices[0]?.date ?? 0;
@@ -132,12 +147,23 @@ export function Brooklyn() {
 
   const lineData: LineGraphData = useMemo(() => {
     if (!salesData || !selectedId) return {};
-    const result: Record<string, Record<string, DataPoint[]>> = {
-      ALL: { 'residentialPrices-median': salesData['ALL']?.['residentialPrices-median'] ?? [] },
+    // The `-median` key routes to the ALL (borough) dataset in the line chart;
+    // it is sourced from ALL.residentialPrices (the borough-wide pooled median).
+    const borough = salesData['ALL']?.residentialPrices ?? [];
+    const neighborhood = salesData[selectedId]?.residentialPrices ?? [];
+
+    const transform = (points: DataPoint[]): DataPoint[] => {
+      if (priceView === 'indexed') return indexToBase(points);
+      if (priceView === 'real' && cpi) return points.map(makeDeflator(cpi));
+      return points;
     };
-    result[selectedId] = { residentialPrices: salesData[selectedId]?.residentialPrices ?? [] };
+
+    const result: LineGraphData = {
+      ALL: { 'residentialPrices-median': transform(borough) },
+    };
+    result[selectedId] = { residentialPrices: transform(neighborhood) };
     return result;
-  }, [salesData, selectedId]);
+  }, [salesData, selectedId, priceView, cpi]);
 
   const areaData = useMemo(
     () =>
@@ -173,6 +199,14 @@ export function Brooklyn() {
     };
   }, [salesData]);
 
+  const scatterData = useMemo(() => {
+    if (!salesData) return [];
+    const names = Object.fromEntries(
+      Object.entries(neighborhoodNames).map(([id, n]) => [id, formatName(n) ?? id]),
+    );
+    return computeGrowthScatter(salesData, { names, ignoredIds: IGNORED_IDS });
+  }, [salesData, neighborhoodNames]);
+
   if (loading || !topology || !salesData) {
     return (
       <div id="brooklyn" className="map-app">
@@ -180,6 +214,10 @@ export function Brooklyn() {
       </div>
     );
   }
+
+  // The "real" view deflates to the latest CPI month; surface that year in the
+  // labels so they track `data:cpi` refreshes instead of hardcoding 2025.
+  const cpiYear = cpi ? new Date(cpi.latest.date).getUTCFullYear() : new Date().getUTCFullYear();
 
   return (
     <div id="brooklyn" className="map-app">
@@ -240,14 +278,34 @@ export function Brooklyn() {
                 </div>
               </div>
 
+              <div className="price-view-toggle" role="group" aria-label="Price view">
+                {PRICE_VIEWS.map((view) => (
+                  <button
+                    key={view.id}
+                    type="button"
+                    className={priceView === view.id ? 'active' : undefined}
+                    aria-pressed={priceView === view.id}
+                    onClick={() => setPriceView(view.id)}
+                  >
+                    {view.label.replace('{year}', String(cpiYear))}
+                  </button>
+                ))}
+              </div>
+
               <LineGraph
                 data={lineData}
                 keys={['residentialPrices', 'residentialPrices-median']}
                 startingDataset={selectedId}
                 width={CHART_WIDTH}
                 height={CHART_HEIGHT}
-                label="Median Price per Sqft"
-                yAxisFormat={(v) => `$${v}`}
+                label={
+                  priceView === 'indexed'
+                    ? 'Median Price per Sqft (start = 100)'
+                    : priceView === 'real'
+                      ? `Median Price per Sqft (constant ${cpiYear} $)`
+                      : 'Median Price per Sqft'
+                }
+                yAxisFormat={(v) => (priceView === 'indexed' ? `${v}` : `$${v}`)}
                 showTooltips
               />
 
@@ -276,6 +334,29 @@ export function Brooklyn() {
           Click any neighborhood on the map to see its price history compared to the borough median.
           The building-class chart below shows the mix of property types as a share of total sales.
         </p>
+
+        <h2>The cheapest neighborhoods grew the fastest</h2>
+        <p>
+          Plotting each neighborhood&rsquo;s current price against its growth since{' '}
+          {coverage.firstYear} reveals an inverse relationship: the most affordable areas saw the
+          steepest gains, while the priciest ones have largely plateaued. South Williamsburg more
+          than doubled (+136%) and several East New York and East Flatbush areas climbed ~80%, all
+          from low bases. Meanwhile Brooklyn Heights — already the most expensive at roughly
+          $1,390/sqft — rose only ~8%. Hollow dots mark neighborhoods with thin sales coverage (e.g.
+          Spring Creek-Starrett City, ~27 of 40 quarters, mostly co-ops that don&rsquo;t report
+          square footage), where the trend is less reliable. Hover any dot for its figures, or click
+          to load it on the map above.
+        </p>
+        <div className="scatter-container">
+          <ScatterChart
+            data={scatterData}
+            width={580}
+            height={360}
+            xLabel="Current median $/sqft"
+            yLabel={`Growth since ${coverage.firstYear}`}
+            onSelect={setSelectedId}
+          />
+        </div>
         <p>
           Data comes from the NYC Department of Finance{' '}
           <a

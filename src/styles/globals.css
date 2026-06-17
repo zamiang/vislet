@@ -656,6 +656,39 @@ a:focus-visible {
 .circle-key.gray {
   background: lightgray;
 }
+.price-view-toggle {
+  display: inline-flex;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.price-view-toggle button {
+  appearance: none;
+  border: none;
+  border-left: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted-foreground);
+  font-family: var(--font-heading);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.price-view-toggle button:first-child {
+  border-left: none;
+}
+.price-view-toggle button:hover {
+  color: var(--foreground);
+}
+.price-view-toggle button.active {
+  background: var(--primary);
+  color: var(--primary-foreground, #fff);
+}
 .select-container label {
   font-size: 0.875rem;
   margin-right: 8px;
@@ -781,4 +814,39 @@ text.label-text,
 text.hover-text {
   font-size: 11px;
   fill: #333;
+}
+
+/* Growth-vs-price scatter (write-up) */
+.scatter-container {
+  margin: 16px 0 8px;
+  overflow-x: auto;
+}
+.scatter-dot {
+  fill: var(--primary);
+  fill-opacity: 0.55;
+  stroke: var(--primary);
+  stroke-width: 1px;
+  transition:
+    r 0.12s ease,
+    fill-opacity 0.12s ease;
+}
+.scatter-dot.callout {
+  fill-opacity: 0.9;
+}
+.scatter-dot.sparse {
+  fill: none;
+  stroke: var(--muted-foreground);
+  stroke-dasharray: 2 2;
+}
+.scatter-dot.active {
+  fill-opacity: 1;
+}
+.scatter-label {
+  font-size: 11px;
+  fill: var(--muted-foreground);
+  pointer-events: none;
+}
+.scatter-label.active {
+  fill: var(--foreground);
+  font-weight: 600;
 }

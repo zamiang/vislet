@@ -56,6 +56,17 @@ Key facts:
   TopoJSON maps, neighborhood-name lookups, the `[pop2010, pop2020]` population
   file (from a committed DCP decennial-census extract), and the 2010→2020
   crosswalk. Re-run only when DCP revises the NTA boundaries.
+- **CPI (inflation).** `npm run data:cpi` fetches the monthly US CPI-U index
+  (BLS series `CUUR0000SA0`, keyless public API, ≤10 yr/request) and writes
+  `public/data/cpi-us.json`. The Brooklyn page uses it to deflate $/sqft to
+  constant dollars ("Real $" view). The fetch drops months BLS has not yet
+  published (a delayed release returns the row with a null value — e.g. the
+  shutdown-delayed Oct 2025 CPI). Re-run to extend the range; the committed JSON
+  is the source of truth.
+- **Brooklyn "ALL" series.** The borough-wide line lives in
+  `ALL.residentialPrices` (the pooled quarterly median across every NTA), not a
+  separate `residentialPrices-median` key. The line chart routes `-median`/`-mean`
+  keys to the `ALL` dataset (`src/lib/line-chart.ts`).
 
 ## ⚠️ Other raw inputs are not in the repo
 

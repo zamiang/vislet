@@ -23,7 +23,8 @@
     "data:build:311": "tsx scripts/etl/311/build.ts",
     "data:build:chicago": "tsx scripts/etl/chicago/build.ts",
     "data:build:north-carolina": "tsx scripts/etl/north-carolina/build.ts",
-    "data:reference": "tsx scripts/etl/reference/build-reference.ts"
+    "data:reference": "tsx scripts/etl/reference/build-reference.ts",
+    "data:cpi": "tsx scripts/etl/reference/cpi.ts"
   },
   "dependencies": {
     "@astrojs/react": "5.0.7",
