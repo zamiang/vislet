@@ -15,20 +15,12 @@ import { LineGraph } from '@/components/LineGraph';
 import { ScatterChart } from '@/components/ScatterChart';
 import { SvgMap } from '@/components/SvgMap';
 import type { AreaData } from '@/lib/area-chart';
-import { type CpiData, indexToBase, makeDeflator } from '@/lib/cpi';
+import { type CpiData, makeDeflator } from '@/lib/cpi';
 import { formatName } from '@/lib/format';
-import type { LineGraphData } from '@/lib/line-chart';
+import { type LineGraphData, lineColor } from '@/lib/line-chart';
 import { computeGrowthScatter } from '@/lib/neighborhood-scatter';
 import { parseGraphState, serializeGraphState } from '@/lib/url-state';
-import type { BrooklynData, ColorDatum, DataPoint } from '@/types';
-
-/** Line-chart display modes. `{year}` is replaced with the CPI base year. */
-type PriceView = 'nominal' | 'real' | 'indexed';
-const PRICE_VIEWS: { id: PriceView; label: string }[] = [
-  { id: 'nominal', label: 'Nominal $' },
-  { id: 'real', label: 'Real $ ({year})' },
-  { id: 'indexed', label: 'Indexed (start=100)' },
-];
+import type { BrooklynData, ColorDatum } from '@/types';
 
 const MAP_WIDTH = 500;
 const MAP_HEIGHT = 400;
@@ -44,7 +36,6 @@ export function Brooklyn() {
   const [neighborhoodNames, setNeighborhoodNames] = useState<Record<string, string>>({});
   const [buildingClasses, setBuildingClasses] = useState<Record<string, string>>({});
   const [cpi, setCpi] = useState<CpiData | null>(null);
-  const [priceView, setPriceView] = useState<PriceView>('nominal');
   const [loading, setLoading] = useState(true);
 
   const [selectedId, setSelectedId] = useState<string | null>(DEFAULT_AREA);
@@ -147,23 +138,26 @@ export function Brooklyn() {
 
   const lineData: LineGraphData = useMemo(() => {
     if (!salesData || !selectedId) return {};
-    // The `-median` key routes to the ALL (borough) dataset in the line chart;
-    // it is sourced from ALL.residentialPrices (the borough-wide pooled median).
+    // The `-median` keys route to the ALL (borough) dataset in the line chart;
+    // they are sourced from ALL.residentialPrices (the borough-wide pooled median).
+    // We plot each series twice — nominal (list $) and inflation-adjusted (`-real`,
+    // constant latest-year $ via the CPI deflator) — so all four lines show at once.
     const borough = salesData['ALL']?.residentialPrices ?? [];
     const neighborhood = salesData[selectedId]?.residentialPrices ?? [];
-
-    const transform = (points: DataPoint[]): DataPoint[] => {
-      if (priceView === 'indexed') return indexToBase(points);
-      if (priceView === 'real' && cpi) return points.map(makeDeflator(cpi));
-      return points;
-    };
+    const deflate = cpi ? makeDeflator(cpi) : null;
 
     const result: LineGraphData = {
-      ALL: { 'residentialPrices-median': transform(borough) },
+      ALL: {
+        'residentialPrices-median': borough,
+        ...(deflate ? { 'residentialPrices-median-real': borough.map(deflate) } : {}),
+      },
     };
-    result[selectedId] = { residentialPrices: transform(neighborhood) };
+    result[selectedId] = {
+      residentialPrices: neighborhood,
+      ...(deflate ? { 'residentialPrices-real': neighborhood.map(deflate) } : {}),
+    };
     return result;
-  }, [salesData, selectedId, priceView, cpi]);
+  }, [salesData, selectedId, cpi]);
 
   const areaData = useMemo(
     () =>
@@ -269,43 +263,50 @@ export function Brooklyn() {
               </a>
               <div className="graph-heading-container">
                 <div className="selected-neighborhood-name">
-                  <span className="circle-key blue" />
-                  <span className="graph-heading">{selectedName}</span>
+                  <span
+                    className="circle-key"
+                    style={{ backgroundColor: lineColor('residentialPrices') }}
+                  />
+                  <span className="graph-heading">{selectedName} · list $</span>
+                </div>
+                <div className="selected-neighborhood-name">
+                  <span
+                    className="circle-key"
+                    style={{ backgroundColor: lineColor('residentialPrices-real') }}
+                  />
+                  <span className="graph-heading">
+                    {selectedName} · real {cpiYear} $
+                  </span>
                 </div>
                 <div className="avg-neighborhood-name">
-                  <span className="circle-key gray" />
-                  <span className="graph-heading">Borough Median</span>
+                  <span
+                    className="circle-key"
+                    style={{ backgroundColor: lineColor('residentialPrices-median') }}
+                  />
+                  <span className="graph-heading">Borough median · list $</span>
                 </div>
-              </div>
-
-              <div className="price-view-toggle" role="group" aria-label="Price view">
-                {PRICE_VIEWS.map((view) => (
-                  <button
-                    key={view.id}
-                    type="button"
-                    className={priceView === view.id ? 'active' : undefined}
-                    aria-pressed={priceView === view.id}
-                    onClick={() => setPriceView(view.id)}
-                  >
-                    {view.label.replace('{year}', String(cpiYear))}
-                  </button>
-                ))}
+                <div className="avg-neighborhood-name">
+                  <span
+                    className="circle-key"
+                    style={{ backgroundColor: lineColor('residentialPrices-median-real') }}
+                  />
+                  <span className="graph-heading">Borough median · real {cpiYear} $</span>
+                </div>
               </div>
 
               <LineGraph
                 data={lineData}
-                keys={['residentialPrices', 'residentialPrices-median']}
+                keys={[
+                  'residentialPrices',
+                  'residentialPrices-real',
+                  'residentialPrices-median',
+                  'residentialPrices-median-real',
+                ]}
                 startingDataset={selectedId}
                 width={CHART_WIDTH}
                 height={CHART_HEIGHT}
-                label={
-                  priceView === 'indexed'
-                    ? 'Median Price per Sqft (start = 100)'
-                    : priceView === 'real'
-                      ? `Median Price per Sqft (constant ${cpiYear} $)`
-                      : 'Median Price per Sqft'
-                }
-                yAxisFormat={(v) => (priceView === 'indexed' ? `${v}` : `$${v}`)}
+                label={`Median Price per Sqft (real = constant ${cpiYear} $)`}
+                yAxisFormat={(v) => `$${v}`}
                 showTooltips
               />
 

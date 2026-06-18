@@ -555,6 +555,29 @@ a:focus-visible {
   opacity: 0.8;
 }
 
+/* Interactive tooltip marks (TooltipLayer) — port of legacy svg-tooltips.
+   Circle is a hollow ring (color set inline); label matches axis ticks with a
+   background-colored halo so the readout stays legible over chart lines. */
+.tooltips,
+.tooltips .tooltip-circle,
+.tooltips .tooltip-label {
+  pointer-events: none;
+}
+.tooltip-circle {
+  fill: none;
+  stroke-width: 2px;
+  paint-order: stroke;
+}
+.tooltip-label {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  fill: #555;
+  stroke: var(--background);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
 /* Color key */
 .color-key {
   display: flex;
@@ -633,7 +656,8 @@ a:focus-visible {
 }
 .graph-heading-container {
   display: flex;
-  gap: 24px;
+  flex-wrap: wrap;
+  gap: 6px 18px;
   margin-bottom: 12px;
   font-size: 0.75rem;
   font-family: var(--font-heading);
@@ -655,39 +679,6 @@ a:focus-visible {
 }
 .circle-key.gray {
   background: lightgray;
-}
-.price-view-toggle {
-  display: inline-flex;
-  margin-bottom: 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-}
-.price-view-toggle button {
-  appearance: none;
-  border: none;
-  border-left: 1px solid var(--border);
-  background: transparent;
-  color: var(--muted-foreground);
-  font-family: var(--font-heading);
-  font-size: 0.6875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 6px 12px;
-  cursor: pointer;
-  transition:
-    background 0.15s ease,
-    color 0.15s ease;
-}
-.price-view-toggle button:first-child {
-  border-left: none;
-}
-.price-view-toggle button:hover {
-  color: var(--foreground);
-}
-.price-view-toggle button.active {
-  background: var(--primary);
-  color: var(--primary-foreground, #fff);
 }
 .select-container label {
   font-size: 0.875rem;
