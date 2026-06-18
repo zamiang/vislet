@@ -78,11 +78,15 @@ export function getLines(
   return lines;
 }
 
-/** Series stroke color by name. Mirrors `line-graph/index.coffee` `color`. */
+/** Series stroke color by name. Mirrors `line-graph/index.coffee` `color`.
+ * `-real` keys are the inflation-adjusted (constant-dollar) counterpart of a
+ * series; they get a warm tone so list $ (cool) vs real $ (warm) reads at a
+ * glance, while neighborhood (saturated) vs borough (muted) reads by lightness. */
 export function lineColor(name: string): string {
-  if (isBoroughKey(name)) return 'lightgray';
+  const real = name.includes('-real');
+  if (isBoroughKey(name)) return real ? '#e0b196' : 'lightgray'; // borough: muted
   if (name.includes('compare-')) return '#D53F50';
-  return '#5a7684'; // Steel Blue (--primary) — shared Slate Executive palette
+  return real ? '#c2703d' : '#5a7684'; // neighborhood: rust (real) / steel blue (list)
 }
 
 /** `[min, max]` value extent across all series (skips empty series). Mirrors the y-domain. */

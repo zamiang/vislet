@@ -80,6 +80,14 @@ describe('lineColor', () => {
     expect(lineColor('compare-dataset')).toBe('#D53F50');
     expect(lineColor('park-slope')).toBe('#5a7684'); // Steel Blue (--primary)
   });
+
+  it('gives inflation-adjusted (-real) series a warm counterpart color', () => {
+    expect(lineColor('residentialPrices-real')).toBe('#c2703d'); // neighborhood real
+    expect(lineColor('residentialPrices-median-real')).toBe('#e0b196'); // borough real
+    // nominal keys are unaffected
+    expect(lineColor('residentialPrices')).toBe('#5a7684');
+    expect(lineColor('residentialPrices-median')).toBe('lightgray');
+  });
 });
 
 describe('getLines -median labeling', () => {
