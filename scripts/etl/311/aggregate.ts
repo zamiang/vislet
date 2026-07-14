@@ -211,7 +211,7 @@ export class ComplaintAccumulator {
     const [minY, minM] = min.split('-').map(Number);
     const [maxY, maxM] = max.split('-').map(Number);
     const axis: string[] = [];
-    for (let y = minY, m = minM; y < maxY || (y === maxY && m <= maxM); ) {
+    for (let y = minY, m = minM; y < maxY || (y === maxY && m <= maxM);) {
       axis.push(`${y}-${String(m).padStart(2, '0')}`);
       if (++m > 12) {
         m = 1;
