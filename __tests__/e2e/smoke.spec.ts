@@ -176,4 +176,33 @@ test.describe('No horizontal scroll (responsive)', () => {
       });
     }
   }
+
+  // The document-level check above can't catch content that overflows *inside*
+  // a container, because `#main-layout-container { overflow-x: clip }` clips it
+  // before it registers as page scroll. This guards the map SVG and the
+  // choropleth color key specifically: both must stay within `.map-svg-container`
+  // (i.e. actually scale down, not get silently clipped) on a narrow viewport.
+  for (const path of ['/brooklyn', '/311', '/chicago']) {
+    test(`${path} map + color key fit their container at 375px`, async ({ page }) => {
+      await page.setViewportSize({ width: 375, height: 900 });
+      await page.goto(path, { waitUntil: 'networkidle' });
+      await expect(page.locator('.map-svg-container svg').first()).toBeVisible();
+
+      const overflow = await page.evaluate(() => {
+        const container = document.querySelector('.map-svg-container');
+        if (!container) return { map: null, key: null };
+        const right = container.getBoundingClientRect().right;
+        const svg = container.querySelector('svg');
+        const key = document.querySelector('.linear-graph-key');
+        return {
+          map: svg ? svg.getBoundingClientRect().right - right : null,
+          key: key ? key.getBoundingClientRect().right - right : null,
+        };
+      });
+
+      // Allow 1px for sub-pixel rounding.
+      expect(overflow.map ?? 0).toBeLessThanOrEqual(1);
+      expect(overflow.key ?? 0).toBeLessThanOrEqual(1);
+    });
+  }
 });

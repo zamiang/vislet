@@ -409,20 +409,32 @@ a:focus-visible {
    ========================================================================== */
 .linear-graph-key {
   margin-top: 10px;
+  width: 100%;
 }
+/* Bars/values distribute across the container width via flex (each `flex: 1 1 0`
+   overrides ColorKey's inline per-bar px width) so the legend scales with the
+   now-shrinkable .map-svg-container instead of overflowing it on narrow
+   viewports — where the page-level `overflow-x: clip` backstop would otherwise
+   silently clip the rightmost swatches. */
 .key-bars {
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
 .key-bar {
+  flex: 1 1 0;
+  min-width: 0;
   height: 10px;
 }
 .key-bar-values {
   display: flex;
   flex-direction: row;
+  width: 100%;
   margin-top: 4px;
 }
 .key-bar-value {
+  flex: 1 1 0;
+  min-width: 0;
   font-size: 11px;
   font-family: var(--font-heading);
   color: var(--muted-foreground);
@@ -648,7 +660,10 @@ a:focus-visible {
   max-width: 500px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  /* stretch (not flex-start) so the map SVG and color key fill — and therefore
+     shrink with — the container. With flex-start they'd size to their 500px
+     max-content and overflow (then get clipped) on narrow viewports. */
+  align-items: stretch;
 }
 .map-row .svg-graphs {
   flex: 1 1 500px;
@@ -664,7 +679,7 @@ a:focus-visible {
 .map-svg-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
 }
 .svg-graphs {
   margin-top: 0;
