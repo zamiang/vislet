@@ -73,7 +73,7 @@ function ingest(acc: ComplaintAccumulator, index: NtaIndex, rows: RawRow[]): num
 /** First-of-month "YYYY-MM-01" strings from `startYM` up to and incl. `endYM`. */
 function monthBoundaries(startYM: [number, number], endYM: [number, number]): string[] {
   const out: string[] = [];
-  for (let y = startYM[0], m = startYM[1]; y < endYM[0] || (y === endYM[0] && m <= endYM[1]); ) {
+  for (let y = startYM[0], m = startYM[1]; y < endYM[0] || (y === endYM[0] && m <= endYM[1]);) {
     out.push(`${y}-${String(m).padStart(2, '0')}-01`);
     if (++m > 12) {
       m = 1;
