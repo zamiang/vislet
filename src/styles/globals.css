@@ -90,6 +90,14 @@ body {
   color: var(--foreground);
 }
 
+/* Backstop against sideways scroll: no island (fixed-width SVG, wide table) may
+   push the page wider than the viewport. `clip` — not `hidden` — so it doesn't
+   create a scroll container that would break `position: sticky` descendants. */
+#main-layout-container {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 /* Editorial headings — EB Garamond serif, matching the sibling. Vislet's own
    heading classes opt in to `--font-serif` individually below; this catches
    any semantic h1–h6 in migrated prose. */
@@ -401,20 +409,32 @@ a:focus-visible {
    ========================================================================== */
 .linear-graph-key {
   margin-top: 10px;
+  width: 100%;
 }
+/* Bars/values distribute across the container width via flex (each `flex: 1 1 0`
+   overrides ColorKey's inline per-bar px width) so the legend scales with the
+   now-shrinkable .map-svg-container instead of overflowing it on narrow
+   viewports — where the page-level `overflow-x: clip` backstop would otherwise
+   silently clip the rightmost swatches. */
 .key-bars {
   display: flex;
   flex-direction: row;
+  width: 100%;
 }
 .key-bar {
+  flex: 1 1 0;
+  min-width: 0;
   height: 10px;
 }
 .key-bar-values {
   display: flex;
   flex-direction: row;
+  width: 100%;
   margin-top: 4px;
 }
 .key-bar-value {
+  flex: 1 1 0;
+  min-width: 0;
   font-size: 11px;
   font-family: var(--font-heading);
   color: var(--muted-foreground);
@@ -594,11 +614,17 @@ a:focus-visible {
   width: 100%;
 }
 
-/* Map app layout — legacy used width: 1054px centered */
+/* Map app layout — legacy used a rigid width: 1054px centered, which forced a
+   horizontal scrollbar on any viewport narrower than 1054px. Now fluid: the
+   content still maxes out at 1054px (so wide screens match the legacy baseline
+   exactly), but shrinks below that with a 16px gutter on each side. The
+   max-width is 1054 + 2×16 so the padding eats the gutter rather than the
+   1054px content box. */
 .map-app {
-  width: 1054px;
+  width: 100%;
+  max-width: 1086px;
   margin: 0 auto;
-  padding: 0;
+  padding: 0 16px;
 }
 .map-app header {
   margin-bottom: 16px;
@@ -618,21 +644,30 @@ a:focus-visible {
   margin: 0 auto 16px;
 }
 
-/* Side-by-side map + charts row (Brooklyn, 311) */
+/* Side-by-side map + charts row (Brooklyn, 311). Wraps below ~1054px so the
+   charts panel stacks under the map instead of overflowing the viewport. Both
+   columns can shrink (min-width: 0) and the child SVGs scale via viewBox. */
 .map-row {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 13px;
 }
 .map-row .map-svg-container {
-  flex: 0 0 500px;
+  flex: 1 1 500px;
+  min-width: 0;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  /* stretch (not flex-start) so the map SVG and color key fill — and therefore
+     shrink with — the container. With flex-start they'd size to their 500px
+     max-content and overflow (then get clipped) on narrow viewports. */
+  align-items: stretch;
 }
 .map-row .svg-graphs {
-  flex: 0 0 541px;
+  flex: 1 1 500px;
+  min-width: 0;
 }
 /* Chicago uses narrower chart panel (450px) — override via the map-app direct child */
 .map-row > .svg-graphs {
@@ -644,7 +679,7 @@ a:focus-visible {
 .map-svg-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
 }
 .svg-graphs {
   margin-top: 0;
