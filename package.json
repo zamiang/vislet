@@ -27,7 +27,7 @@
     "data:cpi": "tsx scripts/etl/reference/cpi.ts"
   },
   "dependencies": {
-    "@astrojs/react": "5.0.7",
+    "@astrojs/react": "6.0.1",
     "@astrojs/sitemap": "3.7.3",
     "@tailwindcss/vite": "4.3.2",
     "astro": "6.4.8",
