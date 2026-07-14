@@ -22,5 +22,10 @@ export default defineConfig({
     url: 'http://localhost:4321',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // Astro 7 auto-detects AI coding agents and runs `astro dev` as a detached
+    // background process, which makes Playwright's webServer see the command
+    // exit early. Force the server to stay in the foreground so Playwright can
+    // manage its lifecycle. See ASTRO_DEV_BACKGROUND in the Astro 7 CLI docs.
+    env: { ASTRO_DEV_BACKGROUND: '0' },
   },
 });
