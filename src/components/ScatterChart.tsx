@@ -76,6 +76,8 @@ export function ScatterChart({
       className="scatter-chart"
       width={width + margin.left + margin.right}
       height={height + margin.top + margin.bottom}
+      viewBox={`0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`}
+      style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
     >
       <g transform={`translate(${margin.left},${margin.top})`}>
         {/* Zero-growth reference line. */}

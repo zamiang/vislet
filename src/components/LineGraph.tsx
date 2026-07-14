@@ -115,7 +115,12 @@ export function LineGraph({
 
   return (
     <>
-      <svg width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
+      <svg
+        width={width + margin.left + margin.right}
+        height={height + margin.top + margin.bottom}
+        viewBox={`0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`}
+        style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
+      >
         <g transform={`translate(${margin.left},${margin.top})`}>
           {lines.map((line) => (
             <g className="sales" key={line.name}>

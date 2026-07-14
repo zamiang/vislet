@@ -50,7 +50,15 @@ export function DateSlider({
   const updateFromClientX = (clientX: number) => {
     const track = trackRef.current;
     if (!track) return;
-    const px = clientX - track.getBoundingClientRect().left;
+    // Map the pointer into the track group's own userspace coordinates. Using
+    // getScreenCTM (rather than clientX − boundingRect.left) keeps the drag
+    // accurate when the SVG is scaled down via viewBox on narrow viewports:
+    // the CTM already folds in both the responsive scale factor and the
+    // margin.left translate, so px lands in the scale's [0, width] domain.
+    const ctm = track.getScreenCTM();
+    const px = ctm
+      ? new DOMPoint(clientX, 0).matrixTransform(ctm.inverse()).x
+      : clientX - track.getBoundingClientRect().left;
     const snapped = snapToNearest(dates, Number(x.invert(px)));
     onChange(snapped);
   };
@@ -60,6 +68,8 @@ export function DateSlider({
       id={id}
       width={width + margin.left + margin.right}
       height={height + margin.top + margin.bottom}
+      viewBox={`0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`}
+      style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
     >
       <g ref={trackRef} transform={`translate(${margin.left},${margin.top})`}>
         <Axis

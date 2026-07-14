@@ -179,7 +179,12 @@ export function SvgMap({
 
   return (
     <div className={wrapperClass}>
-      <svg width={width} height={height}>
+      <svg
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
+      >
         {/* Hatch fill for inert "park" areas — referenced by `.tract.park`
             (`fill: url(#hatch)` in globals.css). Without this defs the paint
             reference fails and parks render as solid black. */}

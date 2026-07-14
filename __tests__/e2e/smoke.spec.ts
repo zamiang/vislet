@@ -153,3 +153,27 @@ test.describe('North Carolina page (/north-carolina)', () => {
     expect(getErrors()).toHaveLength(0);
   });
 });
+
+test.describe('No horizontal scroll (responsive)', () => {
+  // Regression guard: the map pages once used a rigid `width: 1054px` on
+  // `.map-app`, which forced a horizontal scrollbar on any viewport narrower
+  // than that. The layout is now fluid (max-width + wrapping row + viewBox-
+  // scaled SVGs); assert the document never overflows its own viewport.
+  const mapPages = ['/brooklyn', '/311', '/chicago', '/north-carolina'];
+  const widths = [1280, 768, 375];
+
+  for (const path of mapPages) {
+    for (const width of widths) {
+      test(`${path} does not scroll horizontally at ${width}px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(path, { waitUntil: 'networkidle' });
+        await expect(page.locator('svg').first()).toBeVisible();
+
+        const overflow = await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        );
+        expect(overflow).toBeLessThanOrEqual(0);
+      });
+    }
+  }
+});
